@@ -8,10 +8,25 @@
 		<!--CSS-->
 		<!--link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}"-->
 		<link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
-		<!--link href="https://fonts.googleapis.com/css?family=Dosis|Cutive+Mono" rel="stylesheet"-->
+		<link href="https://fonts.googleapis.com/css?family=Comfortaa:400,700" rel="stylesheet">
 		<link rel='stylesheet' type='text/css' href="{{ url_for('static', filename='css/bootstrap.min.css')}}">
 		<link rel='stylesheet' type='text/css' href="{{ url_for('static', filename='css/styles.css') }}">
 		<!--End CSS-->
+		<div class="container-fluid top-nav">
+			<div class="row">
+				<div class="col-xs-12 col-md-4 title">
+					<h1>Yadawia</h1>
+				</div>
+				<div class="col-xs-12 col-md-8 menu-space">
+					<ul class="list-inline list-unstyled menu">
+					{% if not session.logged_in %}
+						<li class="button"><i class="fa fa-sign-in"></i> Login</li>
+						<li>Register</li>
+					{% endif %}
+					</ul>
+				</div>
+			</div>
+		</div>
 		{% block middle %}
 		{% endblock %}
 		<!--Scripts-->
