@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, session, redirect, url_for
+from flask import Flask, request, render_template, session, redirect, url_for, abort
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import validates
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -58,18 +58,27 @@ def authenticate(f):
 		return f(*args, **kwargs)
 	return decorated_function
 
+def anonymous_only(f):
+	@wraps(f)
+	def decorated_function(*args, **kwargs):
+		if 'logged_in' in session and session['logged_in'] == True:
+			abort(401)
+		return f(*args, **kwargs)
+	return decorated_function
 
 @app.route('/')
 def home():
 	return render_template('index.html')
 
 @app.route('/login', methods=['GET', 'POST'])
+@anonymous_only
 def login():
 	if request.method == 'POST':
 		pass
 	return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
+@anonymous_only
 def register():
 	if request.method == 'POST':
 		pass
