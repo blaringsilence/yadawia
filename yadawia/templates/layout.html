@@ -6,29 +6,34 @@
 		<title>Yadawia {% block extend_title %}{% endblock %}</title>
 		<!--End Metadata-->
 		<!--CSS-->
-		<!--link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}"-->
+		<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 		<link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
 		<link href="https://fonts.googleapis.com/css?family=Comfortaa:400,700" rel="stylesheet">
 		<link rel='stylesheet' type='text/css' href="{{ url_for('static', filename='css/bootstrap.min.css')}}">
-		<link rel='stylesheet' type='text/css' href="{{ url_for('static', filename='css/styles.css') }}">
+		<link rel='stylesheet' type='text/css' href="{{ url_for('static', filename='css/layout.css') }}">
+		{% block css %}
+		{% endblock %}
 		<!--End CSS-->
+	<body>
 		<div class="container-fluid top-nav">
 			<div class="row">
 				<div class="col-xs-12 col-md-4 title">
-					<h1><a href="{{ url_for('home') }}">Yadawia</a></h1>
+					<h1><a href="{{ url_for('home') }}"> {% include 'logo.html' %} Yadawia</a></h1>
 				</div>
 				<div class="col-xs-12 col-md-8 menu-space">
 					<ul class="list-inline list-unstyled menu">
 					{% if not session.logged_in %}
 						<a href="{{ url_for('login') }}"><li class="button"><i class="fa fa-sign-in"></i> Login</li></a>
-						<li>Register</li>
+						<a href="{{ url_for('register') }}"><li>Register</li></a>
 					{% endif %}
 					</ul>
 				</div>
 			</div>
 		</div>
+		<div class="container-fluid">
 		{% block middle %}
 		{% endblock %}
+		</div>
 		<!--Scripts-->
 		{% block scripts %}
 		{% endblock %}

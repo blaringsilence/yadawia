@@ -3,7 +3,7 @@
 	- Blue: rgb(76,212,176);
 	- Yellow: rgb(237,216,52);
 	- Orange: rgb(242,77,22);
-	- Purple: rgb(125,20,36); 
+	- Purple: rgb(117,28,53); 
 	- Text Grey: rgb(51,51,51);
 */
 
@@ -14,7 +14,7 @@ body {
 }
 
 a {
-	color: rgb(125,20,36); /* PURPLE */
+	color: rgb(117,28,53); /* PURPLE */
 }
 
 .top-nav {
@@ -26,8 +26,18 @@ a {
 	text-decoration: none;
 }
 
+.top-nav .logo {
+	width: 0.9em;
+	margin-right: -0.2em;
+}
+
 .title {
 	margin-top: 0.2em;
+	transition-duration: 0.3s;
+}
+
+.title:hover {
+	opacity: 0.7;
 }
 
 .menu-space {
