@@ -19,7 +19,11 @@ a {
 
 .top-nav {
 	background-color: rgb(76,212,176); /* BLUE */
+}
+
+.top-nav, .top-nav a {
 	color: white;
+	text-decoration: none;
 }
 
 .title {

@@ -15,12 +15,12 @@
 		<div class="container-fluid top-nav">
 			<div class="row">
 				<div class="col-xs-12 col-md-4 title">
-					<h1>Yadawia</h1>
+					<h1><a href="{{ url_for('home') }}">Yadawia</a></h1>
 				</div>
 				<div class="col-xs-12 col-md-8 menu-space">
 					<ul class="list-inline list-unstyled menu">
 					{% if not session.logged_in %}
-						<li class="button"><i class="fa fa-sign-in"></i> Login</li>
+						<a href="{{ url_for('login') }}"><li class="button"><i class="fa fa-sign-in"></i> Login</li></a>
 						<li>Register</li>
 					{% endif %}
 					</ul>
