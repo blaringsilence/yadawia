@@ -17,6 +17,10 @@ a {
 	color: rgb(117,28,53); /* PURPLE */
 }
 
+.middle-container {
+	padding-top: 1em;
+}
+
 .top-nav {
 	background-color: rgb(76,212,176); /* BLUE */
 }

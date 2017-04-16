@@ -30,11 +30,16 @@
 				</div>
 			</div>
 		</div>
-		<div class="container-fluid">
+		<div class="container-fluid middle-container">
+		{% block flash %}
+			{% include 'flash.html' %}
+		{% endblock %}
 		{% block middle %}
 		{% endblock %}
 		</div>
 		<!--Scripts-->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+		<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
 		{% block scripts %}
 		{% endblock %}
 		<!--End Scripts-->

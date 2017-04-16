@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, session, redirect, url_for, abort
+from flask import Flask, request, render_template, session, redirect, url_for, abort, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import validates
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -50,6 +50,12 @@ def login_user(username, password):
 		session['userId'] = user.id
 	raise LoginException({'message': 'Username does not exist.', 'code': 'username'})
 
+def redirect_back(endpoint, **values):
+    target = request.form['next']
+    if not target:
+        target = url_for(endpoint, **values)
+    return redirect(target)
+
 def authenticate(f):
 	@wraps(f)
 	def decorated_function(*args, **kwargs):
@@ -74,7 +80,15 @@ def home():
 @anonymous_only
 def login():
 	if request.method == 'POST':
-		pass
+		username = request.form['username']
+		password = request.form['password']
+		try:
+			login_user(username, password)
+		except LoginException as e:
+			error_msg = e.args[0]['message']
+			flash(error_msg)
+			return jsonify(error=error_msg)
+		return redirect_back('home')
 	return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])

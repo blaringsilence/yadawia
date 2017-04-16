@@ -1,0 +1,6 @@
+{% for message in get_flashed_messages() %}
+	<div class='alert alert-warning alert-dismissable fade in' role='alert'>
+		<a class="close" data-dismiss="alert" aria-label="close">&times;</a>
+		{{ message }}
+	</div>
+{% endfor %}
