@@ -1,12 +1,45 @@
 {% extends 'layout.html' %}
 
+{% from 'macros.html' import form_group with context %}
+
 {% block extend_title %}
 | Home
+{% endblock %}
+
+{% block css %}
+<link href="https://fonts.googleapis.com/css?family=Montserrat:700" rel="stylesheet">
 {% endblock %}
 
 {% block flash %}
 {% endblock %}
 
 {% block middle %}
+	<div class="row banner">
+		<div class="col-xs-10 col-centered">
+			<h2>All your handmade needs in one place. What are you waiting for?</h2>	
+		</div>
+		<div class="col-xs-10 col-centered">
+			<form class="form-inline" id="main-search-form">
+				<div class="col-xs-10 cols">
+				{% call form_group('', 'main-search', hasFeedback=True, hasLabel=False) %}
+					<input id="main-search" type="text" class="form-control" placeholder="Search for products..">
+				{% endcall %}
+				</div>
+				<div class="col-xs-2 cols">
+					<input type="submit" class="btn btn-default submit" value="Search">
+				</div>
+			</form>
+		</div>
+		<div class="col-xs-1 col-centered">
+			<h3 class="or">OR</h3>
+		</div>
+		<div class="col-xs-10 col-md-4 col-centered">
+			<button class="btn btn-primary start-selling"><i class="fa fa-bolt"></i>&nbsp; &nbsp;Start Selling Now</button>
+		</div>
+	</div>
 	{% include 'flash.html' %}
+{% endblock %}
+
+{% block scripts %}
+	<script src="{{ url_for('static', filename='js/index.js') }}"></script>
 {% endblock %}

@@ -5,3 +5,6 @@ var generateMessage = function (type, selector, message) {
 		+ "</div>"
 	)
 };
+
+// for layout page/footer
+$(function () { $('#year', '.footer').text(new Date().getFullYear()); });

@@ -7,6 +7,30 @@
 	- Text Grey: rgb(51,51,51);
 */
 
+
+/* SCROLLBAR */
+::-webkit-scrollbar {
+  width: 10px;
+  background-color: rgba(0,0,0,0);
+  -webkit-border-radius: 100px;
+}
+::-webkit-scrollbar:hover {
+  background-color: rgba(0, 0, 0, 0.09);
+}
+::-webkit-scrollbar-thumb:vertical {
+  
+  background: rgba(0,0,0,0.5);
+  -webkit-border-radius: 100px;
+  background-clip: padding-box;
+  border: 2px solid rgba(0, 0, 0, 0);
+  min-height: 10px; /*Prevent it from getting too small */
+}
+::-webkit-scrollbar-thumb:vertical:active {
+  background: rgba(0,0,0,0.61); /* Some darker color when you click it */
+  -webkit-border-radius: 100px;
+}
+/* END SCROLLBAR */
+
 body {
 	font-family: 'Comfortaa', sans-serif;
 	color: rgb(51,51,51);
@@ -134,4 +158,81 @@ a {
 .menu-space .menu li:not(.button):hover {
 	color: rgb(237,216,52);
 	text-decoration: none;
+}
+
+
+.banner img {
+	width: 100%;
+	opacity: .9;
+	filter: blur(1px);
+	overflow: hidden;
+}
+
+.banner {
+	font-weight: bold;
+	font-size: 1.5em;
+	background-color: black;
+	font-family: 'Montserrat', sans-serif;
+}
+
+.banner {
+	background-image: url('../img/banner.jpg');
+	background-size: cover;
+	min-height: 100vh;
+}
+
+.banner h2 {
+	margin-top: 5em;
+	background-color: rgba(237,216,52,0.7);
+	padding: 0.5em;
+	word-wrap: break-word;
+	text-align: center;
+	transition-duration: 0.5s;
+}
+
+.banner h2:hover {
+	background-color: rgba(237,216,52,1);
+}
+
+#main-search-feedback {
+	opacity: 0.3;
+}
+
+#main-search-form input:not(.submit), #main-search-form .form-group {
+	width: 100%;
+}
+
+#main-search-form .submit {
+	float: right;
+	width: 95%;
+}
+
+#main-search-form .cols {
+	padding: 0px;
+}
+
+.banner .or {
+	font-size: 2.3em;
+	margin-top: 1em;
+	color: white;
+}
+
+.banner .start-selling {
+	width: 100%;
+	font-size: 2.3rem;
+	font-weight: normal;
+	height: auto;
+	margin-bottom: 1em;
+}
+
+.all-but-footer {
+	min-height: calc(100vh - 10em);
+}
+
+.footer {
+	min-height: 10em;
+	padding: 1em;
+	background-color: rgb(51,51,51);
+	color: rgba(255,255,255,0.8);
+	margin-bottom: 0px;
 }
