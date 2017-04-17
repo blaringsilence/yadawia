@@ -1,5 +1,10 @@
 {% extends 'layout.html' %}
 
 {% block middle %}
-	<h2>Login</h2>
+	<div class="row">
+		<div class="col-md-6 col-sm-8 col-xs-12 col-centered">
+		<h2>Login</h2>
+		{% include 'form_login.html' with context %}
+		</div>
+	</div>
 {% endblock %}

@@ -17,6 +17,33 @@ a {
 	color: rgb(117,28,53); /* PURPLE */
 }
 
+.modal-header {
+	background-color: rgb(237,216,52);
+}
+
+.modal-header h4 {
+	font-weight: bold;
+}
+
+.btn {
+	transition-duration: 0.3s;
+}
+
+.btn-primary {
+	background-color: rgb(117,28,53);
+	border-color: rgb(51,51,51);
+	font-weight: bold;
+}
+
+.col-centered{
+	float: none;
+	margin: 0 auto;
+}
+
+.btn-primary:hover {
+	background-color: rgb(99,24,45);
+}
+
 .middle-container {
 	padding-top: 1em;
 }

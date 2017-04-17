@@ -1,3 +1,4 @@
+{% from 'macros.html' import modal, form_group with context %}
 <!doctype html>
 <html lang="en-US">
 	<head>
@@ -11,6 +12,7 @@
 		<link href="https://fonts.googleapis.com/css?family=Comfortaa:400,700" rel="stylesheet">
 		<link rel='stylesheet' type='text/css' href="{{ url_for('static', filename='css/bootstrap.min.css')}}">
 		<link rel='stylesheet' type='text/css' href="{{ url_for('static', filename='css/layout.css') }}">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 		{% block css %}
 		{% endblock %}
 		<!--End CSS-->
@@ -23,7 +25,7 @@
 				<div class="col-xs-12 col-md-8 menu-space">
 					<ul class="list-inline list-unstyled menu">
 					{% if not session.logged_in %}
-						<a href="{{ url_for('login') }}"><li class="button"><i class="fa fa-sign-in"></i> Login</li></a>
+						<a data-toggle="modal" data-target="#login"><li class="button"><i class="fa fa-sign-in"></i> Login</button></li></a>
 						<a href="{{ url_for('register') }}"><li>Register</li></a>
 					{% endif %}
 					</ul>
@@ -37,8 +39,12 @@
 		{% block middle %}
 		{% endblock %}
 		</div>
+		<!--Modals-->
+		{% call modal('login', 'Login') %}
+			{% include 'form_login.html' with context %}
+		{% endcall %}
+		<!--End Modals-->
 		<!--Scripts-->
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 		<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
 		{% block scripts %}
 		{% endblock %}

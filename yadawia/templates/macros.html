@@ -1,0 +1,24 @@
+{% macro modal(id, title) %}
+<div class="modal fade" id="{{ id }}" tabindex="-1" role="dialog" aria-labelledby="{{ id }}Label">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="{{ id }}Label">{{ title }}</h4>
+      </div>
+      <div class="modal-body">
+        {{ caller() }}
+      </div>
+    </div>
+  </div>
+</div>
+{% endmacro %}
+
+{% macro form_group(label, inputId) %}
+<div class="form-group">
+	<label for="{{ inputId }}" class="col-md-2 col-xs-12 control-label">{{ label }}:</label>
+	<div class="col-md-10 col-xs-12">
+		{{ caller() }}
+	</div>
+</div>
+{% endmacro %}
