@@ -14,11 +14,16 @@
 </div>
 {% endmacro %}
 
-{% macro form_group(label, inputId) %}
-<div class="form-group">
-	<label for="{{ inputId }}" class="col-md-2 col-xs-12 control-label">{{ label }}:</label>
-	<div class="col-md-10 col-xs-12">
+{% macro form_group(label, inputId, hasFeedback=False) %}
+<div class="form-group {% if hasFeedback %}has-feedback{% endif %}">
+	<label for="{{ inputId }}" class="control-label col-xs-12">{{ label }}:&nbsp;
+    {% if hasFeedback %}
+    <span id="{{ inputId }}-error-msg" class="error-msg"></span>
+    {% endif %}
+  </label>
 		{{ caller() }}
-	</div>
+    {% if hasFeedback %}
+    <span class="form-control-feedback" id="{{ inputId }}-feedback"></span>
+    {% endif %}
 </div>
 {% endmacro %}

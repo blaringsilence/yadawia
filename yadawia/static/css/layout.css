@@ -17,8 +17,29 @@ a {
 	color: rgb(117,28,53); /* PURPLE */
 }
 
+.control-label.col-xs-12 {
+	padding: 0px;
+}
+
+.loading-check {
+	color: rgb(51,51,51);
+}
+
+.success-check {
+	color: rgba(39, 174, 96,1.0); /* SUCCESS GREEN */
+}
+
+.error-check, .error-msg {
+	color: rgba(192, 57, 43,1.0); /* ERROR RED */
+}
+
+.error-msg {
+	float: right;
+	font-weight: bold;
+}
+
 .modal-header {
-	background-color: rgb(237,216,52);
+	background-color: rgb(237,216,52); /* YELLOW */
 }
 
 .modal-header h4 {
@@ -30,8 +51,8 @@ a {
 }
 
 .btn-primary {
-	background-color: rgb(117,28,53);
-	border-color: rgb(51,51,51);
+	background-color: rgb(117,28,53); /* PURPLE */
+	border-color: rgb(51,51,51); /* TEXT GREY */
 	font-weight: bold;
 }
 
@@ -40,8 +61,9 @@ a {
 	margin: 0 auto;
 }
 
-.btn-primary:hover {
+.btn-primary:hover, .btn-primary:hover:disabled{
 	background-color: rgb(99,24,45);
+	border-color: rgb(51,51,51);
 }
 
 .middle-container {

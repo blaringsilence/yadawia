@@ -1,9 +1,10 @@
-<form class="form-horizontal" action="{{ url_for('login') }}" method='post'>
+{% from 'macros.html' import form_group with context %}
+<form  id="login-form" action="{{ url_for('login') }}" method='post'>
 	{% call form_group('Username', 'username') %}
-		<input id="username" class="form-control" type="text" placeholder="Username" name="username">
+		<input id="username" class="form-control" type="text" placeholder="Username" name="username" required>
 	{% endcall %}
 	{% call form_group('Password', 'password') %}
-		<input id="password" class="form-control" type="password" placeholder="Password" name="password">
+		<input id="password" class="form-control" type="password" placeholder="Password" name="password" required>
 	{% endcall %}
 		<input type="hidden" name="next" id="nextVal"/>
 	<div class="modal-footer">
@@ -12,8 +13,4 @@
 	</div>
 </form>
 
-<script>
-	$(function(){
-		$('#nextVal').val('http://google.com');
-	});
-</script>
+<script src="{{ url_for('static', filename='js/form_login.js') }}"></script>
