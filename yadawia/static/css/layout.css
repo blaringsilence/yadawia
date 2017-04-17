@@ -98,7 +98,15 @@ a {
 	margin-bottom: 1.7em;
 }
 
-.menu li {
+.mobile-menu {
+	padding-left: 2em;
+}
+
+.mobile-menu .menu li {
+	margin-bottom: .6em;
+}
+
+.menu-space .menu li {
 	float: right;
 	padding: 0.5em;
 	font-weight: bold;
@@ -107,22 +115,22 @@ a {
 	transition-duration: 0.3s;
 }
 
-.menu li.button {
+.menu-space .menu li.button {
 	border: 2px solid white;
 	border-radius: 1em;
 }
 
-.menu li.button:hover {
+.menu-space .menu li.button:hover {
 	background-color: rgb(237,216,52);
 	border-color: rgb(237,216,52);
 	font-weight: bold;
 }
 
-.menu li:not(.button) {
+.menu-space .menu li:not(.button) {
 	text-decoration: underline;
 }
 
-.menu li:not(.button):hover {
+.menu-space .menu li:not(.button):hover {
 	color: rgb(237,216,52);
 	text-decoration: none;
 }

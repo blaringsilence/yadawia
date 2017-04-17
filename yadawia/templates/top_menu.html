@@ -1,0 +1,9 @@
+<ul class="list-inline list-unstyled menu">
+{% if not session.logged_in %}
+	<a data-toggle="modal" data-target="#login"><li class="button" title="Login"><i class="fa fa-sign-in"></i> Login</li></a>
+	<a data-toggle="modal" data-target="#register"><li title="Register">Register</li></a>
+{% else %}
+	<a href="{{ url_for('logout') }}"><li class="button" title="Logout" id="logout"><i class="fa fa-sign-out"></i> Logout</li></a>
+	<a><li class="button" title="Profile"><i class="fa fa-user"></i> {{ session.username }}</li></a>
+{% endif %}
+</ul>

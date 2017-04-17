@@ -24,16 +24,13 @@
 				<div class="col-xs-12 col-md-4 title">
 					<h1 title="Home"><a href="{{ url_for('home') }}"> {% include 'logo.html' %} Yadawia</a></h1>
 				</div>
-				<div class="col-xs-12 col-md-8 menu-space">
-					<ul class="list-inline list-unstyled menu">
-					{% if not session.logged_in %}
-						<a data-toggle="modal" data-target="#login"><li class="button" title="Login"><i class="fa fa-sign-in"></i> Login</li></a>
-						<a data-toggle="modal" data-target="#register"><li title="Register">Register</li></a>
-					{% else %}
-						<a href="{{ url_for('logout') }}"><li class="button" title="Logout" id="logout"><i class="fa fa-sign-out"></i> Logout</li></a>
-						<a><li class="button" title="Profile"><i class="fa fa-user"></i> {{ session.username }}</li></a>
-					{% endif %}
-					</ul>
+				<div class="col-xs-12 col-md-8 menu-space hidden-xs hidden-sm">
+					{% include 'top_menu.html' with context %}
+				</div>
+			</div>
+			<div class="row hidden-md hidden-lg">
+				<div class="col-xs-12 mobile-menu">
+					{% include 'top_menu.html' with context %}
 				</div>
 			</div>
 		</div>
