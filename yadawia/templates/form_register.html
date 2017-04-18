@@ -1,17 +1,23 @@
 {% from 'macros.html' import form_group with context %}
 <form id="register-form">
 	<div class="main-error-msg"></div>
-	{% call form_group('Username', 'username', hasFeedback=True) %}
+	{% call form_group('Name', 'name', hasFeedback=True) %}
+		<input id="name" title="No special characters or numbers allowed." class="form-control" type="text" placeholder="Name (Optional)" name="name">
+	{% endcall %}
+	{% call form_group('Username', 'username', hasFeedback=True, required=True) %}
 		<input id="username" title="Only letters, numbers, and underscores within them allowed. Must begin with a letter. (Minimum 2 characters)" class="form-control feedback-elem" pattern="^[a-zA-Z][\w]+$" type="text" placeholder="Username" name="username" data-type="username" data-valid="false" data-endpoint="validate_field" required>
 	{% endcall %}
-	{% call form_group('Email', 'email', hasFeedback=True) %}
+	{% call form_group('Email', 'email', hasFeedback=True, required=True) %}
 		<input id="email" class="form-control feedback-elem"  data-type="email" data-valid="false" data-endpoint="validate_field" type="email" placeholder="Email" name="email" required>
 	{% endcall %}
-	{% call form_group('Password', 'password', hasFeedback=True) %}
+	{% call form_group('Password', 'password', hasFeedback=True, required=True) %}
 		<input id="password" title="Minimum 6 characters." pattern=".{6,}" class="form-control" type="password" placeholder="Password" name="password" required>
 	{% endcall %}
-	{% call form_group('Repeat Password', 'password2', hasFeedback=True) %}
+	{% call form_group('Repeat Password', 'password2', hasFeedback=True, required=True) %}
 		<input id="password2" title="Must match the first password." class="form-control" type="password" placeholder="Repeat password" name="password2" data-valid="false" required>
+	{% endcall %}
+	{% call form_group('Location', 'location', hasFeedback=True) %}
+		<input id="location" title="No special characters allowed." class="form-control" type="text" placeholder="Location (Optional)" name="location">
 	{% endcall %}
 		<input type="hidden" name="next" id="nextVal"/>
 	<div class="modal-footer">

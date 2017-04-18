@@ -35,12 +35,16 @@ class User(db.Model):
     _password = db.Column(db.String(157), nullable=False) # 128 + salt + algo info
     email = db.Column(db.String, unique=True, nullable=False)
     name = db.Column(db.String)
+    picture = db.Column(db.String)
+    location = db.Column(db.String)
 
-    def __init__(self, username, email, password):
+    def __init__(self, username, email, password, name='', location=''):
         """Initialize a User using the required fields: username, email, password."""
         self.username = username
         self.email = email
         self.password = password
+        self.name = name
+        self.location = location
 
     @property
     def password(self):
@@ -60,11 +64,20 @@ class User(db.Model):
         """Validate that the name contains anything but numbers and special characters.
         Raises a DBException if invalid.
         """
-        pattern = re.compile('^([^0-9\_\+\,\@\!\#\$\%\^\&\*\(\)\;\\\/\|\<\>\"\'\:\?\=\+])+$')
-        if not pattern.match(name_input):
+        if not no_special_chars(name_input):
             raise DBException({'message': 'Name cannot contain numbers or special characters.',\
                              'code': 'name'})
         return name_input
+
+    @validates('location')
+    def validate_location(self, key, loc):
+        """Validate that the location contains anything but special characters.
+        Raises a DBException if invalid.
+        """
+        if not no_special_chars(loc, allowNumbers=True):
+            raise DBException({'message': 'Name cannot contain numbers or special characters.',\
+                             'code': 'location'})
+        return loc       
 
     @validates('email')
     def validate_email(self, key, em):
@@ -86,3 +99,5 @@ class User(db.Model):
         if not pattern.match(usr):
             raise DBException({'message': 'Username must be 2 characters (number, letter, or underscore) long, and begin with a letter.'})
         return usr
+
+from yadawia.helpers import no_special_chars

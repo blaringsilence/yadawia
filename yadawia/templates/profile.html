@@ -1,5 +1,5 @@
 {% extends 'layout.html' %}
 
 {% block middle %}
-<h1>Hello World, it's {{ user.username }}.</h1>
+<h1>Hello World, it's {% if user.name %} {{ user.name }} {% else %} {{ user.username }}{% endif %}.</h1>
 {% endblock %}

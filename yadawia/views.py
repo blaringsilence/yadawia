@@ -48,9 +48,11 @@ def register():
         username = request.form['username'].lower()
         email = request.form['email'].lower()
         password = request.form['password']
+        location = request.form['location']
+        name = request.form['name']
         error = None
         try:
-            user = User(username, email, password)
+            user = User(username, email, password, name, location)
             db.session.add(user)
             db.session.commit()
             login_user(username, password)

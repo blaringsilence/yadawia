@@ -9,6 +9,7 @@ from flask import session, url_for, redirect, request
 from urllib.parse import urlparse, urljoin
 from functools import wraps
 from werkzeug.security import check_password_hash
+import re
 
 def login_user(username, password):
     """Function to login user through their username.
@@ -46,6 +47,12 @@ def redirect_back(endpoint, **values):
     if not target or not is_safe(target):
         target = url_for(endpoint, **values)
     return redirect(target)
+
+def no_special_chars(string, allowNumbers=False, optional=True):
+    nums = '0-9' if not allowNumbers else ''
+    postfix = '*' if optional else '+'
+    pattern = re.compile('^([^' + nums + '\_\+\,\@\!\#\$\%\^\&\*\(\)\;\\\/\|\<\>\"\'\:\?\=\+])' + postfix + '$')
+    return pattern.match(string)
 
 def authenticate(f):
     """Decorator function to ensure user is logged in before a page is visited."""

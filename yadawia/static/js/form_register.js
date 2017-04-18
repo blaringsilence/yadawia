@@ -42,38 +42,42 @@ $(function(){
 		}
 	});
 
-	$('#password', '#register-form').blur(function(){
-		var field = this;
-		var field_id = '#password';
-		var feedback_elem = field_id + '-feedback';
-		var error_elem = field_id + '-error-msg';
-		if($(field)[0].checkValidity()) {
-			$(field).data('valid', true);
-			$(feedback_elem).html(successful_icon);
-			$(error_elem).html('');
-		} else {
-			$(field).data('valid', false);
-			$(feedback_elem).html(error_icon);
-			$(error_elem).html('Password must be at least 6 characters long.');
-		}
-	});
-
-	$('#password2', '#register-form').blur(function(){
-		var field = this;
+	function offline_check(field, check, message) {
 		var field_id = '#' + $(field).attr('id');
 		var feedback_elem = field_id + '-feedback';
 		var error_elem = field_id + '-error-msg';
-		var password1 = $('#password', '#register-form').val();
-		var password2 = $(field).val();
-		if(password1 === password2) {
+
+		if(check) {
 			$(field).data('valid', true);
 			$(feedback_elem).html(successful_icon);
 			$(error_elem).html('');
 		} else {
 			$(field).data('valid', false);
 			$(feedback_elem).html(error_icon);
-			$(error_elem).html('Passwords do not match.');
+			$(error_elem).html(message);
 		}
+	}
+
+	$('#password', '#register-form').blur(function(){
+		offline_check(this, $(this)[0].checkValidity(), 'Password must be at least 6 characters long.');
+	});
+
+	$('#password2', '#register-form').blur(function(){
+		password1 = $(this).val();
+		password2 = $('#password2', '#register-form').val();
+		offline_check(this, password1 === password2, 'Passwords do not match.');
+	});
+
+	$('#name', '#register-form').blur(function(){
+		var name = $(this).val();
+		var regex = new RegExp('^([^0-9\_\+\,\@\!\#\$\%\^\&\*\(\)\;\\\/\|\<\>\"\'\:\?\=\+])*$');
+		offline_check(this, regex.test(name), 'Name can\'t have numbers or special characters.');
+	});
+
+	$('#location', '#register-form').blur(function(){
+		var loc = $(this).val();
+		var regex = new RegExp('^([^\_\+\,\@\!\#\$\%\^\&\*\(\)\;\\\/\|\<\>\"\'\:\?\=\+])*$');
+		offline_check(this, regex.test(loc), 'Location can\'t have special characters.');
 	});
 
 	// SUBMIT FORM
@@ -82,7 +86,7 @@ $(function(){
 		var form = this;
 		var valid = $(form)[0].checkValidity();
 		var valid_feedback = true;
-			$('.feedback-elem, #password2').each(function(){
+			$('.feedback-elem, #password2, #name').each(function(){
 			var elem = this;
 			$(elem).blur();
 			if(!$(elem).data('valid')) {
