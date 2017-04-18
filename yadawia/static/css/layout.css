@@ -95,7 +95,7 @@ a {
 }
 
 .middle-container {
-	padding:0;
+	padding-top: 1em;
 }
 
 .top-nav {
@@ -244,6 +244,9 @@ a {
 .profile-banner {
 	background-color: #eee;
 	padding: 1em;
+	margin-top: -1em;
+	margin-left: -1em;
+	margin-right: -1em;
 }
 
 #profile-pic {
