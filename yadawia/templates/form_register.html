@@ -2,7 +2,7 @@
 <form id="register-form">
 	<div class="main-error-msg"></div>
 	{% call form_group('Username', 'username', hasFeedback=True) %}
-		<input id="username" title="Only letters, numbers, and underscores within them allowed. Must begin with a letter. (Minimum 2 characters)" class="form-control feedback-elem" pattern="^[a-zA-Z][\w]*[a-zA-Z0-9]+$" type="text" placeholder="Username" name="username" data-type="username" data-valid="false" data-endpoint="validate_field" required>
+		<input id="username" title="Only letters, numbers, and underscores within them allowed. Must begin with a letter. (Minimum 2 characters)" class="form-control feedback-elem" pattern="^[a-zA-Z][\w]+$" type="text" placeholder="Username" name="username" data-type="username" data-valid="false" data-endpoint="validate_field" required>
 	{% endcall %}
 	{% call form_group('Email', 'email', hasFeedback=True) %}
 		<input id="email" class="form-control feedback-elem"  data-type="email" data-valid="false" data-endpoint="validate_field" type="email" placeholder="Email" name="email" required>
