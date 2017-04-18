@@ -7,7 +7,7 @@
 	{% call form_group('Email', 'email', hasFeedback=True) %}
 		<input id="email" class="form-control feedback-elem"  data-type="email" data-valid="false" data-endpoint="validate_field" type="email" placeholder="Email" name="email" required>
 	{% endcall %}
-	{% call form_group('Password', 'password1') %}
+	{% call form_group('Password', 'password', hasFeedback=True) %}
 		<input id="password" title="Minimum 6 characters." pattern=".{6,}" class="form-control" type="password" placeholder="Password" name="password" required>
 	{% endcall %}
 	{% call form_group('Repeat Password', 'password2', hasFeedback=True) %}

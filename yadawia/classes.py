@@ -37,7 +37,11 @@ class User(db.Model):
 
     @password.setter
     def password(self, value):
-        self._password = generate_password_hash(value, method='pbkdf2:sha512:10000')
+        if len(value) >= 6:
+            self._password = generate_password_hash(value, method='pbkdf2:sha512:10000')
+        else:
+            raise DBException({'message': 'Password cannot be less than 6 characters long.',\
+                                'code': 'password'})
 
     @validates('name')
     def validate_name(self, key, name_input):

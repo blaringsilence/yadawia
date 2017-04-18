@@ -42,7 +42,23 @@ $(function(){
 		}
 	});
 
-	$('#password2').blur(function(){
+	$('#password', '#register-form').blur(function(){
+		var field = this;
+		var field_id = '#password';
+		var feedback_elem = field_id + '-feedback';
+		var error_elem = field_id + '-error-msg';
+		if($(field)[0].checkValidity()) {
+			$(field).data('valid', true);
+			$(feedback_elem).html(successful_icon);
+			$(error_elem).html('');
+		} else {
+			$(field).data('valid', false);
+			$(feedback_elem).html(error_icon);
+			$(error_elem).html('Password must be at least 6 characters long.');
+		}
+	});
+
+	$('#password2', '#register-form').blur(function(){
 		var field = this;
 		var field_id = '#' + $(field).attr('id');
 		var feedback_elem = field_id + '-feedback';
