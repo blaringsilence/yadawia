@@ -95,7 +95,7 @@ a {
 }
 
 .middle-container {
-	padding-top: 1em;
+	padding:0;
 }
 
 .top-nav {
@@ -239,4 +239,39 @@ a {
 	background-color: rgb(51,51,51);
 	color: rgba(255,255,255,0.8);
 	margin-bottom: 0px;
+}
+
+.profile-banner {
+	background-color: #eee;
+	padding: 1em;
+}
+
+#profile-pic {
+	width: 10em;
+	height: auto;
+	border-radius: 1em 3.3em;
+	border: 3px solid white;
+}
+
+.profile-banner p {
+	font-size: 1.2em;
+	font-weight: bold;
+	opacity: 0.8;
+	transition-duration: 0.3s;
+}
+
+.profile-banner p:hover {
+	opacity: 1;
+}
+
+.profile-about p {
+	word-wrap: break-word;
+}
+
+.row.profile {
+	padding: 1em;
+}
+
+.profile-avg-rating .fa-star {
+	color: rgb(237,216,52)
 }

@@ -6,7 +6,7 @@ Contains all the view logic/endpoints for this app.
 """
 from yadawia import app, db
 from yadawia.classes import DBException, LoginException, User
-from yadawia.helpers import login_user, is_safe, redirect_back, authenticate, anonymous_only
+from yadawia.helpers import login_user, is_safe, redirect_back, authenticate, anonymous_only, public, curr_user
 from sqlalchemy import exc
 from flask import request, render_template, session, redirect, url_for, abort, flash, jsonify
 
@@ -92,5 +92,6 @@ def profile(username=None):
     user = User.query.filter_by(username=username).first()
     if user is None:
         abort(404)
-    filtered_user = dict(username=user.username, name=user.name)
-    return render_template('profile.html', user=filtered_user)
+    is_current_users_profile = curr_user(username)
+    filtered_user = public(user, ['password', 'email'])
+    return render_template('profile.html', user=filtered_user, is_curr_user=is_current_users_profile)

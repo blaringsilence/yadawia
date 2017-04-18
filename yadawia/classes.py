@@ -37,6 +37,7 @@ class User(db.Model):
     name = db.Column(db.String)
     picture = db.Column(db.String)
     location = db.Column(db.String)
+    about = db.Column(db.String(200))
 
     def __init__(self, username, email, password, name='', location=''):
         """Initialize a User using the required fields: username, email, password."""
@@ -74,8 +75,8 @@ class User(db.Model):
         """Validate that the location contains anything but special characters.
         Raises a DBException if invalid.
         """
-        if not no_special_chars(loc, allowNumbers=True):
-            raise DBException({'message': 'Name cannot contain numbers or special characters.',\
+        if not no_special_chars(loc, allowNumbers=True, allowComma=True):
+            raise DBException({'message': 'Location cannot contain special characters.',\
                              'code': 'location'})
         return loc       
 

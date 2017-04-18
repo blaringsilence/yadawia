@@ -1,5 +1,40 @@
 {% extends 'layout.html' %}
 
 {% block middle %}
-<h1>Hello World, it's {% if user.name %} {{ user.name }} {% else %} {{ user.username }}{% endif %}.</h1>
+<div class="profile-banner">
+	<div class="row">
+		<div class="col-xs-12 col-md-3 text-center">
+			<img id="profile-pic" src="{% if not user.picture %}{{ url_for('static', filename='img/logo.svg') }}{% else %}{{ user.picture }}{% endif %}"/>
+		</div>
+		<div class="col-xs-12 col-md-6">
+			{% if user.name %}
+				<h2>{{ user.name }} <small>({{ user.username }})</small></h2>
+			{% else %}
+				<h2>{{ user.username }}</h2>
+			{% endif %}
+			{% if user.location %}
+				<div class="profile-location">
+					<p><i class="fa fa-map-marker"></i> {{ user.location }}</p>
+				</div>
+			{% endif %}
+				<div class="profile-avg-rating" title="Average product rating (5.0)" style="font-size:1.5em;">
+					5.0
+					<i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
+				</div>
+		</div>
+		<div class="col-xs-12 col-md-3">
+			Controls here.<br>
+			{% if is_curr_user %}
+				This is your profile!
+			{% else %}
+				This is another person!
+			{% endif %}
+		</div>
+	</div>
+</div>
+<div class="row profile">
+	<div class="col-xs-12 profile-about text-center">
+		<h3>A great place to shop for x and y and z.</h3>
+	</div>
+</div>
 {% endblock %}

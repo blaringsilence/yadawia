@@ -48,11 +48,23 @@ def redirect_back(endpoint, **values):
         target = url_for(endpoint, **values)
     return redirect(target)
 
-def no_special_chars(string, allowNumbers=False, optional=True):
+def no_special_chars(string, allowNumbers=False, optional=True, allowComma=False):
     nums = '0-9' if not allowNumbers else ''
     postfix = '*' if optional else '+'
-    pattern = re.compile('^([^' + nums + '\_\+\,\@\!\#\$\%\^\&\*\(\)\;\\\/\|\<\>\"\'\:\?\=\+])' + postfix + '$')
+    comma = '\,' if not allowComma else ''
+    pattern = re.compile('^([^' + nums + '\_\+' + comma + '\@\!\#\$\%\^\&\*\(\)\;\\\/\|\<\>\"\'\:\?\=\+])' + postfix + '$')
     return pattern.match(string)
+
+def public(obj, keys):
+    """Pass a db class object and a list of keys you don't want returned
+    (e.g. password hash, etc) and get a filtered dict.
+    """
+    d = dict((col, getattr(obj, col)) for col in obj.__table__.columns.keys())
+    return {x: d[x] for x in d if x not in keys}
+
+def curr_user(username):
+    """True if this username is that of the logged in user, false otherwise."""
+    return 'username' in session and session['username'] == username
 
 def authenticate(f):
     """Decorator function to ensure user is logged in before a page is visited."""
