@@ -64,7 +64,7 @@ $(function(){
 
 	$('#password2', '#register-form').blur(function(){
 		password1 = $(this).val();
-		password2 = $('#password2', '#register-form').val();
+		password2 = $('#password', '#register-form').val();
 		offline_check(this, password1 === password2, 'Passwords do not match.');
 	});
 
