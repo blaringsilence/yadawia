@@ -1,3 +1,9 @@
+"""
+Helpers
+-------
+Contains helper functions (decorators, others) used by other parts of the app.
+
+"""
 from yadawia.classes import User, LoginException
 from flask import session, url_for, redirect, request
 from urllib.parse import urlparse, urljoin

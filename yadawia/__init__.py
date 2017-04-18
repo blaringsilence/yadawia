@@ -1,3 +1,9 @@
+"""
+App
+---
+Initialize configuration and put all the parts together.
+
+"""
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_jsglue import JSGlue

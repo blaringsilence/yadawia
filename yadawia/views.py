@@ -1,3 +1,9 @@
+"""
+Views
+-------
+Contains all the view logic/endpoints for this app.
+
+"""
 from yadawia import app, db
 from yadawia.classes import DBException, LoginException, User
 from yadawia.helpers import login_user, is_safe, redirect_back, authenticate, anonymous_only
