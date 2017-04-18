@@ -4,6 +4,7 @@
 	<a data-toggle="modal" data-target="#register"><li title="Register">Register</li></a>
 {% else %}
 	<a href="{{ url_for('logout') }}"><li class="button" title="Logout" id="logout"><i class="fa fa-sign-out"></i> Logout</li></a>
-	<a><li class="button" title="Profile"><i class="fa fa-user"></i> {{ session.username }}</li></a>
+	<a href="{{ url_for('profile', username=session.username) }}"><li class="button" title="Profile"><i class="fa fa-user"></i> {{ session.username }}</li></a>
+	<a><li class="button" title="Post a Product"><i class="fa fa-bolt"></i> Post Product</li></a>
 {% endif %}
 </ul>

@@ -13,6 +13,9 @@ app.config.from_pyfile('config.py')
 db = SQLAlchemy(app)
 jsglue = JSGlue(app)
 
+# import other necessary modules
+import yadawia.errorhandlers
+
 class User(db.Model):
     """Database model for users. Contains:
 
@@ -160,3 +163,13 @@ def validate_field():
     existing = User.query.filter_by(**kwargs).first()
     available = 'false' if existing else 'true'
     return jsonify(available=available)
+
+@app.route('/profile')
+@app.route('/p/<username>')
+def profile(username=None):
+    if username is None:
+        if 'username' in session:
+            username = session['username']
+        else:
+            abort(404)
+    return render_template('profile.html', username=username)
