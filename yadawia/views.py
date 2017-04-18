@@ -87,4 +87,8 @@ def profile(username=None):
             username = session['username']
         else:
             abort(404)
-    return render_template('profile.html', username=username)
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        abort(404)
+    filtered_user = dict(username=user.username, name=user.name)
+    return render_template('profile.html', user=filtered_user)

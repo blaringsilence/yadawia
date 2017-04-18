@@ -1,5 +1,9 @@
 {% extends 'layout.html' %}
 
+{% block extend_title %}
+| Error {{ error_code }}
+{% endblock %}
+
 {% block middle %}
 	<div class="col-xs-12 text-center">
 		<h1>{{ error_code }}: {{ error_message }}</h1>
