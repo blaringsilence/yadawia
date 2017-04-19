@@ -1,0 +1,23 @@
+{% from 'macros.html' import form_group with context %}
+<form  id="edit-profile-form">
+	<div class="main-error-msg"></div>
+	{% call form_group('Name', 'edit-name', hasFeedback=True) %}
+		<input id="edit-name" class="form-control" type="text" name="name" {% if user.name %} value="{{ user.name }}" {% endif %} placeholder="Name (Optional)">
+	{% endcall %}	
+	{% call form_group('Username', 'edit-username', hasFeedback=True) %}
+		<input id="edit-username" class="form-control feedback-elem" type="text" title="Only letters, numbers, and underscores within them allowed. Must begin with a letter. (Minimum 2 characters)" class="form-control feedback-elem" pattern="^[a-zA-Z][\w]+$" placeholder="Username" name="username" data-type="username" data-valid="false" data-endpoint="validate_field" value="{{ user.username }}" required>
+	{% endcall %}
+	{% call form_group('Location', 'edit-loc', hasFeedback=True) %}
+		<input id="edit-loc" title="Only letters and numbers allowed." class="form-control" type="text" placeholder="Location (Optional)" {% if user.location %} value="{{ user.location }}" {% endif %} name="location">
+	{% endcall %}
+	{% call form_group('About', 'edit-about') %}
+		<textarea id="edit-about" title="Maximum length: 200 characters." maxlength="200" wrap="soft" class="form-control" placeholder="About (Optional)" name="about">{% if user.about %}{{ user.about }}{% endif %}</textarea>
+	{% endcall %}
+	<small><i class="fa fa-lightbulb-o"></i> Edit your email, password, and other sensitive data through <a href="{{ url_for('settings') }}">Settings</a>.</small>
+	<div class="modal-footer">
+		<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+		<input type="submit" class="btn btn-primary" value="Save Changes">
+	</div>
+</form>
+
+<script src="{{ url_for('static', filename='js/form_edit_profile.js') }}"></script>

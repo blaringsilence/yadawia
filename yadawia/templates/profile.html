@@ -28,7 +28,7 @@
 		</div>
 		<div class="col-xs-12 col-md-3 text-center profile-controls">
 			{% if is_curr_user %}
-				<button class="btn btn-default" title="Edit profile"><i class="fa fa-pencil"></i> Edit Profile</button>
+				<button class="btn btn-default" title="Edit profile" data-toggle="modal" data-target="#edit-profile"><i class="fa fa-pencil"></i> Edit Profile</button>
 				<button class="btn btn-default" title="Settings"><i class="fa fa-gear"></i> Settings</button>
 				<button class="btn btn-default" title="Order History"><i class="fa fa-history"></i> Order History</button>
 				<button class="btn btn-default" title="Messages"><i class="fa fa-envelope"></i> Messages</button>
@@ -39,9 +39,11 @@
 	</div>
 </div>
 <div class="row profile">
+	{% if user.about %}
 	<div class="col-xs-12 profile-about text-center">
-		<h3>A great place to shop for x and y and z.</h3>
+		<h3>{{ user.about }}</h3>
 	</div>
+	{% endif %}
 </div>
 {% endblock %}
 
@@ -49,6 +51,11 @@
 	{% call modal('change-pic', 'Change Profile Picture') %}
 		{% with curr_pic=user.picture_url %}
 			{% include 'form_change_pic.html' with context %}
+		{% endwith %}
+	{% endcall %}
+	{% call modal('edit-profile', 'Edit Profile') %}
+		{% with user=user %}
+			{% include 'form_edit_profile.html' with context %}
 		{% endwith %}
 	{% endcall %}
 {% endblock %}

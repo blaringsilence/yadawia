@@ -5,7 +5,7 @@ How to handle common HTTP errors.
 
 """
 from yadawia import app
-from flask import render_template
+from flask import render_template, request
 
 def render_error(code, msg, det='Oops..'):
     """Render template with variables appropriate to the error provided."""

@@ -10,6 +10,10 @@
 	font-weight: bold;
 }
 
+textarea {
+	resize: vertical;
+}
+
 .profile-controls button {
 	margin-top: 0.5em;
 }
@@ -162,8 +166,11 @@ a {
 	padding: 0.5em;
 	font-weight: bold;
 	margin-left: 0.5em;
-	cursor: pointer;
 	transition-duration: 0.3s;
+}
+
+.menu li {
+	cursor: pointer;
 }
 
 .menu-space .menu li.button {

@@ -72,7 +72,6 @@ def register():
     return render_template('register.html')
 
 @app.route('/_validateField', methods=['GET'])
-@anonymous_only
 def validate_field():
     """Check availability of username. For use in registeration form."""
     field_type = request.args.get('type', 0, type=str)
@@ -81,7 +80,8 @@ def validate_field():
     field = request.args.get('field', 0, type=str)
     kwargs = { field_type: field.lower() }
     existing = User.query.filter_by(**kwargs).first()
-    available = 'false' if existing else 'true'
+    is_taken = existing if not (existing and curr_user(existing.username)) else False
+    available = 'false' if is_taken else 'true'
     return jsonify(available=available)
 
 @app.route('/profile')
@@ -92,11 +92,11 @@ def profile(username=None):
             username = session['username']
         else:
             abort(404)
-    user = User.query.filter_by(username=username).first()
+    user = User.query.filter_by(username=username.lower()).first()
     if user is None:
         abort(404)
-    is_current_users_profile = curr_user(username)
-    filtered_user = public(user, ['password', 'email', 'picture'])
+    is_current_users_profile = curr_user(username.lower())
+    filtered_user = public(user, ['password', 'picture'])
     filtered_user['picture_url'] = get_upload_url(user.picture)
     return render_template('profile.html', user=filtered_user, is_curr_user=is_current_users_profile)
 
@@ -118,4 +118,29 @@ def upload_avatar():
 @app.route('/edit/profile', methods=['POST'])
 @authenticate
 def edit_profile():
-    pass
+    user = User.query.filter_by(id=session['userId']).first()
+    error = None
+    try:
+        user.name = request.form['name']
+        user.username = request.form['username'].lower()
+        user.about = request.form['about']
+        user.location = request.form['location']
+        db.session.commit()
+        session['username'] = request.form['username'].lower()
+    except DBException as dbe:
+        error = dbe.args[0]['message']
+    except exc.IntegrityError as ex:
+        reason = ex.message
+        if reason.endswith('is not unique'):
+            error = "%s is already in use." % ex.params[0] 
+        else:
+            error = reason
+        db.session.rollback()
+    return jsonify(success=True) if error is None else jsonify(error=error)
+
+
+
+@app.route('/settings')
+@authenticate
+def settings():
+    abort(404)
