@@ -10,6 +10,26 @@
 	font-weight: bold;
 }
 
+.profile-controls button {
+	margin-top: 0.5em;
+}
+
+@media (max-width: 991px) { /* sm and xs */
+	.center-if-mobile {
+		text-align: center;
+	}
+
+	.profile-controls button {
+		margin-bottom: 0.5em;
+	}
+}
+
+@media (min-width: 992px) { /* md and lg */
+	.profile-controls button {
+		width: 100%;
+	}
+}
+
 /* SCROLLBAR */
 ::-webkit-scrollbar {
   width: 10px;
@@ -285,10 +305,14 @@ a {
 .profile-banner .edit-btn {
 	margin-top: 1em;
 	font-size: 0.7em;
-	background-color: transparent;
 }
 
-.profile-banner .edit-btn:hover {
+.profile-banner .edit-btn, .profile-controls button {
+	background-color: transparent;
+	transition-duration: 0.5s;
+}
+
+.profile-banner .edit-btn:hover, .profile-controls button:hover {
 	background-color: rgb(117,28,53); /* PURPLE */
 	color: white;
 }

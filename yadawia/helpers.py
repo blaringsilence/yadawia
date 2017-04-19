@@ -70,11 +70,19 @@ def get_upload_url(filename):
     """Return url to uploaded file."""
     return url_for('static', filename='uploads/' + filename) if filename else None
 
+def is_logged_in():
+    """Is the user logged in?"""
+    return 'logged_in' in session and session['logged_in'] == True and 'userId' in session
+
+def user_exists():
+    """Given user is logged in, do they exist in db?"""
+    return User.query.filter_by(id=session['userId']).first() is not None
+
 def authenticate(f):
     """Decorator function to ensure user is logged in before a page is visited."""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if 'logged_in' not in session or not session['logged_in']:
+        if not is_logged_in() or not user_exists():
             return redirect(url_for('login', next=request.url))
         return f(*args, **kwargs)
     return decorated_function
@@ -83,7 +91,7 @@ def anonymous_only(f):
     """Decorator function to ensure user is NOT logged in before a page is visited."""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if 'logged_in' in session and session['logged_in'] == True:
+        if is_logged_in():
             return redirect(url_for('home'))
         return f(*args, **kwargs)
     return decorated_function

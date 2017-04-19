@@ -108,11 +108,14 @@ def upload_avatar():
         try:
             filename = photos.save(request.files['photo'], name=rand_name)
             user = User.query.filter_by(username=session['username']).first()
-            if user is None:
-                abort(400)
             user.picture = filename
             db.session.commit()
         except UploadNotAllowed as e:
             flash('Upload not allowed. Must be an image under 16 megabytes.')
         return redirect(url_for('profile', username=session['username']))
     abort(400)
+
+@app.route('/edit/profile', methods=['POST'])
+@authenticate
+def edit_profile():
+    pass

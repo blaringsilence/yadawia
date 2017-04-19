@@ -10,7 +10,7 @@
 			<button data-toggle="modal" data-target="#change-pic" class="btn btn-default edit-btn" title="Upload a new profile picture."><i class="fa fa-upload"></i> Change</button>
 			{% endif %}
 		</div>
-		<div class="col-xs-12 col-md-6">
+		<div class="col-xs-12 col-md-6 center-if-mobile">
 			{% if user.name %}
 				<h2>{{ user.name }} <small>({{ user.username }})</small></h2>
 			{% else %}
@@ -26,10 +26,12 @@
 					<i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
 				</div>
 		</div>
-		<div class="col-xs-12 col-md-3">
-			Controls here.<br>
+		<div class="col-xs-12 col-md-3 text-center profile-controls">
 			{% if is_curr_user %}
-				This is your profile!
+				<button class="btn btn-default" title="Edit profile"><i class="fa fa-pencil"></i> Edit Profile</button>
+				<button class="btn btn-default" title="Settings"><i class="fa fa-gear"></i> Settings</button>
+				<button class="btn btn-default" title="Order History"><i class="fa fa-history"></i> Order History</button>
+				<button class="btn btn-default" title="Messages"><i class="fa fa-envelope"></i> Messages</button>
 			{% else %}
 				This is another person!
 			{% endif %}
