@@ -45,6 +45,8 @@
 
 {% block modals %}
 	{% call modal('change-pic', 'Change Profile Picture') %}
-		{% include 'form_change_pic.html' with context %}
+		{% with curr_pic=user.picture_url %}
+			{% include 'form_change_pic.html' with context %}
+		{% endwith %}
 	{% endcall %}
 {% endblock %}
