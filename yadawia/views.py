@@ -113,6 +113,6 @@ def upload_avatar():
             user.picture = filename
             db.session.commit()
         except UploadNotAllowed as e:
-            flash('Upload not allowed. Check if the file size is under 16MBs.')
+            flash('Upload not allowed. Must be an image under 16 megabytes.')
         return redirect(url_for('profile', username=session['username']))
     abort(400)
