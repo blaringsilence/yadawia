@@ -1,11 +1,11 @@
 {% from 'macros.html' import form_group with context %}
-<form  id="change-pic-form" enctype="multipart/form-data">
+<form  id="change-pic-form" method="POST" action="{{ url_for('upload_avatar') }}" enctype="multipart/form-data">
 	<div class="col-xs-12 text-center">
-			<img src="{{ user.picture }}" class="pic-preview">
-			<h5>No preview available</h5>
+			<img id="preview" src="{% if user.picture %}{{ user.picture }}{% endif %}" class="pic-preview">
+			{% if not user.picture %}<h5 id="no-preview">No preview available</h5>{% endif %}
 	</div>
 	{% call form_group('New Picture', 'photo') %}
-		<input id="photo" class="form-control" type="file" name="photo" required>
+		<input id="photo" class="form-control" type="file" name="photo" accept="image/*" required>
 	{% endcall %}	
 	<div class="modal-footer">
 		<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>

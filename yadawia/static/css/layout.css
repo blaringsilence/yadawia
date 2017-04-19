@@ -252,7 +252,7 @@ a {
 	margin-right: -1em;
 }
 
-#profile-pic {
+#profile-pic, .pic-preview {
 	width: 10em;
 	height: auto;
 	border-radius: 1em 3.3em;

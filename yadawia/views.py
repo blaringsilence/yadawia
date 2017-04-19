@@ -6,10 +6,12 @@ Contains all the view logic/endpoints for this app.
 """
 from yadawia import app, db, photos
 from yadawia.classes import DBException, LoginException, User
-from yadawia.helpers import login_user, is_safe, redirect_back, authenticate, anonymous_only, public, curr_user
+from yadawia.helpers import login_user, is_safe, redirect_back, \
+                            authenticate, anonymous_only, public, curr_user, get_upload_url
 from sqlalchemy import exc
-from flask import request, render_template, session, redirect, url_for, abort, flash, jsonify
+from flask import request, render_template, session, redirect, url_for, abort, flash, jsonify, send_from_directory
 from flask_uploads import UploadSet, configure_uploads, IMAGES, UploadNotAllowed
+import uuid
 
 @app.route('/')
 def home():
@@ -94,5 +96,23 @@ def profile(username=None):
     if user is None:
         abort(404)
     is_current_users_profile = curr_user(username)
-    filtered_user = public(user, ['password', 'email'])
+    filtered_user = public(user, ['password', 'email', 'picture'])
+    filtered_user['picture_url'] = get_upload_url(user.picture)
     return render_template('profile.html', user=filtered_user, is_curr_user=is_current_users_profile)
+
+@app.route('/upload/profile-pic', methods=['POST'])
+@authenticate
+def upload_avatar():
+    if 'photo' in request.files:
+        rand_name = uuid.uuid4().hex + '.'
+        try:
+            filename = photos.save(request.files['photo'], name=rand_name)
+            user = User.query.filter_by(username=session['username']).first()
+            if user is None:
+                abort(400)
+            user.picture = filename
+            db.session.commit()
+        except UploadNotAllowed as e:
+            flash('Upload not allowed. Check if the file size is under 16MBs.')
+        return redirect(url_for('profile', username=session['username']))
+    abort(400)

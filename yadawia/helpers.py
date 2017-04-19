@@ -66,6 +66,10 @@ def curr_user(username):
     """True if this username is that of the logged in user, false otherwise."""
     return 'username' in session and session['username'] == username
 
+def get_upload_url(filename):
+    """Return url to uploaded file."""
+    return url_for('static', filename='uploads/' + filename) if filename else None
+
 def authenticate(f):
     """Decorator function to ensure user is logged in before a page is visited."""
     @wraps(f)
