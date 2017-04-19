@@ -4,11 +4,12 @@ Views
 Contains all the view logic/endpoints for this app.
 
 """
-from yadawia import app, db
+from yadawia import app, db, photos
 from yadawia.classes import DBException, LoginException, User
 from yadawia.helpers import login_user, is_safe, redirect_back, authenticate, anonymous_only, public, curr_user
 from sqlalchemy import exc
 from flask import request, render_template, session, redirect, url_for, abort, flash, jsonify
+from flask_uploads import UploadSet, configure_uploads, IMAGES, UploadNotAllowed
 
 @app.route('/')
 def home():

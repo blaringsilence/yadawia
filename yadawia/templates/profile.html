@@ -5,6 +5,10 @@
 	<div class="row">
 		<div class="col-xs-12 col-md-3 text-center">
 			<img id="profile-pic" src="{% if not user.picture %}{{ url_for('static', filename='img/logo.svg') }}{% else %}{{ user.picture }}{% endif %}"/>
+			<br>
+			{% if is_curr_user %}
+			<button data-toggle="modal" data-target="#change-pic" class="btn btn-default edit-btn" title="Upload a new profile picture."><i class="fa fa-upload"></i> Change</button>
+			{% endif %}
 		</div>
 		<div class="col-xs-12 col-md-6">
 			{% if user.name %}
@@ -37,4 +41,10 @@
 		<h3>A great place to shop for x and y and z.</h3>
 	</div>
 </div>
+{% endblock %}
+
+{% block modals %}
+	{% call modal('change-pic', 'Change Profile Picture') %}
+		{% include 'form_change_pic.html' with context %}
+	{% endcall %}
 {% endblock %}
