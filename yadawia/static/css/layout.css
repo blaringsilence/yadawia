@@ -152,6 +152,11 @@ a {
 	margin-bottom: 1.7em;
 }
 
+.menu .cart-icon {
+	border-color: rgb(237,216,52) !important;
+	border-style: dashed !important;
+}
+
 .mobile-menu {
 	padding-left: 2em;
 	text-align: center;
