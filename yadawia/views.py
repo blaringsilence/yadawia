@@ -143,4 +143,5 @@ def edit_profile():
 @app.route('/settings')
 @authenticate
 def settings():
-    abort(404)
+    user = User.query.filter_by(username=session['username']).first()
+    return render_template('settings.html', user=user)

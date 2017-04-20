@@ -4,7 +4,7 @@ Helpers
 Contains helper functions (decorators, others) used by other parts of the app.
 
 """
-from yadawia.classes import User, LoginException
+from yadawia.classes import User, LoginException, DBException
 from flask import session, url_for, redirect, request
 from urllib.parse import urlparse, urljoin
 from functools import wraps
@@ -54,6 +54,11 @@ def no_special_chars(string, allowNumbers=False, optional=True, allowComma=False
     comma = '\,' if not allowComma else ''
     pattern = re.compile('^([^' + nums + '\_\+' + comma + '\@\!\#\$\%\^\&\*\(\)\;\\\/\|\<\>\"\'\:\?\=\+])' + postfix + '$')
     return pattern.match(string)
+
+def validate_name_pattern(name_input):
+    if not no_special_chars(name_input):
+        raise DBException({'message': 'Name cannot contain numbers or special characters.',\
+                         'code': 'name'})
 
 def public(obj, keys):
     """Pass a db class object and a list of keys you don't want returned

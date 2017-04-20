@@ -29,7 +29,7 @@
 		<div class="col-xs-12 col-md-3 text-center profile-controls">
 			{% if is_curr_user %}
 				<button class="btn btn-default" title="Edit profile" data-toggle="modal" data-target="#edit-profile"><i class="fa fa-pencil"></i> Edit Profile</button>
-				<button class="btn btn-default" title="Settings"><i class="fa fa-gear"></i> Settings</button>
+				<a href="{{ url_for('settings') }}"><button class="btn btn-default" title="Settings"><i class="fa fa-gear"></i> Settings</button></a>
 				<button class="btn btn-default" title="Order History"><i class="fa fa-history"></i> Order History</button>
 				<button class="btn btn-default" title="Messages"><i class="fa fa-envelope"></i> Messages</button>
 			{% else %}
@@ -38,13 +38,18 @@
 		</div>
 	</div>
 </div>
-<div class="row profile">
+<div class="row">
 	{% if user.about %}
 	<div class="col-xs-12 profile-about text-center">
 		<h3>{{ user.about }}</h3>
 	</div>
 	{% endif %}
 </div>
+<div class="row profile">
+	{% block profile_middle %}
+	{% endblock %}
+</div>
+
 {% endblock %}
 
 {% block modals %}
