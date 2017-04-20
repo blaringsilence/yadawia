@@ -13,6 +13,7 @@
         </h4>
       </div>
       <div class="modal-body">
+        <div class="modal-error-msg"></div>
         {{ caller() }}
         {% if defaultFooter %}
           <div class="modal-footer">
@@ -65,8 +66,22 @@
 
 {% macro settings_nav(text, icon, section_id, selected=False) %}
 <li>
-  <button class="btn btn-default settings-nav-button {% if selected %}selected-btn{% endif %}" data-section="{{ section_id }}">
+  <button id="{{ section_id }}-button" class="btn btn-default settings-nav-button {% if selected %}selected-btn{% endif %}" data-section="{{ section_id }}">
     <i class="fa fa-{{ icon }}"></i> {{ text }}
   </button>
 </li>
+{% endmacro %}
+
+
+{% macro saved_address(address, hasControls=True) %}
+<div class="address-card">
+  <h4><i class="fa fa-location-arrow"></i> {{ address.name }}</h4>
+  <p title="Street Address">{{ address.text }}</p>
+  <p title="Zip/Postal Code, City">{{ address.code }} {{ address.city }}</p>
+  <p title="Country">{{ address.country_id | country_name }}</p>
+  <p title="Phone">{% if address.phone %}<i class="fa fa-phone"></i> {% endif %}{{ address.phone }}</p>
+  <div class="addr-card-controls text-right">
+    <button class="addr-delete btn btn-danger" data-aID="{{ address.id }}" data-aName="{{ address.name }}"><i class="fa fa-trash"></i> Delete</button>
+  </div>
+</div>
 {% endmacro %}

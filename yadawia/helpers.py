@@ -63,8 +63,8 @@ def no_special_chars(string, allowNumbers=False, optional=True, allowComma=False
     pattern = re.compile('^([^' + nums + '\_\+' + comma + '\@\!\#\$\%\^\&\*\(\)\;\\\/\|\<\>\"\'\:\?\=\+])' + postfix + '$')
     return pattern.match(string)
 
-def validate_name_pattern(name_input):
-    if not no_special_chars(name_input):
+def validate_name_pattern(name_input, allowNumbers=False):
+    if not no_special_chars(name_input, allowNumbers=allowNumbers):
         raise DBException({'message': 'Name cannot contain numbers or special characters.',\
                          'code': 'name'})
 

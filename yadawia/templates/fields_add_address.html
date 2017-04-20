@@ -1,0 +1,22 @@
+	{% from 'macros.html' import form_group with context %}
+	{% call form_group('Name', 'addr-name', hasFeedback=True, required=True) %}
+	<input id="addr-name" class="form-control" type="text" name="name" placeholder="Name for the address (only visible to you)." data-nums="true" required>
+	{% endcall %}
+	{% call form_group('Street Address', 'addr-text', required=True) %}
+	<input id="addr-text" class="form-control" placeholder="Example: 1 Elm Street, Sesame Neighborhood" type="text" name="text" required>
+	{% endcall %}
+	{% call form_group('Zip/Postal Code', 'addr-code') %}
+	<input id="addr-code" class="form-control" type="text" name="code" placeholder="Zip/Postal Code (Optional)">
+	{% endcall %}
+	{% call form_group('City', 'addr-city', required=True, hasFeedback=True) %}
+	<input id="addr-city" class="form-control" type="text" name="city" placeholder="City">
+	{% endcall %}
+	{% call form_group('Country', 'addr-country', required=True) %}
+	<select id="addr-country" class="form-control" name="country" required>
+		<option disabled="disabled" value="" selected>Select Country</option>
+		{% include 'countries.html' %}
+	</select>
+	{% endcall %}
+	{% call form_group('Phone Number', 'addr-phone') %}
+	<input id="addr-phone" class="form-control" placeholder="Phone associated with address. (Optional)" type="tel" name="phone">
+	{% endcall %}

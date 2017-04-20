@@ -118,25 +118,29 @@ class Address(db.Model):
         - id: int, auto-incremented.
         - name: name to assign to this address (every user can have multiple addresses).
         - user_id: int, foreign key.
-        - country: string, ISO 3166-1 code.
+        - country_id: string, ISO 3166-1 code, foreign key.
         - city: string.
         - zip/postal code: string.
         - phone: string.
+        - text: string.
     """
     __tablename__ = 'addresses'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, default='Default')
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    country = db.Column(db.String(2), nullable=False)
+    country_id = db.Column(db.String(2), db.ForeignKey('countries.id'))
     code = db.Column(db.String)
     _phone = db.Column(db.String)
+    text = db.Column(db.String, nullable=False)
+    orders = db.relationship('Order', backref='address', lazy='dynamic')
 
-    def __init__(self, name, user_id, country, code=None, phone=None):
+    def __init__(self, name, user_id, text, country_id, code=None, phone=None):
         self.name = name
         self.user_id = user_id
-        self.country = country
+        self.country_id = country_id
         self.code = code
         self.phone = phone
+        self.text = text
 
     @property
     def phone(self):
@@ -153,7 +157,7 @@ class Address(db.Model):
         """Makes sure the name doesn't have any numbers or special chars.
         Raises a DBException otherwise.
         """
-        validate_name_pattern(name_input)
+        validate_name_pattern(name_input, allowNumbers=True)
         return name_input
 
 class Product(db.Model):
@@ -338,6 +342,7 @@ class Order(db.Model):
         - create_date: date.
         - update_date: date.
         - status: string.
+        - address_id: int, foreign key.
     """
     __tablename__ = 'orders'
     id = db.Column(db.Integer, primary_key=True)
@@ -345,6 +350,7 @@ class Order(db.Model):
     create_date = db.Column(db.DateTime, server_default=func.now())
     update_date = db.Column(db.DateTime, onupdate=func.now())
     status = db.Column(db.String, default='New')
+    address_id = db.Column(db.Integer, db.ForeignKey('addresses.id'))
     products = db.relationship('Product', secondary='order_product',\
                                 back_populates='orders', lazy='dynamic')
     message_threads = db.relationship('MessageThread', backref='order', lazy='dynamic')
@@ -427,7 +433,15 @@ class Message(db.Model):
         self.sender_id = sender_id
         self.text = text
 
-
+class Country(db.Model):
+    """Database model for all countries. Contains:
+        - id: string, ISO 3166-1 code.
+        - value: string, name.
+    """
+    __tablename__ = 'countries'
+    id = db.Column(db.String(2), primary_key=True)
+    value = db.Column(db.String)
+    addresses = db.relationship('Address', backref='country', lazy='dynamic')
 
 
 from yadawia.helpers import validate_name_pattern, no_special_chars

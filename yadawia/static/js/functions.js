@@ -11,6 +11,15 @@ var successful_icon = '<i class="fa fa-check success-check"></i>';
 var error_icon = '<i class="fa fa-times error-check"></i>';
 var loading_icon = '<i class="fa fa-circle-o-notch fa-spin loading-check"></i>';
 
+var name_regexp = function (allowNums) {
+	var nums = allowNums ? '' : '0-9';
+	return new RegExp('^([^' + nums + '\_\+\,\@\!\#\$\%\^\&\*\(\)\;\\\/\|\<\>\"\'\:\?\=\+])*$');
+}
+
+var getURLParameter = function (name) {
+  return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
+}
+
 var offline_check = function (field, check, message) {
 	var field_id = '#' + $(field).attr('id');
 	var feedback_elem = field_id + '-feedback';
@@ -97,13 +106,15 @@ $(function(){
 
 	$('input[name="name"]').blur(function(){
 		var name = $(this).val();
-		var regex = new RegExp('^([^0-9\_\+\,\@\!\#\$\%\^\&\*\(\)\;\\\/\|\<\>\"\'\:\?\=\+])*$');
-		offline_check(this, regex.test(name), 'Name can\'t have numbers or special characters.');
+		var has_nums = $(this).data('nums');
+		var regex = name_regexp(has_nums);
+		var ext = has_nums ? '' : 'numbers or '
+		offline_check(this, regex.test(name), 'Name can\'t have ' + ext + 'special characters.');
 	});
 
 	$('input[name="location"]').blur(function(){
 		var loc = $(this).val();
-		var regex = new RegExp('^([^\_\+\,\@\!\#\$\%\^\&\*\(\)\;\\\/\|\<\>\"\'\:\?\=\+])*$');
+		var regex = name_regexp(true);
 		offline_check(this, regex.test(loc), 'Location can\'t have special characters.');
 	});
 

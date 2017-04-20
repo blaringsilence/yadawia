@@ -15,6 +15,10 @@
 	color: white;
 }
 
+.hidden {
+	display: none;
+}
+
 .settings-section {
 	border-style: dashed;
 	border-radius: 1em;
@@ -36,6 +40,18 @@ textarea {
 
 .profile-controls button {
 	margin-top: 0.5em;
+}
+
+.address-card {
+	border-radius: 1em;
+	border: dashed rgba(51,51,51,0.5);
+	padding: 1em;
+	margin-bottom: 1em;
+	height: 100%;
+}
+
+.addr-card-controls button {
+	font-size: 0.8em;
 }
 
 @media (max-width: 991px) { /* sm and xs */

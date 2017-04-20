@@ -5,13 +5,17 @@ Contains all the view logic/endpoints for this app.
 
 """
 from yadawia import app, db, photos
-from yadawia.classes import DBException, LoginException, User
+from yadawia.classes import DBException, LoginException, User, Address, Country
 from yadawia.helpers import login_user, is_safe, redirect_back, \
                             authenticate, anonymous_only, public, curr_user, get_upload_url, logout_user
 from sqlalchemy import exc
 from flask import request, render_template, session, redirect, url_for, abort, flash, jsonify, send_from_directory
 from flask_uploads import UploadSet, configure_uploads, IMAGES, UploadNotAllowed
 import uuid
+
+@app.template_filter('country_name')
+def country_name_filter(country_id):
+    return Country.query.filter_by(id=country_id).first().value
 
 @app.route('/')
 def home():
@@ -140,7 +144,7 @@ def edit_profile():
 @authenticate
 def settings():
     user = User.query.filter_by(username=session['username']).first()
-    return render_template('settings.html', user=user, addresses=user.addresses)
+    return render_template('settings.html', user=user, addresses=user.addresses.all())
 
 @app.route('/settings/account', methods=['POST'])
 @authenticate
@@ -165,7 +169,7 @@ def update_account():
 
 @app.route('/settings/deactivate', methods=['POST'])
 @authenticate
-def deactivate_account():
+def deactivate_account(): # TODO prevent deactivate if ongoing orders.
     password = request.form['password']
     user = User.query.filter_by(username=session['username']).first()
     if user.isPassword(password):
@@ -177,3 +181,41 @@ def deactivate_account():
     flash('The password you entered was incorrect.')
     return redirect(url_for('settings'))
 
+@app.route('/settings/addresses/add', methods=['POST'])
+@authenticate
+def add_address():
+    error = None
+    name = request.form['name']
+    text = request.form['text']
+    city = request.form['city']
+    country_id = request.form['country']
+    code = request.form['code']
+    phone = request.form['phone']
+    user_id = session['userId']
+    try:
+        address = Address(name, user_id, text, country_id, code, phone)
+        db.session.add(address)
+        db.session.commit()
+    except DBException as dbe:
+        error = dbe.args[0]['message']
+    except exc.SQLAlchemyError as e:
+        error = e.message
+        db.session.rollback()
+    return jsonify(success=True) if not error else jsonify(error=error)
+
+
+@app.route('/settings/addresses/delete', methods=['DELETE'])
+@authenticate
+def delete_address():
+    error = None
+    user = User.query.filter_by(username=session['username']).first()
+    address_id = int(request.form['address_id'])
+    address = Address.query.filter_by(id=address_id).first()
+    if address is not None and address.user_id == user.id:
+        try:
+            db.session.delete(address)
+            db.session.commit()
+        except exc.IntegrityError as e: # TODO check if ongoing orders or just history
+            error = 'Cannot delete an address currently used in ongoing orders.'
+        return jsonify(success=True) if not error else jsonify(error=error) 
+    abort(400)

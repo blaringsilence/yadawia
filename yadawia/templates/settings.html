@@ -1,5 +1,5 @@
 {% extends 'layout.html' %}
-{% from 'macros.html' import settings_section, form_group, settings_nav with context %}
+{% from 'macros.html' import settings_section, form_group, settings_nav, saved_address with context %}
 
 {% block extend_title %}
 | Settings
@@ -45,17 +45,36 @@
 		{% endcall %}
 	</div>
 
-	<div id="address-settings" class="col-xs-12 col-md-8 settings-section-wrapper">
-		{% call settings_section('Your Addresses', 'address-update', ajax=True, icon='location-arrow', additionalClass='update') %}
-			{% if addresses %}
-			{{ addresses }}
-			{% else %}
-			<h3>No addresses yet!</h3>
-			{% endif %}
+	<div id="address-settings" class="col-xs-12 col-md-8 settings-section-wrapper" style="display:none;">
+		{% call settings_section('New Address', 'address-update', icon='location-arrow', additionalClass='update', ajax=True, submit='Save') %}
+			{% include 'fields_add_address.html' with context %}
 		{% endcall %}
+
+		<div class="row">
+			<div class="col-xs-12 col-md-8">
+				<h3><i class="fa fa-bookmark"></i> Saved Addresses</h3>
+				{% if addresses %}
+					{% for address in addresses %}
+						{{ saved_address(address) }}
+					{% endfor %}
+					{% else %}
+						<h4>No addresses saved yet.</h4>
+				{% endif %}
+			</div>
+		</div>
 	</div>
 {% endblock %}
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/form_settings.js') }}"></script>
+{% endblock %}
+
+{% block modals %}
+	{% call modal('delete-address', 'Delete Address') %}
+	<h4>Are you sure you want to delete the address "<span id="address-name-del"></span>"?</h4>
+	<div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" id="delete-btn" class="btn btn-danger">Delete</button>
+    </div>
+	{% endcall %}
 {% endblock %}
