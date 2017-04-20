@@ -140,7 +140,7 @@ def edit_profile():
 @authenticate
 def settings():
     user = User.query.filter_by(username=session['username']).first()
-    return render_template('settings.html', user=user)
+    return render_template('settings.html', user=user, addresses=user.addresses)
 
 @app.route('/settings/account', methods=['POST'])
 @authenticate

@@ -45,7 +45,7 @@
 
 {% macro settings_section(section_title, id, endpoint='', ajax=False, submit='Update', icon=None, requirePassword=False, additionalClass='') %}
 <div class="row">
-  <div class="col-xs-12 col-md-6 col-centered settings-section {{ additionalClass }}">
+  <div class="col-xs-12 col-md-8 settings-section {{ additionalClass }}">
     <h3>{% if icon %}<i class="fa fa-{{ icon }}"></i> {% endif %}{{ section_title }}</h3>
       <form  id="{{ id }}-form" {% if not ajax %} action="{{ url_for(endpoint) }}" method='post' {% endif %}>
       <div class="main-error-msg"></div>
@@ -61,4 +61,12 @@
     </form>
   </div>
 </div>
+{% endmacro %}
+
+{% macro settings_nav(text, icon, section_id, selected=False) %}
+<li>
+  <button class="btn btn-default settings-nav-button {% if selected %}selected-btn{% endif %}" data-section="{{ section_id }}">
+    <i class="fa fa-{{ icon }}"></i> {{ text }}
+  </button>
+</li>
 {% endmacro %}
