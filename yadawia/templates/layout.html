@@ -36,7 +36,9 @@
 			</div>
 		</div>
 		<div class="container-fluid middle-container">
-		{% include 'flash.html' %}
+		{% block flash %}
+			{% include 'flash.html' %}
+		{% endblock %}
 		{% block middle %}
 		{% endblock %}
 		</div>

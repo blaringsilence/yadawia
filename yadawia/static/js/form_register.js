@@ -9,9 +9,10 @@ $(function(){
 	});
 
 	$('#password2', '#register-form').blur(function(){
-		password1 = $(this).val();
-		password2 = $('#password', '#register-form').val();
-		offline_check(this, password1 === password2, 'Passwords do not match.');
+		password2 = $(this);
+		password1 = $('#password', '#register-form');
+		if(password1[0].checkValidity())
+			offline_check(this, password1.val() === password2.val(), 'Passwords do not match.');
 	});
 
 

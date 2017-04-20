@@ -1,18 +1,43 @@
 {% extends 'layout.html' %}
+{% from 'macros.html' import settings_section, form_group with context %}
 
 {% block extend_title %}
 | Settings
 {% endblock %}
 
 {% block middle %}
-<div class="row">
-	<div class="col-xs-12 col-md-6 col-centered">
-		<h2><i class="fa fa-gear"></i> Settings</h2>
+	<div class="row">
+		<div class="col-xs-12 col-md-6 col-centered">
+			<h2><i class="fa fa-gear"></i> Settings</h2>
+		</div>
 	</div>
-</div>
-<div class="row">
-	<div class="col-xs-12 col-md-6 col-centered section">
-		<h3>Section Title</h3>
+	{% call settings_section('Update Password', 'password-change', ajax=True, icon='user', additionalClass='update', requirePassword=True) %}
+		{% call form_group('New Password', 'new-password', required=True, hasFeedback=True) %}
+		<input id="new-password" class="form-control" type="password" title="Minimum 6 characters." pattern=".{6,}" placeholder="New Password" name="new_password" data-valid="false" required>
+		{% endcall %}
+		{% call form_group('Repeat Password', 'repeat-password', required=True, hasFeedback=True) %}
+		<input id="repeat-password" class="form-control" type="password" placeholder="Repeat Password" name="repeat_password" data-valid="false" required>
+		{% endcall %}
+		<input type="hidden" name="type" value="password">
+	{% endcall %}
+
+	{% call settings_section('Change Email', 'email-change', ajax=True, icon='at', additionalClass='update', requirePassword=True) %}
+		{% call form_group('Email', 'email') %}
+		<input id="email" class="form-control" type="email" value="{{ user.email }}" name="email" disabled="disabled" required>
+		{% endcall %}
+		{% call form_group('New Email', 'new-email', required=True, hasFeedback=True) %}
+		<input id="new-email" class="form-control feedback-elem" type="email" placeholder="New Email" name="new_email" data-type="email" data-valid="false" data-endpoint="validate_field" required>
+		{% endcall %}
+		<input type="hidden" name="type" value="email">
+	{% endcall %}
+
+	{% call settings_section('Deactivate Account', 'account-deactivate', ajax=False, endpoint='deactivate_account', additionalClass='critical', requirePassword=True, submit='Deactivate') %}
+	<div class="checkbox">
+	  <label><input type="checkbox" value="" required>I understand that by deactivating my account, people will lose access to my <strong>profile and products</strong>, and any ongoing orders <strong>not already approved</strong> will be <strong>canceled</strong>.</label>
 	</div>
-</div>
+	{% endcall %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/form_settings.js') }}"></script>
 {% endblock %}

@@ -44,9 +44,13 @@ var validate_and_send = function(form, endpoint, extra_valid_check, refresh_to) 
 			type: 'POST',
 			data: $(form).serialize(),
 			success: function(data) {
-				console.log(data);
 				if(data.error){
 					generateMessage('warning', main_error_place, data.error);
+				} else if (data.message){ 
+					generateMessage('success', main_error_place, data.message);
+					$(form)[0].reset();
+					$('.form-control-feedback', form).html('');
+					$('.error-msg', form).html('');
 				} else if(refresh_to) {
 					window.location.href = refresh_to;
 				} else {

@@ -1,10 +1,10 @@
 {% with messages = get_flashed_messages() %}
 	{% if messages %}
-		{% call modal('flash-message', 'Hey..', defaultFooter=True, cancel='Dismiss', small=True) %}
-			{% for message in messages %}
-				<h5><i class="fa fa-exclamation-circle"></i> {{ message }}</h5>
-			{% endfor %}
-		{% endcall %}
+			{% call modal('flash-message', 'Hey..', defaultFooter=True, cancel='Dismiss', small=True) %}
+				{% for message in messages %}
+					<h5>{{ message }}</h5>
+				{% endfor %}
+			{% endcall %}
 		<script>$(function(){ $('#flash-message').modal('show'); });</script>
 	{% endif %}
 {% endwith %}

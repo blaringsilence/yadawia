@@ -4,11 +4,11 @@ Helpers
 Contains helper functions (decorators, others) used by other parts of the app.
 
 """
+from yadawia import db
 from yadawia.classes import User, LoginException, DBException
-from flask import session, url_for, redirect, request
+from flask import session, url_for, redirect, request, flash
 from urllib.parse import urlparse, urljoin
 from functools import wraps
-from werkzeug.security import check_password_hash
 import re
 
 def login_user(username, password):
@@ -26,14 +26,17 @@ def login_user(username, password):
     """
     user = User.query.filter_by(username=username.lower()).first()
     if user is not None:
-        if check_password_hash(user.password, password) == False:
+        if not user.isPassword(password):
             raise LoginException({'message': 'Password is incorrect.', 'code': 'password'})
+        if user.disabled:
+            user.disabled = False
+            db.session.commit()
+            flash('Welcome back!')
         session['logged_in'] = True
         session['username'] = username.lower()
         session['userId'] = user.id
     else:
         raise LoginException({'message': 'Username does not exist.', 'code': 'username'})
-
 
 def is_safe(url):
     ref_url = urlparse(request.host_url)
@@ -47,6 +50,11 @@ def redirect_back(endpoint, **values):
     if not target or not is_safe(target):
         target = url_for(endpoint, **values)
     return redirect(target)
+
+def logout_user():
+    session.pop('logged_in', None)
+    session.pop('username', None)
+    session.pop('userId', None)
 
 def no_special_chars(string, allowNumbers=False, optional=True, allowComma=False):
     nums = '0-9' if not allowNumbers else ''

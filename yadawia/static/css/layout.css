@@ -10,6 +10,21 @@
 	font-weight: bold;
 }
 
+.settings-section {
+	border-style: dashed;
+	border-radius: 1em;
+	margin-bottom: 1em !important;
+	border-color: #eee; /* GREY */
+}
+
+.settings-section.update {
+	border-color: rgb(76,212,176); /* BLUE */
+}
+
+.settings-section.critical {
+	border-color: rgb(192,57,43); /* RED */
+}
+
 textarea {
 	resize: vertical;
 }
@@ -152,7 +167,11 @@ a {
 	margin-bottom: 1.7em;
 }
 
-.menu .cart-icon {
+.flash-category {
+	text-transform: capitalize;
+}
+
+.menu-space .cart-icon {
 	border-color: rgb(237,216,52) !important;
 	border-style: dashed !important;
 }

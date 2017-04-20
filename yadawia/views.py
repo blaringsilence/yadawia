@@ -7,7 +7,7 @@ Contains all the view logic/endpoints for this app.
 from yadawia import app, db, photos
 from yadawia.classes import DBException, LoginException, User
 from yadawia.helpers import login_user, is_safe, redirect_back, \
-                            authenticate, anonymous_only, public, curr_user, get_upload_url
+                            authenticate, anonymous_only, public, curr_user, get_upload_url, logout_user
 from sqlalchemy import exc
 from flask import request, render_template, session, redirect, url_for, abort, flash, jsonify, send_from_directory
 from flask_uploads import UploadSet, configure_uploads, IMAGES, UploadNotAllowed
@@ -38,9 +38,7 @@ def login():
 @authenticate
 def logout():
     """Log user out."""
-    session.pop('logged_in', None)
-    session.pop('username', None)
-    session.pop('userId', None)
+    logout_user()
     return redirect_back('home')
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -92,7 +90,7 @@ def profile(username=None):
             username = session['username']
         else:
             abort(404)
-    user = User.query.filter_by(username=username.lower()).first()
+    user = User.query.filter_by(username=username.lower(), disabled=False).first()
     if user is None:
         abort(404)
     is_current_users_profile = curr_user(username.lower())
@@ -138,10 +136,44 @@ def edit_profile():
         db.session.rollback()
     return jsonify(success=True) if error is None else jsonify(error=error)
 
-
-
 @app.route('/settings')
 @authenticate
 def settings():
     user = User.query.filter_by(username=session['username']).first()
     return render_template('settings.html', user=user)
+
+@app.route('/settings/account', methods=['POST'])
+@authenticate
+def update_account():
+    field_type = request.form['type']
+    if field_type in ['password', 'email']:
+        error = None
+        old_password = request.form['password']
+        new_value = request.form['new_' + field_type]
+        user = User.query.filter_by(username=session['username']).first()
+        if user.isPassword(old_password):
+            try:
+                setattr(user, field_type, new_value)
+                db.session.commit()
+            except DBException as dbe:
+                error = dbe.args[0]['message'] 
+        else:
+            error = 'Current password is incorrect.'
+        return jsonify(success=True, message='Successfully changed ' + field_type + '.')\
+                 if error is None else jsonify(error=error)
+    abort(400)
+
+@app.route('/settings/deactivate', methods=['POST'])
+@authenticate
+def deactivate_account():
+    password = request.form['password']
+    user = User.query.filter_by(username=session['username']).first()
+    if user.isPassword(password):
+        user.disabled = True
+        db.session.commit()
+        flash('Your account has been deactivated. Login again to reactivate it!')
+        logout_user()
+        return redirect(url_for('home'))
+    flash('The password you entered was incorrect.')
+    return redirect(url_for('settings'))
+

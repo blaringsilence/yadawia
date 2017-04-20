@@ -1,10 +1,16 @@
-{% macro modal(id, title, defaultFooter=False, cancel='Cancel', small=False) %}
+{% macro modal(id, title, defaultFooter=False, cancel='Cancel', small=False, isFlash=False) %}
 <div class="modal fade" id="{{ id }}" tabindex="-1" role="dialog" aria-labelledby="{{ id }}Label">
   <div class="modal-dialog {% if small %} modal-sm {% endif %}" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="{{ id }}Label">{{ title }}</h4>
+        <h4 class="modal-title" id="{{ id }}Label">
+        {% if isFlash %}
+          <span class="flash-category">{{ category }}</span>
+        {% else %}
+          {{ title }}
+        {% endif %}
+        </h4>
       </div>
       <div class="modal-body">
         {{ caller() }}
@@ -34,5 +40,25 @@
     {% if hasFeedback %}
     <span class="form-control-feedback" id="{{ inputId }}-feedback"></span>
     {% endif %}
+</div>
+{% endmacro %}
+
+{% macro settings_section(section_title, id, endpoint='', ajax=False, submit='Update', icon=None, requirePassword=False, additionalClass='') %}
+<div class="row">
+  <div class="col-xs-12 col-md-6 col-centered settings-section {{ additionalClass }}">
+    <h3>{% if icon %}<i class="fa fa-{{ icon }}"></i> {% endif %}{{ section_title }}</h3>
+      <form  id="{{ id }}-form" {% if not ajax %} action="{{ url_for(endpoint) }}" method='post' {% endif %}>
+      <div class="main-error-msg"></div>
+        {% if requirePassword %}
+          {% call form_group('Current Password', 'old-password', required=True) %}
+          <input id="old-password" class="form-control" type="password" placeholder="Current Password" name="password" required>
+          {% endcall %}
+        {% endif %}
+        {{ caller() }}
+      <div class="modal-footer">
+        <input type="submit" class="btn btn-primary" value="{{ submit }}">
+      </div>
+    </form>
+  </div>
 </div>
 {% endmacro %}

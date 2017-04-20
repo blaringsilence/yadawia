@@ -6,7 +6,7 @@ Contains all the classes (database, exceptions, etc) created for this app.
 """
 from yadawia import app, db
 from sqlalchemy.orm import validates
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.sql import func
 import re
 
@@ -56,6 +56,9 @@ class User(db.Model):
         self.password = password
         self.name = name
         self.location = location
+
+    def isPassword(self, pw):
+        return check_password_hash(self.password, pw)
 
     @property
     def password(self):
