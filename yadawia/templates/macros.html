@@ -85,3 +85,24 @@
   </div>
 </div>
 {% endmacro %}
+
+{% macro rating_stars(rating) %}
+  {% set remainder = rating % 1 %}
+  {% set full = (rating - remainder) | int %}
+  {% set half = 0 %}
+  {% if remainder >= 0.5 %}
+    {% set half = 1 %}
+  {% endif %}
+  {% set empty = 5 - (full + half) %}
+
+  {% for x in range(full) %}
+    <i class="fa fa-star"></i>
+  {% endfor %}
+  {% for x in range(half) %}
+    <i class="fa fa-star-half-o"></i>
+  {% endfor %}
+  {% for x in range(empty) %}
+    <i class="fa fa-star-o"></i>
+  {% endfor %}
+
+{% endmacro %}

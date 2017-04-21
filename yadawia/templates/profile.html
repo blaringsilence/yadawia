@@ -1,4 +1,5 @@
 {% extends 'layout.html' %}
+{% from 'macros.html' import rating_stars with context %}
 
 {% block middle %}
 <div class="profile-banner">
@@ -21,10 +22,12 @@
 					<p><i class="fa fa-map-marker"></i> {{ user.location }}</p>
 				</div>
 			{% endif %}
-				<div class="profile-avg-rating" title="Average product rating (5.0)" style="font-size:1.5em;">
-					5.0
-					<i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
+			{% if avg_rating %}
+				<div class="profile-avg-rating" title="Average product rating ({{ avg_rating }})" style="font-size:1.5em;">
+					{{ avg_rating }}
+					{{ rating_stars(avg_rating )}}
 				</div>
+			{% endif %}
 		</div>
 		<div class="col-xs-12 col-md-3 text-center profile-controls">
 			{% if is_curr_user %}

@@ -360,7 +360,7 @@ a {
 	padding: 1em;
 }
 
-.profile-avg-rating .fa-star {
+.fa-star,  .fa-star-o, .fa-star-half-o{
 	color: rgb(237,216,52)
 }
 

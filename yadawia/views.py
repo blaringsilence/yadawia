@@ -5,12 +5,13 @@ Contains all the view logic/endpoints for this app.
 
 """
 from yadawia import app, db, photos
-from yadawia.classes import DBException, LoginException, User, Address, Country
+from yadawia.classes import DBException, LoginException, User, Address, Country, Review, Product
 from yadawia.helpers import login_user, is_safe, redirect_back, \
                             authenticate, anonymous_only, public, curr_user, get_upload_url, logout_user
 from sqlalchemy import exc
 from flask import request, render_template, session, redirect, url_for, abort, flash, jsonify, send_from_directory
 from flask_uploads import UploadSet, configure_uploads, IMAGES, UploadNotAllowed
+from sqlalchemy.sql import func
 import uuid
 
 @app.template_filter('country_name')
@@ -94,13 +95,18 @@ def profile(username=None):
             username = session['username']
         else:
             abort(404)
+
     user = User.query.filter_by(username=username.lower(), disabled=False).first()
     if user is None:
         abort(404)
+    rating = db.session.query(func.avg(Review.rating).label('average'))\
+            .join(Product).join(User).filter(User.id == user.id).first()[0]
+    avg_rating = round(rating,2) if rating is not None else None
     is_current_users_profile = curr_user(username.lower())
     filtered_user = public(user, ['password', 'picture'])
     filtered_user['picture_url'] = get_upload_url(user.picture)
-    return render_template('profile.html', user=filtered_user, is_curr_user=is_current_users_profile)
+    return render_template('profile.html', user=filtered_user, \
+                            is_curr_user=is_current_users_profile, avg_rating=avg_rating)
 
 @app.route('/upload/profile-pic', methods=['POST'])
 @authenticate
