@@ -1,6 +1,6 @@
 $(function(){
 	var home = Flask.url_for('home');
-	var this_page = window.location.pathname;
-	var next = home === this_page ? Flask.url_for('login') : this_page;
+	var arg_next = getURLParameter('next');
+	var next = arg_next ? arg_next : home;
 	$('#nextVal', '#login-form').val(next);
 });

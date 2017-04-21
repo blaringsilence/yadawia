@@ -221,3 +221,4 @@ def delete_address():
             error = 'Cannot delete an address currently used in ongoing orders.'
         return jsonify(success=True) if not error else jsonify(error=error) 
     abort(400)
+
