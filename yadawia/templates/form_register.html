@@ -20,6 +20,7 @@
 		<input id="location" title="No special characters allowed." class="form-control" type="text" placeholder="Location (Optional)" name="location">
 	{% endcall %}
 		<input type="hidden" name="next" id="nextVal"/>
+		<input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"/>
 	<div class="modal-footer">
 		<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
 		<input type="submit" class="btn btn-primary submit-btn" value="Register">

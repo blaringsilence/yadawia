@@ -20,3 +20,4 @@
 	{% call form_group('Phone Number', 'addr-phone') %}
 	<input id="addr-phone" class="form-control" placeholder="Phone associated with address. (Optional)" type="tel" name="phone">
 	{% endcall %}
+	<input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"/>

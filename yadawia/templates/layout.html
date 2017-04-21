@@ -18,7 +18,7 @@
 		<!--End CSS-->
 		{{ JSGlue.include() }}
 	</head>
-	<body>
+	<body data-csrf="{{ csrf_token() }}" data-in="{% if session.logged_in %}true{% else %}false{% endif %}">
 		<div class="all-but-footer">
 		<div class="container-fluid top-nav">
 			<div class="row">

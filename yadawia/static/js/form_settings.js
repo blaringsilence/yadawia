@@ -27,6 +27,7 @@ $(function(){
 		validate_and_send(form, 'update_account', '#repeat-password', Flask.url_for('settings', { sel: 'account' }));
 	});
 
+
 	$('.settings-nav-button').click(function(){
 		var selected = this;
 		$('.settings-nav-button').removeClass('selected-btn');
@@ -58,7 +59,7 @@ $(function(){
 			$.ajax({
 				url: Flask.url_for('delete_address'),
 				type: 'DELETE',
-				data: { address_id: address_id },
+				data: { address_id: address_id, _csrf_token: $('body').data('csrf') },
 				success: function(data) {
 					if(data.error) {
 						var error_place = $('.modal-error-msg', '#delete-address');

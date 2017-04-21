@@ -11,9 +11,10 @@ var successful_icon = '<i class="fa fa-check success-check"></i>';
 var error_icon = '<i class="fa fa-times error-check"></i>';
 var loading_icon = '<i class="fa fa-circle-o-notch fa-spin loading-check"></i>';
 
-var name_regexp = function (allowNums) {
+var name_regexp = function (allowNums, allowCommas) {
 	var nums = allowNums ? '' : '0-9';
-	return new RegExp('^([^' + nums + '\_\+\,\@\!\#\$\%\^\&\*\(\)\;\\\/\|\<\>\"\'\:\?\=\+])*$');
+	var commas = allowCommas ? '' : '\,';
+	return new RegExp('^([^' + nums + '\_\+' + commas + '\@\!\#\$\%\^\&\*\(\)\;\\\/\|\<\>\"\'\:\?\=\+])*$');
 }
 
 var getURLParameter = function (name) {
@@ -71,6 +72,16 @@ var validate_and_send = function(form, endpoint, extra_valid_check, refresh_to) 
 }
 
 $(function(){
+	// Log in/out of all tabs if logged in/out in one.
+	window.addEventListener('storage', function(event){
+		if(event.key === 'logged_in')
+	        window.location.reload();
+	}, false)
+
+	var logged_in = $('body').data('in');
+
+	window.localStorage.setItem('logged_in', logged_in);
+
 	// CHECK AVAILABILITY (FOR EMAIL AND USERNAME FIELDS)
 	$('.feedback-elem').bind('blur', function(){
 		var field = this;
@@ -114,7 +125,7 @@ $(function(){
 
 	$('input[name="location"]').blur(function(){
 		var loc = $(this).val();
-		var regex = name_regexp(true);
+		var regex = name_regexp(true, true);
 		offline_check(this, regex.test(loc), 'Location can\'t have special characters.');
 	});
 

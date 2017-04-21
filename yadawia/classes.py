@@ -33,7 +33,7 @@ class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, unique=True, nullable=False)
-    _password = db.Column(db.String(157), nullable=False) # 128 + salt + algo info
+    password = db.Column(db.String(157), nullable=False) # 128 + salt + algo info
     email = db.Column(db.String, unique=True, nullable=False)
     name = db.Column(db.String)
     picture = db.Column(db.String)
@@ -60,18 +60,12 @@ class User(db.Model):
     def isPassword(self, pw):
         return check_password_hash(self.password, pw)
 
-    @property
-    def password(self):
-        return self._password
-
-    @password.setter
-    def password(self, value):
-        """Hashes and sets the password if >= 6 chars, otherwise raises a DBException."""
-        if len(value) >= 6:
-            self._password = generate_password_hash(value, method='pbkdf2:sha512:10000')
-        else:
+    @validates('password')
+    def validate_password(self, key, pw):
+        if len(pw) < 6:
             raise DBException({'message': 'Password cannot be less than 6 characters long.',\
                                 'code': 'password'})
+        return generate_password_hash(pw, method='pbkdf2:sha512:10000')
 
     @validates('name')
     def validate_name(self, key, name_input):
@@ -99,7 +93,7 @@ class User(db.Model):
         w3c_pattern = re.compile('^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$')
         if not w3c_pattern.match(em):
             raise DBException({'message': 'Email must be valid.', 'code': 'email'})
-        return em
+        return em.lower()
 
     @validates('username')
     def validate_username(self, key, usr):
@@ -110,7 +104,7 @@ class User(db.Model):
         pattern = re.compile('^[a-zA-Z][\w]+$')
         if not pattern.match(usr):
             raise DBException({'message': 'Username must be 2 characters (number, letter, or underscore) long, and begin with a letter.'})
-        return usr
+        return usr.lower()
 
 class Address(db.Model):
     """Database model for addresses (physical). Contains:

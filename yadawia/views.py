@@ -14,10 +14,6 @@ from flask_uploads import UploadSet, configure_uploads, IMAGES, UploadNotAllowed
 from sqlalchemy.sql import func
 import uuid
 
-@app.template_filter('country_name')
-def country_name_filter(country_id):
-    return Country.query.filter_by(id=country_id).first().value
-
 @app.route('/')
 def home():
     """View function for home."""
@@ -51,8 +47,8 @@ def logout():
 def register():
     """View function for Registeration."""
     if request.method == 'POST':
-        username = request.form['username'].lower()
-        email = request.form['email'].lower()
+        username = request.form['username']
+        email = request.form['email']
         password = request.form['password']
         location = request.form['location']
         name = request.form['name']
@@ -130,7 +126,7 @@ def edit_profile():
     error = None
     try:
         user.name = request.form['name']
-        user.username = request.form['username'].lower()
+        user.username = request.form['username']
         user.about = request.form['about']
         user.location = request.form['location']
         db.session.commit()
@@ -156,8 +152,8 @@ def settings():
 @authenticate
 def update_account():
     field_type = request.form['type']
+    error = None
     if field_type in ['password', 'email']:
-        error = None
         old_password = request.form['password']
         new_value = request.form['new_' + field_type]
         user = User.query.filter_by(username=session['username']).first()

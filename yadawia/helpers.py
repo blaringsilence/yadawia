@@ -10,6 +10,8 @@ from flask import session, url_for, redirect, request, flash
 from urllib.parse import urlparse, urljoin
 from functools import wraps
 import re
+import string
+import random
 
 def login_user(username, password):
     """Function to login user through their username.
@@ -35,8 +37,19 @@ def login_user(username, password):
         session['logged_in'] = True
         session['username'] = username.lower()
         session['userId'] = user.id
+        generate_csrf_token(force=True)
     else:
         raise LoginException({'message': 'Username does not exist.', 'code': 'username'})
+
+def get_random_string(length=32):
+    """Generate a random string of length 32, used in ``generate_csrf_token()``"""
+    return ''.join(random.choice(string.ascii_letters + string.digits) for i in range(length))
+
+def generate_csrf_token(force=False):
+    """Create a CSRF-protection token if one doesn't already exist in the user's session (or force it, as done per login) and put it there."""
+    if force or '_csrf_token' not in session:
+        session['_csrf_token'] = get_random_string()
+    return session['_csrf_token']
 
 def is_safe(url):
     ref_url = urlparse(request.host_url)
@@ -55,6 +68,7 @@ def logout_user():
     session.pop('logged_in', None)
     session.pop('username', None)
     session.pop('userId', None)
+    generate_csrf_token(force=True)
 
 def no_special_chars(string, allowNumbers=False, optional=True, allowComma=False):
     nums = '0-9' if not allowNumbers else ''

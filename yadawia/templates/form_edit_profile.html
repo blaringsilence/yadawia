@@ -13,6 +13,7 @@
 	{% call form_group('About', 'edit-about') %}
 		<textarea id="edit-about" title="Maximum length: 200 characters." maxlength="200" wrap="soft" class="form-control" placeholder="About (Optional)" name="about">{% if user.about %}{{ user.about }}{% endif %}</textarea>
 	{% endcall %}
+	<input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"/>
 	<small><i class="fa fa-lightbulb-o"></i> Edit your email, password, and other sensitive data through <a href="{{ url_for('settings') }}">Settings</a>.</small>
 	<div class="modal-footer">
 		<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>

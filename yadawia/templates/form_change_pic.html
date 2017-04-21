@@ -7,6 +7,7 @@
 	{% call form_group('New Picture', 'photo', hasFeedback=True, required=True) %}
 		<input id="photo" class="form-control" type="file" name="photo" accept="image/*" required>
 	{% endcall %}	
+	<input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"/>
 	<div class="modal-footer">
 		<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
 		<input type="submit" class="btn btn-primary" id="change-pic-submit" value="Upload">
