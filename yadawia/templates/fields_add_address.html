@@ -14,7 +14,9 @@
 	{% call form_group('Country', 'addr-country', required=True) %}
 	<select id="addr-country" class="form-control" name="country" required>
 		<option disabled="disabled" value="" selected>Select Country</option>
-		{% include 'countries.html' %}
+		{% for country in countries %}
+		<option value="{{ country.id }}">{{ country.value }}</option>
+		{% endfor %}
 	</select>
 	{% endcall %}
 	{% call form_group('Phone Number', 'addr-phone') %}

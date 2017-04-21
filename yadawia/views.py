@@ -146,7 +146,8 @@ def edit_profile():
 @authenticate
 def settings():
     user = User.query.filter_by(username=session['username']).first()
-    return render_template('settings.html', user=user, addresses=user.addresses.all())
+    countries = Country.query.order_by(Country.value).all()
+    return render_template('settings.html', user=user, addresses=user.addresses.all(), countries=countries)
 
 @app.route('/settings/account', methods=['POST'])
 @authenticate
@@ -222,3 +223,9 @@ def delete_address():
         return jsonify(success=True) if not error else jsonify(error=error) 
     abort(400)
 
+@app.route('/product/create', methods=['GET', 'POST'])
+@authenticate
+def create_product():
+    if request.method == 'POST':
+        pass
+    return render_template('create_product.html')
