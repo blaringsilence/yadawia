@@ -1,6 +1,10 @@
 {% extends 'layout.html' %}
 {% from 'macros.html' import rating_stars with context %}
 
+{% block extend_title %} 
+| {% if user.name %}{{ user.name }}{% else %}{{ user.username }}{% endif %}
+{% endblock %}
+
 {% block middle %}
 <div class="profile-banner">
 	<div class="row">
