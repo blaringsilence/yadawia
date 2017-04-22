@@ -381,17 +381,27 @@ a {
 	margin-right: -1em;
 }
 
-#profile-pic, .pic-preview {
+#profile-pic, .pic-preview, .pic-preview-large, .little-preview-pic {
 	object-fit: cover;
-	width: 10em;
-	height: 10em;
 	border-radius: 1em 3.3em;
 	border: 3px solid white;
+}
+
+#profile-pic, .pic-preview {
+	width: 10em;
+	height: 10em;
 }
 
 .pic-preview-large {
 	width: 15em;
 	height: 15em;
+}
+
+.little-preview-pic {
+	width: 3em;
+	height: 3em;
+	border-radius: 0px;
+	cursor: pointer;
 }
 
 .profile-banner p {

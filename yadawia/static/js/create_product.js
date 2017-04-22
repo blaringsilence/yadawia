@@ -5,6 +5,7 @@ $(function(){
 		var arr = $(this).val();
 		var disp_element = $('#prod-cat-selected');
 		$(disp_element).html('');
+		console.log('clicked');
 		if (arr) {
 			if (arr.length >= 5) {
 				$('option', this).each(function(){

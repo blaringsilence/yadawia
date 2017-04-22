@@ -13,9 +13,9 @@
 </div>
 
 <div class="row">
-<form  id="product-upload-form" class="big-form">
+<form  id="product-upload-form" class="big-form" enctype="multipart/form-data">
 	<div class="product-uploads col-xs-12 col-md-4">
-		{{ change_pic_form('prod-pics', prompt='Product Photos', ajax=True, hasUpload=False, largePic=True, multiple=True) }}
+		{{ change_pic_form('prod-pics', prompt='Product Photos', hasUpload=False, largePic=True, multiple=True) }}
 	</div>
 	<div class="product-main col-xs-12 col-md-8">
 			{% call form_group('Product Name', 'prod-name', required=True, hasFeedback=True, helper='') %}

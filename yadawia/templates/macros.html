@@ -33,9 +33,7 @@
   {% if required %}<span class="required-asterisk"><i class="fa fa-asterisk"></i>&nbsp;</span>{% endif %}
   {% if helper %}<small class="form-group-helper">{{ helper }}</small>{% endif %}
   &nbsp;
-    {% if hasFeedback %}
     <span id="{{ inputId }}-error-msg" class="error-msg"></span>
-    {% endif %}
   </label>
   {% endif %}
 		{{ caller() }}
@@ -110,17 +108,17 @@
 {% endmacro %}
 
 
-{% macro change_pic_form(id, prompt='New Picture', ajax=False, endpoint='', curr_pic=None, hasUpload=True, largePic=False, multiple=False) %}
-  <form  id="{{ id }}" class="change-pic-form" {% if not ajax %} method="POST" action="{{ url_for(endpoint) }}" {% endif %} enctype="multipart/form-data">
+{% macro change_pic_form(id, prompt='New Picture', curr_pic=None, hasUpload=True, largePic=False, multiple=False) %} 
   <div class="col-xs-12 text-center">
       <div id="preview-wrapper">
-        <div id="init-preview">
-          <img id="preview" src="{% if curr_pic %}{{ curr_pic }}{% endif %}" class="pic-preview {% if largePic %}pic-preview-large{% endif %}">
-          {% if not curr_pic %}<h5 id="no-preview">No preview available</h5>{% endif %}
-        </div>
+          <img id="preview" src="{% if curr_pic %}{{ curr_pic }}{% endif %}" class="pic-preview{% if largePic %}-large{% endif %}">
+          <div id="init-preview">
+            <h5 id="no-preview" {% if curr_pic %} style="display:none;" {% endif %}>No preview available</h5>
+          </div>
+        <div id="little-previews"></div>
       </div>
   </div>
-  {% call form_group(prompt, 'photo', hasFeedback=True, required=True) %}
+  {% call form_group(prompt, 'photo', required=True) %}
     <input id="photo" class="form-control" type="file" name="photo" accept="image/*" {% if multiple %} multiple="multiple" {% endif %} required>
   {% endcall %} 
   <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"/>
@@ -130,7 +128,6 @@
     <input type="submit" class="btn btn-primary" id="change-pic-submit" value="Upload">
   </div>
   {% endif %}
-</form>
 
 <script src="{{ url_for('static', filename='js/form_change_pic.js') }}"></script>
 {% endmacro %}
