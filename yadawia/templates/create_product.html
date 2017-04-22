@@ -1,4 +1,5 @@
 {% extends 'layout.html' %}
+{% from 'macros.html' import form_group, change_pic_form %}
 
 {% block extend_title %}
 | Create Product
@@ -10,4 +11,74 @@
 		<h2><i class="fa fa-bolt"></i> Create Product</h2>
 	</div>
 </div>
+
+<div class="row">
+<form  id="product-upload-form" class="big-form">
+	<div class="product-uploads col-xs-12 col-md-4">
+		{{ change_pic_form('prod-pics', prompt='Product Photos', ajax=True, hasUpload=False, largePic=True, multiple=True) }}
+	</div>
+	<div class="product-main col-xs-12 col-md-8">
+			{% call form_group('Product Name', 'prod-name', required=True, hasFeedback=True, helper='') %}
+				<input id="prod-name" class="form-control" type="text" placeholder="Product's Name" name="name" required>
+			{% endcall %}
+			{% call form_group('Category', 'prod-cat', required=True, helper='Hold down Ctrl/Command ⌘ key to choose more than one. Maximum 5.') %}
+				<select id="prod-cat" class="form-control" name="category" multiple="multiple" required>
+					<option id="default-cat" disabled="disabled" value="" selected>Choose Category</option>
+					{% for category in categories %}
+						<option id="cat-{{ category.id }}" value="{{ category.id }}">{{ category.name }}</option>
+					{% endfor %}
+				</select>
+			{% endcall %}
+			<div id="prod-cat-selected"></div>
+			{% call form_group('Currency', 'prod-curr', required=True) %}
+				<select id="prod-curr" class="form-control" name="currency" required>
+					<option disabled="disabled" value="" selected>Choose Currency</option>
+					{% for currency in currencies %}
+						<option value="{{ currency.id }}">{{ currency.name }} ({{ currency.id }})</option>
+					{% endfor %}
+				</select>
+			{% endcall %}
+			{% call form_group('Default Price', 'prod-price', helper='Product price if no specific variety with its own price is selected.') %}
+				<input id="prod-price" class="form-control" type="number" min="0">
+			{% endcall %}
+			{% call form_group('Description', 'prod-desc') %}
+				<textarea id="prod-desc" placeholder="Product Description.." class="form-control"></textarea>
+			{% endcall %}
+			<!--Varieties-->
+			<div class="prod-varieties">
+				<h4>Varieties: <small>Different types, like sizes, materials, etc. Example: title: Size XL, price: 200.</small></h4>
+				<div class="col-xs-8">
+					{% call form_group('Title', 'prod-var-title') %}
+						<input id="prod-var-title" type="text" placeholder="(e.g. Size XL)" class="form-control">
+					{% endcall %}
+				</div>
+				<div class="col-xs-2">
+					{% call form_group('Price', 'prod-var-price') %}
+						<input id="prod-var-price" type="number" min="0" placeholder="(e.g. 200)" class="form-control">
+					{% endcall %}
+				</div>
+				<div class="col-xs-2">
+					{% call form_group('', 'prod-var-add') %}
+						<input type="button" class="btn btn-primary" id="prod-var-add" value="Add" disabled>
+					{% endcall %}			
+				</div>
+				<div id="prod-var-select" class="col-xs-12"></div>
+			</div>
+			<!--End Varieties-->
+				<input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"/>
+				<input type="hidden" name="variety_title" value=""/>
+				<input type="hidden" name="variety_price" value=""/>
+				<div class="row" style="margin-bottom: 1em;">
+					<div class="col-xs-12 text-right">
+						<input type="submit" class="btn btn-primary" value="Create">		
+					</div>
+				</div>
+				
+	</div>
+</form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+	<script src="{{ url_for('static', filename='js/create_product.js')}}"></script>
 {% endblock %}

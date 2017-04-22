@@ -174,6 +174,7 @@ class Product(db.Model):
     create_date = db.Column(db.DateTime, server_default=func.now())
     update_date = db.Column(db.DateTime, onupdate=func.now())
     description = db.Column(db.String)
+    currency = db.Column(db.String)
     price = db.Column(db.Float)
     categories = db.relationship('Category', secondary='product_category',\
                                 back_populates='products', lazy='dynamic')
@@ -205,7 +206,7 @@ class Product(db.Model):
     def validate_price(self, key, p):
         """Makes sure the price is not less than 0."""
         if p is not None and p < 0:
-            raise DBException({'message': 'Price cannot be less than zero.', 'code': 'price'})
+            raise DBException({'message': 'Default price cannot be less than zero.', 'code': 'price'})
         return p
 
 class Category(db.Model):
@@ -216,9 +217,10 @@ class Category(db.Model):
     """
     __tablename__ = 'categories'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
+    name = db.Column(db.String, nullable=False, unique=True)
     products = db.relationship('Product', secondary='product_category',\
                                 back_populates='categories', lazy='dynamic')
+
 
     def __init__(self, name):
         self.name = name
@@ -228,7 +230,7 @@ class Category(db.Model):
         """Makes sure the name doesn't have any numbers or special chars.
         Raises a DBException otherwise.
         """
-        validate_name_pattern(name_input)
+        validate_name_pattern(name_input, optional=False)
         return name_input
 
 class ProductCategory(db.Model):
@@ -268,6 +270,12 @@ class Variety(db.Model):
         self.product_id = product_id
         self.price = price
         self.available = available
+
+    @validates('price')
+    def validate_price(self, key, pr):
+        if pr < 0:
+            raise DBException({'message': 'Variety price cannot be less than zero.', 'code': 'price'})
+        return pr
 
 class Upload(db.Model):
     """Database model for product-related uploads (photo, video). Contains:
@@ -382,7 +390,7 @@ class OrderProduct(db.Model):
     def validate_quantity(self, key, q):
         """Validate that quantity is more than 0."""
         if q < 0:
-            raise DBException({'message': 'Quantity cannot be less than 0.', 'code': 'quantity'})
+            raise DBException({'message': 'Quantity cannot be less than zero.', 'code': 'quantity'})
         return q
 
 class MessageThread(db.Model):
@@ -434,8 +442,28 @@ class Country(db.Model):
     """
     __tablename__ = 'countries'
     id = db.Column(db.String(2), primary_key=True)
-    value = db.Column(db.String)
+    value = db.Column(db.String, unique=True)
     addresses = db.relationship('Address', backref='country', lazy='dynamic')
+
+    def __init__(self, country_id, value):
+        self.id = country_id
+        self.value = value
+
+class Currency(db.Model):
+    """Database model for all supported currencies. Contains:
+        - id: string, ISO-4217 code.
+        - name: string.
+        - symbol: string.
+    """
+    __tablename__ = 'currencies'
+    id = db.Column(db.String(3), primary_key=True)
+    name = db.Column(db.String, unique=True)
+    symbol = db.Column(db.String, nullable=True)
+
+    def __init__(self, curr_id, name, symbol=None):
+        self.name = name
+        self.id = curr_id
+        self.symbol = symbol
 
 
 from yadawia.helpers import validate_name_pattern, no_special_chars

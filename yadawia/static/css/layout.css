@@ -10,6 +10,54 @@
 	font-weight: bold;
 }
 
+.form-group-helper {
+	opacity: 0.7;
+	font-size: 0.7em;
+	transition-duration: 0.3s;
+}
+
+.form-group-helper:hover {
+	opacity: 1;
+}
+
+
+.prod-cat-disp, .prod-var-disp {
+	background-color: rgb(237,216,52);
+	border-radius: 0.5em;
+	font-size: 0.7em;
+	padding: 0.5em;
+	font-weight: bold;
+	margin-right: 1em;
+	margin-bottom: 1em;
+	cursor: pointer;
+	transition-duration: 0.3s;
+}
+
+.prod-cat-disp i, .prod-var-disp i {
+	display:none;
+}
+
+.prod-cat-disp:hover, .prod-var-disp:hover {
+	background-color: rgba(192, 57, 43,1.0);
+	color: white;
+}
+
+.prod-cat-disp:hover i, .prod-var-disp:hover i {
+	display:inline-block;
+}
+
+.product-main h4 {
+	font-weight: bold;
+}
+
+#prod-cat-selected {
+	margin-bottom: 1em;
+}
+
+.big-form {
+	font-size: 1.2em;
+}
+
 .selected-btn, .selected-btn:hover, .selected-btn:focus {
 	background-color: rgb(51,51,51);
 	color: white;
@@ -339,6 +387,11 @@ a {
 	height: 10em;
 	border-radius: 1em 3.3em;
 	border: 3px solid white;
+}
+
+.pic-preview-large {
+	width: 15em;
+	height: 15em;
 }
 
 .profile-banner p {

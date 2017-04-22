@@ -5,7 +5,7 @@ Contains all the view logic/endpoints for this app.
 
 """
 from yadawia import app, db, photos
-from yadawia.classes import DBException, LoginException, User, Address, Country, Review, Product
+from yadawia.classes import DBException, LoginException, User, Address, Country, Review, Product, Category, Currency
 from yadawia.helpers import login_user, is_safe, redirect_back, \
                             authenticate, anonymous_only, public, curr_user, get_upload_url, logout_user
 from sqlalchemy import exc
@@ -228,4 +228,7 @@ def delete_address():
 def create_product():
     if request.method == 'POST':
         pass
-    return render_template('create_product.html')
+    elif request.method == 'GET':
+        categories = Category.query.order_by(Category.name).all()
+        currencies = Currency.query.order_by(Currency.name).all()
+        return render_template('create_product.html', categories=categories, currencies=currencies)

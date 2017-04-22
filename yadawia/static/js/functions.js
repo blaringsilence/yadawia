@@ -6,6 +6,10 @@ var generateMessage = function (type, selector, message) {
 	)
 };
 
+var generateHidden = function(name, value, form, class_name) {
+	$(form).append('<input type="hidden" class="' + class_name + '" name="' + name + '" value="' + value + '">');
+}
+
 // FEEDBACK ICONS
 var successful_icon = '<i class="fa fa-check success-check"></i>';
 var error_icon = '<i class="fa fa-times error-check"></i>';
@@ -34,6 +38,14 @@ var offline_check = function (field, check, message) {
 		$(feedback_elem).html(error_icon);
 		$(error_elem).html(message);
 	}
+}
+
+var hide_feedback_elem = function(field) {
+	var field_id = '#' + $(field).attr('id');
+	var feedback_elem = field_id + '-feedback';
+	var error_elem = field_id + '-error-msg';
+	$(error_elem).html('');
+	$(feedback_elem).html('');
 }
 
 var validate_and_send = function(form, endpoint, extra_valid_check, refresh_to) {
@@ -125,12 +137,14 @@ $(function(){
 		var regex = name_regexp(has_nums);
 		var ext = has_nums ? '' : 'numbers or '
 		offline_check(this, regex.test(name), 'Name can\'t have ' + ext + 'special characters.');
+		if(name === '') { hide_feedback_elem(this); }
 	});
 
 	$('input[name="location"]').blur(function(){
 		var loc = $(this).val();
 		var regex = name_regexp(true, true);
 		offline_check(this, regex.test(loc), 'Location can\'t have special characters.');
+		if(loc === '') { hide_feedback_elem(this); }
 	});
 
 	// for layout page/footer

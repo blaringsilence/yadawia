@@ -1,5 +1,5 @@
 {% extends 'layout.html' %}
-{% from 'macros.html' import rating_stars with context %}
+{% from 'macros.html' import rating_stars, change_pic_form with context %}
 
 {% block extend_title %} 
 | {% if user.name %}{{ user.name }}{% else %}{{ user.username }}{% endif %}
@@ -62,7 +62,7 @@
 {% block modals %}
 	{% call modal('change-pic', 'Change Profile Picture') %}
 		{% with curr_pic=user.picture_url %}
-			{% include 'form_change_pic.html' with context %}
+			{{  change_pic_form('change-avatar', endpoint='upload_avatar', curr_pic=curr_pic) }}
 		{% endwith %}
 	{% endcall %}
 	{% call modal('edit-profile', 'Edit Profile') %}
