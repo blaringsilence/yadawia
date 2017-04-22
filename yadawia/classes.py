@@ -174,7 +174,7 @@ class Product(db.Model):
     create_date = db.Column(db.DateTime, server_default=func.now())
     update_date = db.Column(db.DateTime, onupdate=func.now())
     description = db.Column(db.String)
-    currency = db.Column(db.String)
+    currency_id = db.Column(db.String(3), db.ForeignKey('currencies.id'))
     price = db.Column(db.Float)
     categories = db.relationship('Category', secondary='product_category',\
                                 back_populates='products', lazy='dynamic')
@@ -188,19 +188,12 @@ class Product(db.Model):
                                 back_populates='products', lazy='dynamic')
     available = db.Column(db.Boolean, default=True, nullable=False)
 
-    def __init__(self, name, seller_id, description=None, price=None):
+    def __init__(self, name, seller_id, description=None, price=None, currency_id=None):
         self.name = name
         self.seller_id = seller_id
         self.description = description
         self.price = price
-
-    @validates('name')
-    def validate_name(self, key, name_input):
-        """Makes sure the name doesn't have any numbers or special chars.
-        Raises a DBException otherwise.
-        """
-        validate_name_pattern(name_input)
-        return name_input
+        self.currency_id = currency_id
 
     @validates('price')
     def validate_price(self, key, p):
@@ -260,7 +253,7 @@ class Variety(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
     name = db.Column(db.String, nullable=False)
-    price = db.Column(db.Float)
+    price = db.Column(db.Float, nullable=True)
     available = db.Column(db.Boolean, default=True)
     uploads = db.relationship('Upload', backref='variety', lazy='dynamic')
     orders = db.relationship('OrderProduct', backref='variety', lazy='dynamic')
@@ -273,7 +266,7 @@ class Variety(db.Model):
 
     @validates('price')
     def validate_price(self, key, pr):
-        if pr < 0:
+        if pr is not None and pr < 0:
             raise DBException({'message': 'Variety price cannot be less than zero.', 'code': 'price'})
         return pr
 
@@ -459,6 +452,7 @@ class Currency(db.Model):
     id = db.Column(db.String(3), primary_key=True)
     name = db.Column(db.String, unique=True)
     symbol = db.Column(db.String, nullable=True)
+    products = db.relationship('Product', backref='currency', lazy='dynamic')
 
     def __init__(self, curr_id, name, symbol=None):
         self.name = name

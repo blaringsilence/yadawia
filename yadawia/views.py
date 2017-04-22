@@ -5,7 +5,8 @@ Contains all the view logic/endpoints for this app.
 
 """
 from yadawia import app, db, photos
-from yadawia.classes import DBException, LoginException, User, Address, Country, Review, Product, Category, Currency
+from yadawia.classes import DBException, LoginException, User, Address,\
+                             Country, Review, Product, Category, Currency, Variety, ProductCategory, Upload
 from yadawia.helpers import login_user, is_safe, redirect_back, \
                             authenticate, anonymous_only, public, curr_user, get_upload_url, logout_user
 from sqlalchemy import exc
@@ -93,16 +94,21 @@ def profile(username=None):
             abort(404)
 
     user = User.query.filter_by(username=username.lower(), disabled=False).first()
+
     if user is None:
         abort(404)
     rating = db.session.query(func.avg(Review.rating).label('average'))\
             .join(Product).join(User).filter(User.id == user.id).first()[0]
     avg_rating = round(rating,2) if rating is not None else None
+
     is_current_users_profile = curr_user(username.lower())
-    filtered_user = public(user, ['password', 'picture'])
-    filtered_user['picture_url'] = get_upload_url(user.picture)
-    return render_template('profile.html', user=filtered_user, \
-                            is_curr_user=is_current_users_profile, avg_rating=avg_rating)
+
+    return render_template('profile.html', user=user,\
+                            picture_url=get_upload_url(user.picture),\
+                            is_curr_user=is_current_users_profile,\
+                            avg_rating=avg_rating,\
+                            products=user.products.filter_by(available=True)\
+                                    .order_by(Product.create_date.desc()).all())
 
 @app.route('/upload/profile-pic', methods=['POST'])
 @authenticate
@@ -227,8 +233,52 @@ def delete_address():
 @authenticate
 def create_product():
     if request.method == 'POST':
-        pass
+        error = None
+        name = request.form['pname']
+        seller_id = session['userId']
+        description = request.form['description']
+        currency = request.form['currency']
+        price = int(request.form['price']) if request.form['price'] is not None else None
+        categories = request.form.getlist('categories')
+        variety_titles = request.form.getlist('variety_title')
+        variety_prices = request.form.getlist('variety_price')
+        pictures = request.files.getlist('photo')
+        try:
+            product = Product(name, seller_id, description, price, currency)
+            db.session.add(product)
+            db.session.flush() # to access product ID
+            for category_id in categories:
+                prodCat = ProductCategory(product.id, category_id)
+                db.session.add(prodCat)
+            for i in range(1, len(variety_titles)):
+                vtitle = variety_titles[i]
+                vprice = int(variety_prices[i]) if variety_prices[i] != 'Default' else None
+                variety = Variety(vtitle, product.id, vprice)
+                db.session.add(variety)
+            for pic in pictures:
+                rand_name = uuid.uuid4().hex + '.'
+                filename = photos.save(pic, name=rand_name)
+                upload = Upload(filename, product.id)
+                db.session.add(upload)
+            db.session.commit()
+        except DBException as dbe:
+            error = dbe.args[0]['message']
+        except (exc.IntegrityError, exc.SQLAlchemyError) as e:
+            error = e.message
+        if error:
+            flash(error)
+            return redirect(url_for('create_product'))
+        else:
+            return redirect(url_for('product', productID=product.id))
     elif request.method == 'GET':
         categories = Category.query.order_by(Category.name).all()
         currencies = Currency.query.order_by(Currency.name).all()
         return render_template('create_product.html', categories=categories, currencies=currencies)
+
+@app.route('/product/<productID>')
+def product(productID):
+    productID = int(productID)
+    product = Product.query.filter_by(id=productID).first()
+    if product is None:
+        abort(404)
+    return render_template('product.html', product=product)

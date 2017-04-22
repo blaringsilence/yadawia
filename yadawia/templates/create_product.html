@@ -13,16 +13,16 @@
 </div>
 
 <div class="row">
-<form  id="product-upload-form" class="big-form" enctype="multipart/form-data">
+<form  id="product-upload-form" class="big-form" method="POST" action="{{ url_for('create_product') }}" enctype="multipart/form-data">
 	<div class="product-uploads col-xs-12 col-md-4">
 		{{ change_pic_form('prod-pics', prompt='Product Photos', hasUpload=False, largePic=True, multiple=True) }}
 	</div>
 	<div class="product-main col-xs-12 col-md-8">
-			{% call form_group('Product Name', 'prod-name', required=True, hasFeedback=True, helper='') %}
-				<input id="prod-name" class="form-control" type="text" placeholder="Product's Name" name="name" required>
+			{% call form_group('Product Name', 'prod-name', required=True, helper='') %}
+				<input id="prod-name" class="form-control" type="text" placeholder="Product's Name" name="pname" required>
 			{% endcall %}
 			{% call form_group('Category', 'prod-cat', required=True, helper='Hold down Ctrl/Command ⌘ key to choose more than one. Maximum 5.') %}
-				<select id="prod-cat" class="form-control" name="category" multiple="multiple" required>
+				<select id="prod-cat" class="form-control" name="categories" multiple="multiple" required>
 					<option id="default-cat" disabled="disabled" value="" selected>Choose Category</option>
 					{% for category in categories %}
 						<option id="cat-{{ category.id }}" value="{{ category.id }}">{{ category.name }}</option>
@@ -38,11 +38,11 @@
 					{% endfor %}
 				</select>
 			{% endcall %}
-			{% call form_group('Default Price', 'prod-price', helper='Product price if no specific variety with its own price is selected.') %}
-				<input id="prod-price" class="form-control" type="number" min="0">
+			{% call form_group('Default Price', 'prod-price', required=True, helper='Product price if no specific variety with its own price is selected. Set to 0 ONLY IF all your varieties are priced.') %}
+				<input id="prod-price" class="form-control" name="price" type="number" min="0" required>
 			{% endcall %}
 			{% call form_group('Description', 'prod-desc') %}
-				<textarea id="prod-desc" placeholder="Product Description.." class="form-control"></textarea>
+				<textarea id="prod-desc" name="description" placeholder="Product Description.." class="form-control"></textarea>
 			{% endcall %}
 			<!--Varieties-->
 			<div class="prod-varieties">

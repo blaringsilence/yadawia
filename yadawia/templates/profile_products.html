@@ -1,0 +1,3 @@
+{% for product in products %}
+	<a href="{{ url_for('product', productID=product.id) }}"><h4>{{ product.name }}</h4></a>
+{% endfor %}
