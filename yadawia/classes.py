@@ -40,6 +40,7 @@ class User(db.Model):
     location = db.Column(db.String)
     about = db.Column(db.String(200))
     disabled = db.Column(db.Boolean, unique=False, default=False)
+    suspended = db.Column(db.Boolean, unique=False, default=False)
     addresses = db.relationship('Address', backref='user', lazy='dynamic',\
                 cascade='save-update, merge, delete')
     products = db.relationship('Product', backref='seller', lazy='dynamic',\
@@ -407,6 +408,9 @@ class MessageThread(db.Model):
         self.user2 = user2
         self.title = title
 
+    def isParticipant(self, user):
+        return self.user1 == user or self.user2 == user
+
 class Message(db.Model):
     """Database model for messages in a thread. Contains:
         
@@ -444,6 +448,7 @@ class Country(db.Model):
 
 class Currency(db.Model):
     """Database model for all supported currencies. Contains:
+
         - id: string, ISO-4217 code.
         - name: string.
         - symbol: string.
@@ -458,6 +463,65 @@ class Currency(db.Model):
         self.name = name
         self.id = curr_id
         self.symbol = symbol
+
+class Reason(db.Model):
+    """Database model for report reasons. Contains:
+        
+        - id: int, auto-incremented.
+        - text: string.
+    """
+    __tablename__ = 'reasons'
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.String, unique=True)
+    reports = db.relationship('Report', backref='reason', lazy='dynamic')
+
+    def __init__(self, text):
+        self.text = text
+
+class Report(db.Model):
+    """Database model for reports to admins. Contains:
+
+        - id: int, auto-incremented.
+        - sender_id: int, foreign key.
+        - about_id: int, foreign key.
+        - reason: int, foreign key.
+        - date: date.
+    """
+    __tablename__ = 'reports'
+    id = db.Column(db.Integer, primary_key=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    about_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    reason_id = db.Column(db.Integer, db.ForeignKey('reasons.id'))
+    message = db.Column(db.String, nullable=False)
+    date = db.Column(db.DateTime, server_default=func.now())
+    resolved = db.Column(db.Boolean, default=False)
+
+    def __init__(self, sender_id, about_id, reason_id, message):
+        self.sender_id = sender_id
+        self.about_id = about_id
+        self.reason_id = reason_id
+        self.message = message
+
+    def getSender(self):
+        return User.query.filter_by(id=self.sender_id).first()
+
+    def getAbout(self):
+        return User.query.filter_by(id=self.about_id).first()
+
+
+class Admins(db.Model):
+    """Database model for admins. Contains:
+        
+        - id: int, auto-incremented.
+        - user_id: int, foreign key.
+        - date: date.
+    """
+    __tablename__ = 'admins'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), unique=True)
+
+    def __init__(self, user_id):
+        self.user_id = user_id
 
 
 from yadawia.helpers import validate_name_pattern, no_special_chars

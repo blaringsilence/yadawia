@@ -1,0 +1,9 @@
+{% extends 'layout.html' %}
+
+{% block extend_title %}
+| {% if thread.title %}{{ thread.title }}{% else %}Message with {% if other_user.name %}{{ other_user.name }}{% else %}{{ other_user.username }}{% endif %}{%endif%}
+{% endblock %}
+
+{% block middle %}
+	<h3>Message with {{ other_user.username }}</h3>
+{% endblock %}

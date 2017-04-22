@@ -6,9 +6,13 @@ Contains all the view logic/endpoints for this app.
 """
 from yadawia import app, db, photos
 from yadawia.classes import DBException, LoginException, User, Address,\
-                             Country, Review, Product, Category, Currency, Variety, ProductCategory, Upload
+                             Country, Review, Product, Category, Currency,\
+                              Variety, ProductCategory, Upload, MessageThread,\
+                              Message, Reason, Report
 from yadawia.helpers import login_user, is_safe, redirect_back, \
-                            authenticate, anonymous_only, public, curr_user, get_upload_url, logout_user
+                            authenticate, anonymous_only, public,\
+                            curr_user, get_upload_url, logout_user,\
+                            is_allowed_in_thread
 from sqlalchemy import exc
 from flask import request, render_template, session, redirect, url_for, abort, flash, jsonify, send_from_directory
 from flask_uploads import UploadSet, configure_uploads, IMAGES, UploadNotAllowed
@@ -100,6 +104,7 @@ def profile(username=None):
     rating = db.session.query(func.avg(Review.rating).label('average'))\
             .join(Product).join(User).filter(User.id == user.id).first()[0]
     avg_rating = round(rating,2) if rating is not None else None
+    report_reasons = Reason.query.order_by(Reason.text).all()
 
     is_current_users_profile = curr_user(username.lower())
 
@@ -108,7 +113,8 @@ def profile(username=None):
                             is_curr_user=is_current_users_profile,\
                             avg_rating=avg_rating,\
                             products=user.products.filter_by(available=True)\
-                                    .order_by(Product.create_date.desc()).all())
+                                    .order_by(Product.create_date.desc()).all(),\
+                            report_reasons=report_reasons)
 
 @app.route('/upload/profile-pic', methods=['POST'])
 @authenticate
@@ -282,3 +288,86 @@ def product(productID):
     if product is None:
         abort(404)
     return render_template('product.html', product=product)
+
+@app.route('/message/create', methods=['POST'])
+@authenticate
+def new_message():
+    error = None
+    title = request.form['subject']
+    message = request.form['message']
+    user1 = session['userId']
+    user2 = User.query.filter_by(username=request.form['send_to']).first().id
+    if user2 is None:
+        abort(400)
+    try:
+        thread = MessageThread(user1, user2, title)
+        db.session.add(thread)
+        db.session.flush()
+        message = Message(thread.id, user1, message)
+        db.session.add(message)
+        db.session.commit()
+    except DBException as dbe:
+        error = dbe.args[0]['message']
+    except (exc.IntegrityError, exc.SQLAlchemyError) as e:
+        error = e.message
+    if error:
+        flash(error)
+        return redirect(url_for('profile', username=request.form['send_to']))
+    else:
+        return redirect(url_for('message_thread', threadID=thread.id))
+
+@app.route('/messages/<threadID>/reply', methods=['POST'])
+@authenticate
+def reply(threadID):
+    if is_allowed_in_thread(threadID):
+        error = None
+        message = request.form['message']
+        sender_id = session['userId']
+        try:
+            msg = Message(int(threadID), sender_id, message)
+            db.session.add(msg)
+            db.session.commit()
+        except DBException as dbe:
+            error = dbe.args[0]['message']
+        except (exc.IntegrityError, exc.SQLAlchemyError) as e:
+            error = e.message
+        if error:
+            flash(error)
+        redirect(url_for('message_thread', threadID=threadID))
+    abort(400)
+
+
+@app.route('/messages/<threadID>')
+@authenticate
+def message_thread(threadID): # TODO: PAGE
+    if is_allowed_in_thread(threadID): # checks if thread exists and user is allowed in
+        thread = MessageThread.query.filter_by(id=int(threadID)).first()
+        other_user_id = thread.user2 if thread.user1 == session['userId'] else thread.user1
+        other_user = User.query.filter_by(id=other_user_id).first()
+        return render_template('message_thread.html',\
+                             thread=thread, other_user=other_user)
+    abort(400)
+
+@app.route('/report/new', methods=['POST'])
+@authenticate
+def report_user():
+    error = None
+    sender_id = session['userId']
+    about_username = request.form['reported_user']
+    about_user = User.query.filter_by(username=about_username).first()
+    if about_user is None:
+        abort(400)
+    about_id = about_user.id
+    reason_id = int(request.form['reason'])
+    message = request.form['message']
+    try:
+        report = Report(sender_id, about_id, reason_id, message)
+        db.session.add(report)
+        db.session.commit()
+    except DBException as dbe:
+        error = dbe.args[0]['message']
+    except (exc.IntegrityError, exc.SQLAlchemyError) as e:
+        error = e.message
+    flash_msg = error if error else 'Thank you for reporting this user. Someone will review this report and take the appropriate action if needed.'
+    flash(flash_msg)
+    return redirect(url_for('profile', username=about_username))

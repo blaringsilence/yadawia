@@ -39,8 +39,9 @@
 				<a href="{{ url_for('settings') }}"><button class="btn btn-default" title="Settings"><i class="fa fa-gear"></i> Settings</button></a>
 				<button class="btn btn-default" title="Order History"><i class="fa fa-history"></i> Order History</button>
 				<button class="btn btn-default" title="Messages"><i class="fa fa-envelope"></i> Messages</button>
-			{% else %}
-				This is another person!
+			{% elif session.logged_in %}
+				<button class="btn btn-default" title="Send a message" data-toggle="modal" data-target="#send-message"><i class="fa fa-envelope"></i> Send A Message</button>
+				<button class="btn btn-default" title="Report User" data-toggle="modal" data-target="#report-user"><i class="fa fa-flag"></i> Report User</button>
 			{% endif %}
 		</div>
 	</div>
@@ -73,4 +74,16 @@
 			{% include 'form_edit_profile.html' with context %}
 		{% endwith %}
 	{% endcall %}
+	{% if not is_curr_user and session.logged_in %}
+		{% call modal('send-message', 'Send A Message') %}
+			{% with user=user %}
+				{% include 'form_send_message.html' with context %}
+			{% endwith %}
+		{% endcall %}
+		{% call modal('report-user', 'Report User') %}
+			{% with user=user %}
+				{% include 'form_report.html' with context %}
+			{% endwith %}
+		{% endcall %}
+	{% endif %}
 {% endblock %}

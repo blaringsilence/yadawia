@@ -1,0 +1,21 @@
+{% from 'macros.html' import form_group with context %}
+<form  id="report-user-form" action="{{ url_for('report_user') }}" method='post'>
+	{% call form_group('Reason', 'reason', required=True) %}
+		<select id="reason" class="form-control" name="reason" required>
+			<option value="" selected="selected" disabled>Choose A Reason</option>
+			{% for reason in report_reasons %}
+				<option value="{{ reason.id }}">{{ reason.text }}</option>
+			{% endfor %}
+		</select>
+	{% endcall %}
+	{% call form_group('Explanation', 'message', required=True) %}
+		<textarea class="form-control" name="message" placeholder="Why are you reporting this user?" required></textarea>
+	{% endcall %}
+		<input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"/>
+		<input type="hidden" name="reported_user" value="{{ user.username }}"/>
+	<div class="modal-footer">
+		<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+		<input type="submit" class="btn btn-primary" value="Report">
+	</div>
+</form>
+

@@ -12,6 +12,11 @@ def render_error(code, msg, det='Oops..'):
     return render_template('error.html', error_code=code, error_message=msg, error_details=det), code
 
 # error handling
+@app.errorhandler(500)
+def internal_error(e):
+    """Render error template with the message: Internal Server Error and no details."""
+    return render_error(500, 'Internal Server Error')
+
 @app.errorhandler(400)
 def bad_request(e):
     """Render error template with the message: Bad Request and no details."""

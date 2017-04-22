@@ -5,7 +5,7 @@ Contains helper functions (decorators, others) used by other parts of the app.
 
 """
 from yadawia import db
-from yadawia.classes import User, LoginException, DBException
+from yadawia.classes import User, LoginException, DBException, MessageThread
 from flask import session, url_for, redirect, request, flash
 from urllib.parse import urlparse, urljoin
 from functools import wraps
@@ -50,6 +50,10 @@ def generate_csrf_token(force=False):
     if force or '_csrf_token' not in session:
         session['_csrf_token'] = get_random_string()
     return session['_csrf_token']
+
+def is_allowed_in_thread(threadID):
+    thread = MessageThread.query.filter_by(id=int(threadID)).first()
+    return thread is not None and thread.isParticipant(session['userId'])
 
 def is_safe(url):
     ref_url = urlparse(request.host_url)
