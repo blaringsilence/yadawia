@@ -106,8 +106,6 @@ $(function(){
 
 	window.localStorage.setItem('logged_in', logged_in);
 
-	var is_home = window.location.path === Flask.url_for('home');
-	var logout_args = is_home ? {} : { next: window.location.href };
 	$('#logout', '.menu').parent().attr('href', Flask.url_for('logout', { next: window.location.href }));
 
 	// CHECK AVAILABILITY (FOR EMAIL AND USERNAME FIELDS)
