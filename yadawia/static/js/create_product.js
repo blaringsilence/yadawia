@@ -5,7 +5,6 @@ $(function(){
 		var arr = $(this).val();
 		var disp_element = $('#prod-cat-selected');
 		$(disp_element).html('');
-		console.log('clicked');
 		if (arr) {
 			if (arr.length >= 5) {
 				$('option', this).each(function(){
@@ -53,7 +52,7 @@ $(function(){
 
 	var generateCat = function(name, id, disp_element, select_element) {
 		$(disp_element).append('<span title="Remove" id="prod-remove-' + id 
-								+ '" class="prod-cat-disp">' + name + ' <i class="fa fa-times"></i></span>');
+								+ '" class="prod-cat-disp-create">' + name + ' <i class="fa fa-times"></i></span>');
 		$('#prod-remove-' + id).click(function(){
 			$('#cat-' + id).prop('selected', false);
 			$(select_element).change();

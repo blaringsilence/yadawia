@@ -281,13 +281,16 @@ def create_product():
         currencies = Currency.query.order_by(Currency.name).all()
         return render_template('create_product.html', categories=categories, currencies=currencies)
 
-@app.route('/product/<productID>')
+@app.route('/product/<int:productID>')
 def product(productID):
-    productID = int(productID)
+    productID = productID
     product = Product.query.filter_by(id=productID).first()
     if product is None:
         abort(404)
-    return render_template('product.html', product=product)
+    rating = db.session.query(func.avg(Review.rating).label('average'))\
+            .join(Product).filter(Product.id == productID).first()[0]
+    avg_rating = round(rating, 2) if rating is not None else None
+    return render_template('product.html', product=product, avg_rating=avg_rating)
 
 @app.route('/message/create', methods=['POST'])
 @authenticate
@@ -325,7 +328,7 @@ def messages():
             .order_by(Message.date.desc()).all()
     return render_template('messages.html', threads=threads)
 
-@app.route('/see-message/<threadID>', methods=['POST'])
+@app.route('/see-message/<int:threadID>', methods=['POST'])
 @authenticate
 def see_message(threadID):
     if is_allowed_in_thread(threadID):
@@ -334,14 +337,14 @@ def see_message(threadID):
         messages = Message.query.filter(Message.sender_id != user_id).all()
         try:
             for message in messages:
-                message.see()
+                message.see(user_id)
             db.session.commit()
         except exc.SQLAlchemyError as e:
             error = e.message
         return jsonify(success=True) if not error else jsonify(error=error)
     abort(400)
 
-@app.route('/messages/<threadID>/reply', methods=['POST'])
+@app.route('/messages/<int:threadID>/reply', methods=['POST'])
 @authenticate
 def reply(threadID):
     if is_allowed_in_thread(threadID):
@@ -362,7 +365,7 @@ def reply(threadID):
     abort(400)
 
 
-@app.route('/messages/<threadID>')
+@app.route('/messages/<int:threadID>')
 @authenticate
 def message_thread(threadID): # TODO: PAGE
     if is_allowed_in_thread(threadID): # checks if thread exists and user is allowed in

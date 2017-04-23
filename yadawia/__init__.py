@@ -45,6 +45,10 @@ def sender(thread_id):
 def name_or_username(userId):
 	return yadawia.classes.User.query.filter_by(id=userId).first().name_or_username()
 
+@app.template_filter('upload_url')
+def upload_url(filename):
+    return yadawia.helpers.get_upload_url(filename)
+
 
 
 

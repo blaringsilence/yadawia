@@ -1,9 +1,80 @@
 {% extends 'layout.html' %}
+{% from 'macros.html' import rating_stars, form_group with context %}
 
 {% block extend_title %}
 | {{ product.name }}
 {% endblock %}
 
 {% block middle %}
-	<h3>{{ product.name }}</h3>
+<div class="product-banner">
+	<div class="row">
+		<div class="col-xs-12 col-md-4 text-center">
+			{% for upload in product.uploads %}
+				<img class="prod-page-pic" id="{{ upload.id }}" data-circle="circ-{{ upload.id }}" src="{{ upload.filename | upload_url }}">
+			{% endfor %}
+			<div id="prod-pic-circles" title="Click circle to view pictures."></div>
+		</div>
+		<div class="col-xs-12 col-md-6 center-if-mobile">
+			<h2>{{ product.name }} <small>by <a href="{{ url_for('profile', username=product.seller.username) }}">{{ product.seller.name_or_username() }}</a></small></h2>
+			<ul class="list-unstyled list-inline prod-categories">
+			{% for category in product.categories %}
+					<li><span class="prod-cat-disp">{{ category.name }}</span></li>
+			{% endfor %}
+			</ul>
+			{% if avg_rating %}
+				<p>
+					<span title="{{ product.reviews.count() }} review(s)" class="avg-rating" title="Average rating ({{ avg_rating }})">
+						{{ avg_rating }}
+						{{ rating_stars(avg_rating) }}
+					</span>
+				</p>
+			{% endif %}
+		</div>
+		<div class="col-xs-12 col-md-2 center-if-mobile banner-controls">
+			<form id="add-to-cart" action="" method="POST">
+			{% call form_group('Variety', 'variety', required=True) %}
+				<select name="variety" class="form-control" id="variety" required>
+				{% if product.varieties.count() > 0 %}
+					<option value="" disabled="disabled" selected>Choose A Variety</option>
+					{% for variety in product.varieties %}
+						<option value="{{ variety.id }}" data-price="{% if variety.price %}{{ variety.price }}{% else %}{{ product.price }}{% endif %}">{{ variety.name }}</option>
+					{% endfor %}
+				{% else %}
+					<option value="default" data-price="{{ product.price }}">Default</option>
+				{% endif %}
+				</select>
+			{% endcall %}
+			{% call form_group('Quantity', 'quantity', required=True) %}
+				<input type="number" name="quantity" id="quantity" class="form-control" min="1" value="1" required>
+			{% endcall %}
+			<div id="total-price">
+				{% if product.currency.symbol %}
+					{{ product.currency.symbol }}
+				{% else %}
+					{{ product.currency.id }}
+				{% endif %}
+				<span id="total-disp"></span>
+			</div>
+			<button type="submit" class="btn btn-default"><i class="fa fa-cart-plus"></i> Add to cart</button>
+			</form>
+		</div>
+	</div>
+</div>
+<div class="product-middle">
+	<div class="row">
+		<div class="col-xs-12 col-md-6 col-centered">
+			<h3>{{ product.description }}</h3>
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block modals %}
+	{% call modal('prod-pic', 'Details') %}
+		<img id="zoomed-pic">
+	{% endcall %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/product.js') }}"></script>
 {% endblock %}

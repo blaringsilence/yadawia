@@ -2,7 +2,7 @@
 {% from 'macros.html' import rating_stars, change_pic_form with context %}
 
 {% block extend_title %} 
-| {% if user.name %}{{ user.name }}{% else %}{{ user.username }}{% endif %}
+| {{ user.name_or_username() }}
 {% endblock %}
 
 {% block middle %}
@@ -16,29 +16,32 @@
 			{% endif %}
 		</div>
 		<div class="col-xs-12 col-md-6 center-if-mobile">
-			{% if user.name %}
-				<h2>{{ user.name }} <small>({{ user.username }})</small></h2>
-			{% else %}
-				<h2>{{ user.username }}</h2>
-			{% endif %}
+			
+				<h2>
+					{{ user.name_or_username() }}
+					{% if user.name %}
+						<small>({{ user.username }})</small>
+					{% endif %}
+				</h2>
+			
 			{% if user.location %}
 				<div class="profile-location">
 					<p><i class="fa fa-map-marker"></i> {{ user.location }}</p>
 				</div>
 			{% endif %}
 			{% if avg_rating %}
-				<div class="profile-avg-rating" title="Average product rating ({{ avg_rating }})" style="font-size:1.5em;">
+				<span class="avg-rating" title="Average product rating ({{ avg_rating }})">
 					{{ avg_rating }}
 					{{ rating_stars(avg_rating) }}
-				</div>
+				</span>
 			{% endif %}
 		</div>
-		<div class="col-xs-12 col-md-3 text-center profile-controls">
+		<div class="col-xs-12 col-md-3 text-center banner-controls">
 			{% if is_curr_user %}
 				<button class="btn btn-default" title="Edit profile" data-toggle="modal" data-target="#edit-profile"><i class="fa fa-pencil"></i> Edit Profile</button>
 				<a href="{{ url_for('settings') }}"><button class="btn btn-default" title="Settings"><i class="fa fa-gear"></i> Settings</button></a>
 				<button class="btn btn-default" title="Order History"><i class="fa fa-history"></i> Order History</button>
-				<button class="btn btn-default" title="Messages"><i class="fa fa-envelope"></i> Messages</button>
+				<a href="{{ url_for('messages') }}"><button class="btn btn-default" title="Messages"><i class="fa fa-envelope"></i> Messages</button></a>
 			{% elif session.logged_in %}
 				<button class="btn btn-default" title="Send a message" data-toggle="modal" data-target="#send-message"><i class="fa fa-envelope"></i> Send A Message</button>
 				<button class="btn btn-default" title="Report User" data-toggle="modal" data-target="#report-user"><i class="fa fa-flag"></i> Report User</button>

@@ -52,7 +52,7 @@ def generate_csrf_token(force=False):
     return session['_csrf_token']
 
 def is_allowed_in_thread(threadID):
-    thread = MessageThread.query.filter_by(id=int(threadID)).first()
+    thread = MessageThread.query.filter_by(id=threadID).first()
     return thread is not None and thread.isParticipant(session['userId'])
 
 def is_safe(url):

@@ -208,6 +208,7 @@ class Product(db.Model):
             raise DBException({'message': 'Default price cannot be less than zero.', 'code': 'price'})
         return p
 
+
 class Category(db.Model):
     """Database model for categories. Contains:
     
