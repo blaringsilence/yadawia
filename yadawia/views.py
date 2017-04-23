@@ -13,7 +13,7 @@ from yadawia.helpers import login_user, is_safe, redirect_back, \
                             authenticate, anonymous_only, public,\
                             curr_user, get_upload_url, logout_user,\
                             is_allowed_in_thread
-from sqlalchemy import exc
+from sqlalchemy import exc, or_, and_
 from flask import request, render_template, session, redirect, url_for, abort, flash, jsonify, send_from_directory
 from flask_uploads import UploadSet, configure_uploads, IMAGES, UploadNotAllowed
 from sqlalchemy.sql import func
@@ -315,6 +315,31 @@ def new_message():
         return redirect(url_for('profile', username=request.form['send_to']))
     else:
         return redirect(url_for('message_thread', threadID=thread.id))
+
+@app.route('/messages')
+@authenticate
+def messages():
+    user_id = session['userId']
+    threads = MessageThread.query.join(Message)\
+            .filter(or_(MessageThread.user1 == user_id, MessageThread.user2 == user_id))\
+            .order_by(Message.date.desc()).all()
+    return render_template('messages.html', threads=threads)
+
+@app.route('/see-message/<threadID>', methods=['POST'])
+@authenticate
+def see_message(threadID):
+    if is_allowed_in_thread(threadID):
+        error = None
+        user_id = session['userId']
+        messages = Message.query.filter(Message.sender_id != user_id).all()
+        try:
+            for message in messages:
+                message.see()
+            db.session.commit()
+        except exc.SQLAlchemyError as e:
+            error = e.message
+        return jsonify(success=True) if not error else jsonify(error=error)
+    abort(400)
 
 @app.route('/messages/<threadID>/reply', methods=['POST'])
 @authenticate

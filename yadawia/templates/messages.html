@@ -1,0 +1,13 @@
+{% extends 'layout.html' %}
+
+{% block extend_title %}
+| Messages
+{% endblock %}
+
+{% block middle %}
+	<h3>Messages</h3>
+	{% for thread in threads %}
+		{% if thread.title %}{{ thread.title }}{% else %}Untitled Thread{% endif %} by {{ thread.id | sender | name_or_username }}
+		{{ thread.messages.first().text }}
+	{% endfor %}
+{% endblock %}

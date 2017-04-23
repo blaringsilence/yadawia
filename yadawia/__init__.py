@@ -36,6 +36,17 @@ def csrf_protect():
 def country_name_filter(country_id):
     return yadawia.classes.Country.query.filter_by(id=country_id).first().value
 
+@app.template_filter('sender')
+def sender(thread_id):
+	userId = session['userId']
+	return yadawia.classes.MessageThread.query.filter_by(id=thread_id).first().otherUser(userId)
+
+@app.template_filter('name_or_username')
+def name_or_username(userId):
+	return yadawia.classes.User.query.filter_by(id=userId).first().name_or_username()
+
+
+
 
 app.jinja_env.globals['csrf_token'] = yadawia.helpers.generate_csrf_token
 """Whenever `{{ csrf_token() }}` is used in a Jinja2 template, it returns the result of the function `generate_csrf_token()` """

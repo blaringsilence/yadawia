@@ -9,7 +9,7 @@ from sqlalchemy.orm import validates
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.sql import func
 import re
-
+import datetime
 
 class DBException(Exception):
     """Custom exceptions raised on the ORM level. In its 0th arg,\
@@ -60,6 +60,11 @@ class User(db.Model):
 
     def isPassword(self, pw):
         return check_password_hash(self.password, pw)
+
+    def name_or_username(self):
+        if self.name:
+            return self.name
+        return self.username
 
     @validates('password')
     def validate_password(self, key, pw):
@@ -402,6 +407,7 @@ class MessageThread(db.Model):
     user2 = db.Column(db.Integer, db.ForeignKey('users.id'))
     title = db.Column(db.String, nullable=True)
     order_id = db.Column(db.Integer, db.ForeignKey('orders.id'))
+    messages = db.relationship('Message', backref='thread', lazy='dynamic')
 
     def __init__(self, user1, user2, title=None):
         self.user1 = user1
@@ -411,6 +417,11 @@ class MessageThread(db.Model):
     def isParticipant(self, user):
         return self.user1 == user or self.user2 == user
 
+    def otherUser(self, user):
+        if self.isParticipant(user):
+            return self.user2 if self.user1 == user else self.user1
+        return None
+
 class Message(db.Model):
     """Database model for messages in a thread. Contains:
         
@@ -419,6 +430,7 @@ class Message(db.Model):
         - sender_id: int, foreign key. No need for receiver because thread has info.
         - date: date.
         - text: string.
+        - seen: date.
     """
     __tablename__ = 'messages'
     id = db.Column(db.Integer, primary_key=True)
@@ -426,11 +438,20 @@ class Message(db.Model):
     sender_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     text = db.Column(db.String, nullable=False)
     date = db.Column(db.DateTime, server_default=func.now())
+    seen = db.Column(db.DateTime)
 
     def __init__(self, thread_id, sender_id, text):
         self.thread_id = thread_id
         self.sender_id = sender_id
         self.text = text
+
+    def see(self, userId):
+        thread = self.thread.first()
+        if userId != self.sender_id and (thread.user1 == userId or thread.user2 == userId):
+            self.seen = datetime.datetime.utcnow()
+        
+
+
 
 class Country(db.Model):
     """Database model for all countries. Contains:
