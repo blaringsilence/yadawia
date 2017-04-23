@@ -177,8 +177,8 @@ class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     seller_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    create_date = db.Column(db.DateTime, server_default=func.now())
-    update_date = db.Column(db.DateTime, onupdate=func.now())
+    create_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    update_date = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow)
     description = db.Column(db.String)
     currency_id = db.Column(db.String(3), db.ForeignKey('currencies.id'))
     price = db.Column(db.Float)
@@ -290,7 +290,7 @@ class Upload(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
     filename = db.Column(db.String)
-    date = db.Column(db.DateTime, server_default=func.now())
+    date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     variety_id = db.Column(db.Integer, db.ForeignKey('varieties.id'))
 
     def __init__(self, filename, product_id, variety_id=None):
@@ -317,8 +317,8 @@ class Review(db.Model):
     rating = db.Column(db.Float, nullable=False)
     title = db.Column(db.String)
     text = db.Column(db.String)
-    create_date = db.Column(db.DateTime, server_default=func.now())
-    update_date = db.Column(db.DateTime, onupdate=func.now())
+    create_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    update_date = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow)
 
     def __init__(self, user_id, product_id, rating, title=None, text=None):
         self.user_id = user_id
@@ -349,8 +349,8 @@ class Order(db.Model):
     __tablename__ = 'orders'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    create_date = db.Column(db.DateTime, server_default=func.now())
-    update_date = db.Column(db.DateTime, onupdate=func.now())
+    create_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    update_date = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow)
     status = db.Column(db.String, default='New')
     address_id = db.Column(db.Integer, db.ForeignKey('addresses.id'))
     products = db.relationship('Product', secondary='order_product',\
@@ -377,8 +377,8 @@ class OrderProduct(db.Model):
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
     variety_id = db.Column(db.Integer, db.ForeignKey('varieties.id'))
     quantity = db.Column(db.Integer, nullable=False, default=0)
-    create_date = db.Column(db.DateTime, server_default=func.now())
-    update_date = db.Column(db.DateTime, onupdate=func.now())
+    create_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    update_date = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow)
 
     def __init__(self, order_id, product_id, variety_id, quantity=0):
         self.order_id = order_id
@@ -438,7 +438,7 @@ class Message(db.Model):
     thread_id = db.Column(db.Integer, db.ForeignKey('message_threads.id'))
     sender_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     text = db.Column(db.String, nullable=False)
-    date = db.Column(db.DateTime, server_default=func.now())
+    date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     seen = db.Column(db.DateTime)
 
     def __init__(self, thread_id, sender_id, text):
@@ -515,7 +515,7 @@ class Report(db.Model):
     about_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     reason_id = db.Column(db.Integer, db.ForeignKey('reasons.id'))
     message = db.Column(db.String, nullable=False)
-    date = db.Column(db.DateTime, server_default=func.now())
+    date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     resolved = db.Column(db.Boolean, default=False)
 
     def __init__(self, sender_id, about_id, reason_id, message):

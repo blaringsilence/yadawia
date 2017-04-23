@@ -1,5 +1,5 @@
 {% extends 'layout.html' %}
-{% from 'macros.html' import rating_stars, form_group with context %}
+{% from 'macros.html' import rating_stars, form_group, review_card with context %}
 
 {% block extend_title %}
 | {{ product.name }}
@@ -31,6 +31,7 @@
 			{% endif %}
 		</div>
 		<div class="col-xs-12 col-md-2 center-if-mobile banner-controls">
+		{% if not session.logged_in or product.seller_id != session.userId %}
 			<form id="add-to-cart" action="" method="POST">
 			{% call form_group('Variety', 'variety', required=True) %}
 				<select name="variety" class="form-control" id="variety" required>
@@ -57,13 +58,48 @@
 			</div>
 			<button type="submit" class="btn btn-default"><i class="fa fa-cart-plus"></i> Add to cart</button>
 			</form>
+		{% else %}
+			<button class="btn btn-default"><i class="fa fa-pencil"></i> Edit Product</button>
+			{% if product.available %}
+				<button class="btn btn-default"><i class="fa fa-eye-slash"></i> Mark Unavailable</button>
+			{% else %}
+				<button class="btn btn-default"><i class="fa fa-eye"></i> Mark Available</button>
+			{% endif %}
+		{% endif %}
 		</div>
 	</div>
 </div>
 <div class="product-middle">
 	<div class="row">
-		<div class="col-xs-12 col-md-6 col-centered">
-			<h3>{{ product.description }}</h3>
+		<div class="col-xs-12 col-md-6 col-centered" title="Description">
+			<h3>{{ product.description | paragraph | safe}}</h3>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-12 col-md-4 text-center new-review">
+			<h4><i class="fa fa-pencil-square-o"></i> Your Review</h4>
+			{% if session.logged_in and product.reviews.filter_by(user_id=session.userId).count() > 0 %}
+				You have reviewed this item before!
+			{% elif session.logged_in %}
+				{% include 'form_review.html' with context %}
+			{% else %}
+				Login or Register to write a review!
+			{% endif %}
+		</div>
+		<div class="col-xs-12 col-md-8">
+			<h4><i class="fa fa-comment-o"></i> All Reviews</h4>
+			{% if session.logged_in and product.reviews.filter_by(user_id=session.userId).first() %}
+				{{ review_card(product.reviews.filter_by(user_id=session.userId).first(), owner=product.seller_id, yours=True) }}
+			{% endif %}
+			{% if product.reviews.count() > 0 %}
+				{% for review in product.reviews %}
+					{% if (not session.logged_in or review.user_id != session.userId) and not review.user.disabled %}
+						{{ review_card(review, owner=product.seller_id) }}
+					{% endif %}
+				{% endfor %}
+			{% else %}
+				No reviews for this product yet.
+			{% endif %}
 		</div>
 	</div>
 </div>
@@ -73,8 +109,24 @@
 	{% call modal('prod-pic', 'Details') %}
 		<img id="zoomed-pic">
 	{% endcall %}
+	{% if session.logged_in and product.reviews.filter_by(user_id=session.userId).count() > 0 %}
+		{% call modal('edit-review-modal', 'Edit Review') %}
+			{% with review=product.reviews.filter_by(user_id=session.userId).first(), review_edit=True %}
+				{% include 'form_review.html' with context %}
+			{% endwith %}
+		{% endcall %}
+		{% call modal('delete-review-modal', 'Delete Review') %}
+			<h3>Are you sure you want to delete your review?</h3>
+			<form method="POST" action="{{ url_for('delete_review', productID=product.id) }}" class="text-center">
+				<input type="hidden" value="{{ csrf_token() }}" name="_csrf_token">
+				<button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i> Delete</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+			</form>
+		{% endcall %}
+	{% endif %}
 {% endblock %}
 
 {% block scripts %}
+<script src="{{ url_for('static', filename='js/review_card.js') }}"></script>
 <script src="{{ url_for('static', filename='js/product.js') }}"></script>
 {% endblock %}

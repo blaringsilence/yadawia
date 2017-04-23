@@ -284,7 +284,7 @@ def create_product():
 @app.route('/product/<int:productID>')
 def product(productID):
     productID = productID
-    product = Product.query.filter_by(id=productID).first()
+    product = Product.query.filter_by(id=productID).outerjoin(Review).order_by(Review.create_date.desc()).first()
     if product is None:
         abort(404)
     rating = db.session.query(func.avg(Review.rating).label('average'))\
@@ -399,3 +399,61 @@ def report_user():
     flash_msg = error if error else 'Thank you for reporting this user. Someone will review this report and take the appropriate action if needed.'
     flash(flash_msg)
     return redirect(url_for('profile', username=about_username))
+
+@app.route('/product/<int:productID>/review/new', methods=['POST'])
+@authenticate
+def new_review(productID):
+    error = None
+    text = request.form['text']
+    rating = float(request.form['rating'])
+    user_id = session['userId']
+    title = request.form['title']
+    try:
+        review = Review(user_id, productID, rating, title=title, text=text)
+        db.session.add(review)
+        db.session.commit()
+    except DBException as dbe:
+        error = dbe.args[0]['message']
+    except (exc.IntegrityError, exc.SQLAlchemyError) as e:
+        error = e.message
+    return jsonify(success=True) if error is None else jsonify(error=error)
+
+@app.route('/product/<int:productID>/review/edit', methods=['POST'])
+@authenticate
+def edit_review(productID):
+    error = None
+    text = request.form['text']
+    rating = float(request.form['rating'])
+    user_id = session['userId']
+    title = request.form['title']
+    try:
+        review = Review.query.filter_by(product_id=productID, user_id=user_id).first()
+        if review is None:
+            abort(400)
+        review.text = text
+        review.rating = rating
+        review.title = title
+        db.session.commit()
+    except DBException as dbe:
+        error = dbe.args[0]['message']
+    except (exc.IntegrityError, exc.SQLAlchemyError) as e:
+        error = e.message
+    return jsonify(success=True) if error is None else jsonify(error=error)
+
+@app.route('/product/<int:productID>/review/delete', methods=['POST'])
+@authenticate
+def delete_review(productID):
+    error = None
+    user_id = session['userId']
+    try:
+        review = Review.query.filter_by(product_id=productID, user_id=user_id).first()
+        if review is None:
+            abort(400)
+        db.session.delete(review)
+        db.session.commit()
+    except DBException as dbe:
+        error = dbe.args[0]['message']
+    except (exc.IntegrityError, exc.SQLAlchemyError) as e:
+        error = e.message
+    flash_msg = error if error is not None else 'Successfully deleted your review.'
+    return redirect(url_for('product', productID=productID))

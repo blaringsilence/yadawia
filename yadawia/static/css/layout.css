@@ -10,6 +10,51 @@
 	font-weight: bold;
 }
 
+.seller-icon {
+	color: rgb(76,212,176);
+}
+
+.user-badge {
+	cursor: help;
+}
+
+.review-card {
+	border-radius: 1em;
+	border: 2px dashed rgba(51,51,51,0.5);
+	padding: 0.5em;
+	margin-bottom: 2em;
+}
+
+.review-card button {
+	font-size: 0.7em;
+	text-transform: uppercase;
+}
+
+.review-card .review-yours-footer {
+	margin-top: 0.5em;
+}
+
+.review-card.yours {
+	border-color: rgb(117,28,53);
+}
+
+.review-card h5 {
+	font-weight: bold;
+	font-size: 1.2em;
+}
+
+.review-card .review-date-area {
+	text-transform: uppercase;
+	font-size: 0.7em;
+	font-weight: bolder;
+	opacity: 0.8;
+	transition-duration: 0.3s;
+}
+
+.review-card .review-date-area:hover {
+	opacity: 1;
+}
+
 .form-group-helper {
 	opacity: 0.7;
 	font-size: 0.7em;
@@ -125,6 +170,10 @@ textarea {
 		width: 100%;
 		text-align: left;
 		margin-bottom: 0.5em;
+	}
+
+	.center-if-desktop {
+		text-align: center;
 	}
 }
 
@@ -363,6 +412,7 @@ a {
 
 .all-but-footer {
 	min-height: calc(100vh - 10em);
+	padding-bottom: 1em;
 }
 
 .footer {
@@ -438,12 +488,22 @@ a {
 	transition-duration: 0.3s;
 }
 
+
 .profile-banner p:hover {
 	opacity: 1;
 }
 
 .profile-about p {
 	word-wrap: break-word;
+}
+
+#rate-area {
+	color: rgb(51,51,51);
+	font-size: 2em;
+}
+
+#rate-area i {
+	cursor: pointer;
 }
 
 #total-price {

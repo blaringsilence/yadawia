@@ -6,6 +6,17 @@ var generateMessage = function (type, selector, message) {
 	)
 };
 
+var colorUntil = function(pos){
+	for(var i=1; i<=5; i++){
+		var elem = $('#star-' + i);
+		if(i <= pos){
+			$(elem).removeClass('fa-star-o').addClass('fa-star');
+		} else {
+			$(elem).removeClass('fa-star').addClass('fa-star-o');
+		}
+	}
+};
+
 var generateHidden = function(name, value, form, class_name) {
 	$(form).append('<input type="hidden" class="' + class_name + '" name="' + name + '" value="' + value + '">');
 }
@@ -48,9 +59,10 @@ var hide_feedback_elem = function(field) {
 	$(feedback_elem).html('');
 }
 
-var validate_and_send = function(form, endpoint, extra_valid_check, refresh_to) {
+var validate_and_send = function(form, endpoint, extra_field_check, refresh_to, url_params) {
 	var valid = $(form)[0].checkValidity();
-	var extra = extra_valid_check ? ', ' + extra_valid_check : '';
+	var url_params = url_params ? url_params : {};
+	var extra = extra_field_check ? ', ' + extra_field_check : '';
 	var valid_feedback = true;
 		$('.feedback-elem, input[name="name"], input[name="location"]' + extra, form).each(function(){
 		var elem = this;
@@ -62,7 +74,7 @@ var validate_and_send = function(form, endpoint, extra_valid_check, refresh_to) 
 	var main_error_place = $('.main-error-msg', form);	
 	if (valid && valid_feedback) {
 		$.ajax({
-			url: Flask.url_for(endpoint),
+			url: Flask.url_for(endpoint, url_params),
 			type: 'POST',
 			data: $(form).serialize(),
 			success: function(data) {

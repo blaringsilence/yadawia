@@ -8,6 +8,7 @@ from flask import Flask, request, session, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_jsglue import JSGlue
 from flask_uploads import UploadSet, configure_uploads, IMAGES
+import re
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
@@ -49,6 +50,9 @@ def name_or_username(userId):
 def upload_url(filename):
     return yadawia.helpers.get_upload_url(filename)
 
+@app.template_filter('paragraph')
+def paragraph(text):
+    return text.replace('\n', '<br />')
 
 
 

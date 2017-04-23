@@ -1,0 +1,20 @@
+{% from 'macros.html' import form_group %}
+<form id="review-item-form" data-product="{{ product.id }}" data-endpoint="{% if review_edit %}edit_review{% else %}new_review{% endif %}">
+	<div class="main-error-msg"></div>
+	<div id="rate-area">
+		{% for i in range(1,6) %}
+			<i class="fa fa-star-o" id="star-{{ i }}" data-num="{{ i }}" title="{{ i }} stars"></i>
+		{% endfor %}
+	</div>
+	{% call form_group('Title', 'new-review-title', required=True) %}
+	<input type="text" name="title" class="form-control" id="new-review-title" placeholder="Title of the review.." required="" value="{% if review is defined %}{{ review.title }}{% endif %}">
+	{% endcall %}
+	{% call form_group('', 'new-review-text') %}
+	<textarea name="text" class="form-control" id="new-review-text" placeholder="What did you think of this product?" required>{% if review is defined %}{{ review.text }}{% endif %}</textarea>
+	{% endcall %}
+	<input type="hidden" id="rating" name="rating" value="{% if review is defined %}{{ review.rating }}{% endif %}">
+	<input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+	<button type="submit" class="btn btn-primary">{% if review_edit %}Edit{% else %}Submit{% endif %} Review</button>
+</form>
+
+<script src="{{ url_for('static', filename='js/form_review.js') }}"></script>
