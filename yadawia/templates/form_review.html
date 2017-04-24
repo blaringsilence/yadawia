@@ -9,7 +9,7 @@
 	{% call form_group('Title', 'new-review-title', required=True) %}
 	<input type="text" name="title" class="form-control" id="new-review-title" placeholder="Title of the review.." required="" value="{% if review is defined %}{{ review.title }}{% endif %}">
 	{% endcall %}
-	{% call form_group('', 'new-review-text') %}
+	{% call form_group('Details', 'new-review-text', required=True) %}
 	<textarea name="text" class="form-control" id="new-review-text" placeholder="What did you think of this product?" required>{% if review is defined %}{{ review.text }}{% endif %}</textarea>
 	{% endcall %}
 	<input type="hidden" id="rating" name="rating" value="{% if review is defined %}{{ review.rating }}{% endif %}">

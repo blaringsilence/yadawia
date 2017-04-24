@@ -415,6 +415,10 @@ a {
 	padding-bottom: 1em;
 }
 
+.index-banner {
+	margin-top: -0.5em;
+}
+
 .footer {
 	min-height: 10em;
 	padding: 1em;
@@ -436,7 +440,7 @@ a {
 }
 
 .product-banner {
-	background-color: rgba(117,28,53,0.3);
+	background-color: rgb(76,212,176);
 }
 
 
