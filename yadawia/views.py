@@ -107,13 +107,14 @@ def profile(username=None):
     report_reasons = Reason.query.order_by(Reason.text).all()
 
     is_current_users_profile = curr_user(username.lower())
+    kwargs = {} if is_current_users_profile else { 'available': True }
 
     return render_template('profile.html', user=user,\
                             picture_url=get_upload_url(user.picture),\
                             is_curr_user=is_current_users_profile,\
                             avg_rating=avg_rating,\
-                            products=user.products.filter_by(available=True)\
-                                    .order_by(Product.create_date.desc()).all(),\
+                            products=user.products.filter_by(**kwargs)\
+                                    .order_by(Product.update_date.desc()).all(),\
                             report_reasons=report_reasons)
 
 @app.route('/upload/profile-pic', methods=['POST'])
@@ -287,10 +288,7 @@ def product(productID):
     product = Product.query.filter_by(id=productID).outerjoin(Review).order_by(Review.create_date.desc()).first()
     if product is None:
         abort(404)
-    rating = db.session.query(func.avg(Review.rating).label('average'))\
-            .join(Product).filter(Product.id == productID).first()[0]
-    avg_rating = round(rating, 2) if rating is not None else None
-    return render_template('product.html', product=product, avg_rating=avg_rating)
+    return render_template('product.html', product=product)
 
 @app.route('/message/create', methods=['POST'])
 @authenticate
@@ -457,3 +455,20 @@ def delete_review(productID):
         error = e.message
     flash_msg = error if error is not None else 'Successfully deleted your review.'
     return redirect(url_for('product', productID=productID))
+
+@app.route('/product/<int:productID>/toggle', methods=['POST'])
+@authenticate
+def toggle_availability(productID):
+    error = None
+    user_id = session['userId']
+    try:
+        product = Product.query.filter_by(id=productID, seller_id=user_id).first()
+        if product is None:
+            abort(400)
+        product.available = not product.available
+        db.session.commit()
+    except DBException as dbe:
+        error = dbe.args[0]['message']
+    except (exc.IntegrityError, exc.SQLAlchemyError) as e:
+        error = e.message
+    return jsonify(success=True) if error is None else jsonify(error=error)

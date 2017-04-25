@@ -21,14 +21,18 @@
 					<li><span class="prod-cat-disp">{{ category.name }}</span></li>
 			{% endfor %}
 			</ul>
-			{% if avg_rating %}
+			{% if product.avg_rating() %}
 				<p>
-					<span title="{{ product.reviews.count() }} review(s)" class="avg-rating" title="Average rating ({{ avg_rating }})">
-						{{ avg_rating }}
-						{{ rating_stars(avg_rating) }}
+					<span title="{{ product.reviews.count() }} review(s)" class="avg-rating" title="Average rating ({{ product.avg_rating() }})">
+						{{ product.avg_rating() }}
+						{{ rating_stars(product.avg_rating()) }}
 					</span>
 				</p>
 			{% endif %}
+			<p>
+				<i class="fa fa-clock-o"></i> 
+				<span class="prod-page-date" data-date="{{ product.update_date }}"></span>
+			</p>
 		</div>
 		<div class="col-xs-12 col-md-2 center-if-mobile banner-controls">
 		{% if not session.logged_in or product.seller_id != session.userId %}
@@ -60,11 +64,9 @@
 			</form>
 		{% else %}
 			<button class="btn btn-default"><i class="fa fa-pencil"></i> Edit Product</button>
-			{% if product.available %}
-				<button class="btn btn-default"><i class="fa fa-eye-slash"></i> Mark Unavailable</button>
-			{% else %}
-				<button class="btn btn-default"><i class="fa fa-eye"></i> Mark Available</button>
-			{% endif %}
+			
+				<button class="btn btn-default" id="toggle-prod" data-prod="{{ product.id }}"><i class="fa fa-eye{% if product.available %}-slash{% endif %}"></i> Mark {% if product.available %}Una{% else %}A{% endif %}vailable</button>
+			
 		{% endif %}
 		</div>
 	</div>
@@ -72,9 +74,11 @@
 <div class="product-middle">
 	<div class="row">
 		<div class="col-xs-12 col-md-6 col-centered" title="Description">
+			<div id="prod-error-place"></div>
 			<h3>{{ product.description | paragraph | safe}}</h3>
 		</div>
 	</div>
+	<hr>
 	<div class="row">
 		<div class="col-xs-12 col-md-4 text-center new-review">
 			<h4><i class="fa fa-pencil-square-o"></i> Your Review</h4>

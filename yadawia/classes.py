@@ -66,6 +66,9 @@ class User(db.Model):
             return self.name
         return self.username
 
+    def bought(self, productID):
+        return self.orders.join(OrderProduct).join(Product).filter(Product.id == productID).count() > 0
+
     @validates('password')
     def validate_password(self, key, pw):
         if len(pw) < 6:
@@ -178,7 +181,7 @@ class Product(db.Model):
     name = db.Column(db.String, nullable=False)
     seller_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     create_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    update_date = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow)
+    update_date = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
     description = db.Column(db.String)
     currency_id = db.Column(db.String(3), db.ForeignKey('currencies.id'))
     price = db.Column(db.Float)
@@ -200,6 +203,14 @@ class Product(db.Model):
         self.description = description
         self.price = price
         self.currency_id = currency_id
+
+    def random_picture(self):
+        return get_upload_url(self.uploads.order_by(func.random()).first().filename)
+
+    
+    def avg_rating(self):
+        return db.session.query(func.avg(Review.rating).label('average')).\
+                join(Product).filter(Product.id == self.id).first()[0]
 
     @validates('price')
     def validate_price(self, key, p):
@@ -318,7 +329,7 @@ class Review(db.Model):
     title = db.Column(db.String)
     text = db.Column(db.String)
     create_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    update_date = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow)
+    update_date = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
     def __init__(self, user_id, product_id, rating, title=None, text=None):
         self.user_id = user_id
@@ -350,7 +361,7 @@ class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     create_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    update_date = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow)
+    update_date = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
     status = db.Column(db.String, default='New')
     address_id = db.Column(db.Integer, db.ForeignKey('addresses.id'))
     products = db.relationship('Product', secondary='order_product',\
@@ -378,7 +389,7 @@ class OrderProduct(db.Model):
     variety_id = db.Column(db.Integer, db.ForeignKey('varieties.id'))
     quantity = db.Column(db.Integer, nullable=False, default=0)
     create_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    update_date = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow)
+    update_date = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
     def __init__(self, order_id, product_id, variety_id, quantity=0):
         self.order_id = order_id
@@ -546,4 +557,4 @@ class Admins(db.Model):
         self.user_id = user_id
 
 
-from yadawia.helpers import validate_name_pattern, no_special_chars
+from yadawia.helpers import validate_name_pattern, no_special_chars, get_upload_url

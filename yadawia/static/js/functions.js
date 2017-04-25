@@ -6,6 +6,11 @@ var generateMessage = function (type, selector, message) {
 	)
 };
 
+var momentDate = function(date) {
+	var moment_date = moment.utc(date).local();
+	return { formatted:  moment_date.format('MMMM Do YYYY, h:mm:ss a'), fromNow: moment_date.fromNow() };
+};
+
 var colorUntil = function(pos){
 	for(var i=1; i<=5; i++){
 		var elem = $('#star-' + i);

@@ -142,6 +142,9 @@
       {% if review.user_id == owner %}
       <span title="Product Seller" class="user-badge seller-icon"><i class="fa fa-check-circle"></i></span>
       {% endif %}
+      {% if review.user.bought(review.product_id) %}
+      <span title="Confirmed Purchase" class="user-badge"><i class="fa fa-shopping-bag"></i></span>
+      {% endif %}
     </small>
   </h5>
   <p>{{ review.text | paragraph | safe }}</p>
@@ -156,4 +159,18 @@
   </div>
   {% endif %}
 </div>
+{% endmacro %}
+
+{% macro product_card(product) %}
+<a href="{{ url_for('product', productID=product.id) }}"><div class="product-card">
+    <img src="{{ product.random_picture() }}">
+    <h5>{{ product.name }}</h5>
+    {% if product.avg_rating() %}
+      <span title="Average rating: {{ product.avg_rating() }}">{{ rating_stars(product.avg_rating()) }}</span>
+    {% else %}
+      <span title="No ratings yet">{% for i in range(5) %}<i class="fa fa-star-o grey"></i> {% endfor %}</span>
+    {% endif %}
+    <br>
+    <span class="prod-card-date" data-date="{{ product.update_date }}"></span>
+</div></a>
 {% endmacro %}

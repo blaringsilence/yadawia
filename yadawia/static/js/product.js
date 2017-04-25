@@ -13,6 +13,13 @@ $(function(){
 									+ '</span>');
 	});
 
+	$('.prod-page-date').each(function(){
+		var date = $(this).data('date');
+		var moment_date = momentDate(date);
+		$(this).attr('title', 'Last Updated: ' + moment_date.formatted);
+		$(this).text(moment_date.fromNow)
+	});
+
 	$('.prod-circle').click(function(){
 		var pic = '#' + $(this).data('pic');
 		$(pic).triggerHandler('show');
@@ -43,6 +50,22 @@ $(function(){
 		var total = price_per_unit * quantity;
 		$('#total-disp', cart_form).text(total);
 	}
+	$('#toggle-prod').click(function(){
+		var prodID = $(this).data('prod');
+		var main_error_place = $('#prod-error-place');
+		$.ajax({
+			url: Flask.url_for('toggle_availability', { productID: prodID }),
+			type: 'POST',
+			data: { _csrf_token: $('body').data('csrf') },
+			success: function(data) {
+				if(data.error){
+					generateMessage('warning', main_error_place, data.error);
+				} else {
+					window.location.reload();
+				}
+			}
+		});
+	});
 
 	if($('#variety', cart_form).find(':selected').val() && $('#quantity', cart_form).val() !== ''){
 		update_total();

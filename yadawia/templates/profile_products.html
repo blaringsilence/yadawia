@@ -1,3 +1,7 @@
+{% from 'macros.html' import product_card %}
 {% for product in products %}
-	<a href="{{ url_for('product', productID=product.id) }}"><h4>{{ product.name }}</h4></a>
+	<div class="col-xs-12 col-md-3 text-center">
+		{{ product_card(product) }}
+	</div>
 {% endfor %}
+<script src="{{ url_for('static', filename='js/profile_products.js') }}"></script>
