@@ -196,6 +196,7 @@ class Product(db.Model):
     orders = db.relationship('Order', secondary='order_product',\
                                 back_populates='products', lazy='dynamic')
     available = db.Column(db.Boolean, default=True, nullable=False)
+    force_unavailable = db.Column(db.Boolean, default=False, nullable=False)
 
     def __init__(self, name, seller_id, description=None, price=None, currency_id=None):
         self.name = name

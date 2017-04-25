@@ -12,7 +12,7 @@ from yadawia.classes import DBException, LoginException, User, Address,\
 from yadawia.helpers import login_user, is_safe, redirect_back, \
                             authenticate, anonymous_only, public,\
                             curr_user, get_upload_url, logout_user,\
-                            is_allowed_in_thread
+                            is_allowed_in_thread, disable_user
 from sqlalchemy import exc, or_, and_
 from flask import request, render_template, session, redirect, url_for, abort, flash, jsonify, send_from_directory
 from flask_uploads import UploadSet, configure_uploads, IMAGES, UploadNotAllowed
@@ -189,8 +189,7 @@ def deactivate_account(): # TODO prevent deactivate if ongoing orders.
     password = request.form['password']
     user = User.query.filter_by(username=session['username']).first()
     if user.isPassword(password):
-        user.disabled = True
-        db.session.commit()
+        disable_user(user.username)
         flash('Your account has been deactivated. Login again to reactivate it!')
         logout_user()
         return redirect(url_for('home'))
@@ -286,7 +285,8 @@ def create_product():
 def product(productID):
     productID = productID
     product = Product.query.filter_by(id=productID).outerjoin(Review).order_by(Review.create_date.desc()).first()
-    if product is None:
+    if product is None or\
+    (not product.available and ('logged_in' not in session or product.seller_id != session['userId'])):
         abort(404)
     return render_template('product.html', product=product)
 

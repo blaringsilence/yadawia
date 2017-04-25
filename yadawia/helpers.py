@@ -30,9 +30,10 @@ def login_user(username, password):
     if user is not None:
         if not user.isPassword(password):
             raise LoginException({'message': 'Password is incorrect.', 'code': 'password'})
-        if user.disabled:
-            user.disabled = False
-            db.session.commit()
+        if user.suspended:
+            raise LoginException({'message': 'Your account has been suspended.', 'code': 'suspend'})
+        elif user.disabled:
+            enable_user(username)
             flash('Welcome back!')
         session['logged_in'] = True
         session['username'] = username.lower()
@@ -40,6 +41,39 @@ def login_user(username, password):
         generate_csrf_token(force=True)
     else:
         raise LoginException({'message': 'Username does not exist.', 'code': 'username'})
+
+def suspend_user(username):
+    """Suspend a user.""" # TODO cancel orders, refund people etc
+    disable_user(username, suspended=True)
+
+def unsuspend_user(username):
+    """Unsuspend a user."""
+    enable_user(username, was_suspended=True)
+
+def disable_user(username, suspended=False):
+    """Disable a user."""
+    user = User.query.filter_by(username=username.lower()).first()
+    if user is not None:
+        user.suspended = suspended
+        user.disabled = True
+        prods = user.products.filter_by(available=True).all()
+        for prod in prods:
+            prod.available = False
+            prod.force_unavailable = True
+        db.session.commit()
+
+def enable_user(username, was_suspended=False):
+    """Enable a user."""
+    user = User.query.filter_by(username=username.lower()).first()
+    if user is not None:
+        if was_suspended:
+            user.suspended = False
+        user.disabled = False
+        prods = user.products.filter_by(force_unavailable=True).all()
+        for prod in prods:
+            prod.available = True
+            prod.force_unavailable = False
+        db.session.commit()
 
 def get_random_string(length=32):
     """Generate a random string of length 32, used in ``generate_csrf_token()``"""
