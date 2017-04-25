@@ -1,4 +1,7 @@
 $(function(){
+	var cw = $('.prod-edit-pic-pic').width();
+	$('.prod-edit-pic-pic').css({'height':cw+'px'});
+
 	var pictures = $('.prod-page-pic');
 	var empty_circle = '<i class="fa fa-circle-o"></i>';
 	var full_circle = '<i class="fa fa-circle"></i>';
@@ -71,4 +74,21 @@ $(function(){
 		update_total();
 	}
 	$(cart_form).change(update_total);
+
+	var updatePos = function(){
+		$('.prod-edit-pic-li').each(function(){
+			var pos = $(this).parent().index() + 1;
+			$('span', this).text(pos);
+			$('span', this).show();
+		});
+	};
+
+	updatePos();
+
+	$( "#sortable" ).sortable({
+		update: function(event, ui) {
+			updatePos();
+		}
+	});
+    $( "#sortable" ).disableSelection();
 });

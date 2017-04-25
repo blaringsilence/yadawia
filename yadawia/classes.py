@@ -297,6 +297,7 @@ class Upload(db.Model):
         - date: upload date.
         - product_id: int, foreign key.
         - variety_id: int, foreign key. Optional.
+        - order: int, default: 0
     """
     __tablename__ = 'uploads'
     id = db.Column(db.Integer, primary_key=True)
@@ -304,11 +305,16 @@ class Upload(db.Model):
     filename = db.Column(db.String)
     date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     variety_id = db.Column(db.Integer, db.ForeignKey('varieties.id'))
+    order = db.Column(db.Integer, default=0)
 
-    def __init__(self, filename, product_id, variety_id=None):
+    def __init__(self, filename, product_id, variety_id=None, order=0):
         self.filename = filename
         self.product_id = product_id
         self.variety_id = variety_id
+        self.order = order
+
+    def url(self):
+        return get_upload_url(self.filename)
 
 class Review(db.Model):
     """Database model for reviews on products. Contains:

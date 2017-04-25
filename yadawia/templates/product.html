@@ -5,14 +5,22 @@
 | {{ product.name }}
 {% endblock %}
 
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/jquery-ui.min.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/jquery-ui.structure.min.css') }}">
+{% endblock %}
+
 {% block middle %}
 <div class="product-banner">
 	<div class="row">
 		<div class="col-xs-12 col-md-4 text-center">
 			{% for upload in product.uploads %}
-				<img class="prod-page-pic" id="{{ upload.id }}" data-circle="circ-{{ upload.id }}" src="{{ upload.filename | upload_url }}">
+				<img class="prod-page-pic" id="{{ upload.id }}" data-circle="circ-{{ upload.id }}" src="{{ upload.url() }}">
 			{% endfor %}
 			<div id="prod-pic-circles" title="Click circle to view pictures."></div>
+			{% if 'logged_in' in session and product.seller_id == session.userId %}
+			<button class="btn btn-default edit-btn" data-toggle="modal" data-target="#prod-edit-pic"><i class="fa fa-upload"></i> Edit Pictures</button>
+			{% endif %}
 		</div>
 		<div class="col-xs-12 col-md-6 center-if-mobile">
 			<h2>{{ product.name }} <small>by <a href="{{ url_for('profile', username=product.seller.username) }}">{{ product.seller.name_or_username() }}</a></small></h2>
@@ -113,7 +121,20 @@
 	{% call modal('prod-pic', 'Details') %}
 		<img id="zoomed-pic">
 	{% endcall %}
-	{% if session.logged_in and product.reviews.filter_by(user_id=session.userId).count() > 0 %}
+	{% if 'logged_in' in session and product.seller_id == session.userId %}
+		{% call modal('prod-edit-pic', 'Edit Pictures') %}
+			<div class="row">
+				<ul id="sortable" class="list-inline list-unstyled">
+					{% for pic in product.uploads %}
+						<div class="col-xs-3">
+							<li class="ui-state-default prod-edit-pic-li" data-id="{{ pic.id }}"><img class="prod-edit-pic-pic" src="{{ pic.url() }}"><br><span class="prod-edit-pic-span"></span></li>
+						</div>
+					{% endfor %}
+				</ul>
+			</div>
+		{% endcall %}
+	{% endif %}
+	{% if 'logged_in' in session and product.reviews.filter_by(user_id=session.userId).count() > 0 %}
 		{% call modal('edit-review-modal', 'Edit Review') %}
 			{% with review=product.reviews.filter_by(user_id=session.userId).first(), review_edit=True %}
 				{% include 'form_review.html' with context %}
@@ -131,6 +152,7 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 <script src="{{ url_for('static', filename='js/review_card.js') }}"></script>
 <script src="{{ url_for('static', filename='js/product.js') }}"></script>
 {% endblock %}
