@@ -4,14 +4,16 @@ Helpers
 Contains helper functions (decorators, others) used by other parts of the app.
 
 """
-from yadawia import db
-from yadawia.classes import User, LoginException, DBException, MessageThread
+from yadawia import db, photos
+from yadawia.classes import User, LoginException, DBException, MessageThread, Product, Variety, ProductCategory, Upload
 from flask import session, url_for, redirect, request, flash
 from urllib.parse import urlparse, urljoin
 from functools import wraps
 import re
 import string
 import random
+from sqlalchemy import exc
+import uuid
 
 def login_user(username, password):
     """Function to login user through their username.
@@ -74,6 +76,54 @@ def enable_user(username, was_suspended=False):
             prod.available = True
             prod.force_unavailable = False
         db.session.commit()
+
+def create_edit_product(create=True, productID=None):
+    error = None
+    name = request.form['pname']
+    seller_id = session['userId']
+    description = request.form['description']
+    currency = request.form['currency']
+    price = float(request.form['price']) if request.form['price'] is not None else None
+    categories = request.form.getlist('categories')
+    variety_titles = request.form.getlist('variety_title')
+    variety_prices = request.form.getlist('variety_price')
+    pictures = request.files.getlist('photo')
+    try:
+        if create:
+            product = Product(name, seller_id, description, price, currency)
+            db.session.add(product)
+            db.session.flush() # to access product ID
+        else:
+            product = Product.query.filter_by(id=productID).first()
+            product.description = description
+            product.name = name
+            product.price = price
+            product.currency_id = currency
+            product.varieties.delete()
+            ProductCategory.query.filter_by(product_id=productID).delete()
+        for category_id in categories:
+            prodCat = ProductCategory(product.id, category_id)
+            db.session.add(prodCat)
+        for i in range(1, len(variety_titles)):
+            vtitle = variety_titles[i]
+            vprice = float(variety_prices[i]) if variety_prices[i] != 'Default' else None
+            variety = Variety(vtitle, product.id, vprice)
+            db.session.add(variety)
+        for pic in pictures:
+            rand_name = uuid.uuid4().hex + '.'
+            filename = photos.save(pic, name=rand_name)
+            upload = Upload(filename, product.id)
+            db.session.add(upload)
+        db.session.commit()
+    except DBException as dbe:
+        error = dbe.args[0]['message']
+    except (exc.IntegrityError, exc.SQLAlchemyError) as e:
+        error = e.message
+    if error:
+        flash(error)
+        if create:
+            return redirect(url_for('create_product'))
+    return redirect(url_for('product', productID=product.id))
 
 def get_random_string(length=32):
     """Generate a random string of length 32, used in ``generate_csrf_token()``"""

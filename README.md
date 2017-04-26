@@ -20,10 +20,13 @@ Web platform for buying and selling handmade products. Built with Flask and Post
     ```
 4. Install PostgreSQL (see [download page](https://www.postgresql.org/download/)), then create a user, and a database.
     ```bash
-      $ sudo -u postgres createuser -s $USER
+      $ sudo -u postgres createuser -s $USER -P
       $ createdb -U $USER yadawia
     ```
-5. Update [yadawia/config.py](yadawia/config.py) by replacing the username and password in the database URL with your database username and password.
+5. Update your venv activation script venv/bin/activate by making it set the DATABASE_URL environment variable to your database string by adding the following line:
+    ```bash
+      export DATABASE_URL="postgresql+psycopg2://USER:PASSWORD@localhost/yadawia"
+    ```
 6. Create the tables.
     ```bash
       $ chmod a+x create_db.py

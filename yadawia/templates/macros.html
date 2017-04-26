@@ -108,7 +108,7 @@
 {% endmacro %}
 
 
-{% macro change_pic_form(id, prompt='New Picture', curr_pic=None, hasUpload=True, largePic=False, multiple=False) %} 
+{% macro change_pic_form(id, prompt='New Picture', curr_pic=None, hasUpload=True, largePic=False, multiple=False, required=True) %} 
   <div class="col-xs-12 text-center">
       <div id="preview-wrapper">
           <img id="preview" src="{% if curr_pic %}{{ curr_pic }}{% endif %}" class="pic-preview{% if largePic %}-large{% endif %}">
@@ -118,8 +118,8 @@
         <div id="little-previews"></div>
       </div>
   </div>
-  {% call form_group(prompt, 'photo', required=True) %}
-    <input id="photo" class="form-control" type="file" name="photo" accept="image/*" {% if multiple %} multiple="multiple" {% endif %} required>
+  {% call form_group(prompt, 'photo', required=required) %}
+    <input id="photo" class="form-control" type="file" name="photo" accept="image/*" {% if multiple %} multiple="multiple" {% endif %} {% if required %} required {% endif %}>
   {% endcall %} 
   <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"/>
   {% if hasUpload %}

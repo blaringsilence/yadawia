@@ -7,6 +7,20 @@
 	- Text Grey: rgb(51,51,51);
 */
 
+.prod-edit-pic-remove {
+	background-color: rgba(192, 57, 43,1.0);
+	color: white;
+	padding-left: 0.3em;
+	padding-right: 0.3em;
+	border-radius: 0.3em;
+	cursor: pointer;
+	transition-duration: 0.3s;
+}
+
+.prod-edit-pic-remove:hover {
+	filter: invert(100%);
+}
+
 a:hover {
 	text-decoration: none;
 }

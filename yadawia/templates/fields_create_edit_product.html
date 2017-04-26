@@ -1,0 +1,71 @@
+{% from 'macros.html' import form_group, change_pic_form with context %}
+<div class="product-uploads">
+		{% if product is defined %}{% set prompt = 'Additional Product Photos' %}{% set requiredPics=False %}{% else %}{% set prompt = 'Product Photos' %}{% set requiredPics=True %}{% endif %}
+		{{ change_pic_form('prod-pics', prompt=prompt, hasUpload=False, largePic=True, multiple=True, required=requiredPics) }}
+		<small>Tip: To remove or re-order existing pictures, you can do so from the Edit Pictures button.</small>
+		<br>
+	</div>
+	<div class="product-main">
+			{% call form_group('Product Name', 'prod-name', required=True, helper='') %}
+				<input id="prod-name" class="form-control" type="text" placeholder="Product's Name" name="pname" {% if product is defined %} value="{{ product.name }}" {% endif %} required>
+			{% endcall %}
+			{% call form_group('Category', 'prod-cat', required=True, helper='Hold down Ctrl/Command ⌘ key to choose more than one. Maximum 5.') %}
+				<select id="prod-cat" class="form-control" name="categories" multiple="multiple" required>
+					<option id="default-cat" disabled="disabled" value="" {% if product is not defined %} selected {% endif %}>Choose Category</option>
+					{% for category in categories %}
+						<option id="cat-{{ category.id }}" value="{{ category.id }}" {% if product is defined and category in product.categories %} selected="selected" {% endif %}>{{ category.name }}</option>
+					{% endfor %}
+				</select>
+			{% endcall %}
+			<div id="prod-cat-selected"></div>
+			{% call form_group('Currency', 'prod-curr', required=True) %}
+				<select id="prod-curr" class="form-control" name="currency" required>
+					<option disabled="disabled" value="" {% if product is not defined %} selected {% endif %}>Choose Currency</option>
+					{% for currency in currencies %}
+						<option value="{{ currency.id }}" {% if product is defined and currency.id == product.currency_id %} selected {% endif %}>{{ currency.name }} ({{ currency.id }})</option>
+					{% endfor %}
+				</select>
+			{% endcall %}
+			{% call form_group('Default Price', 'prod-price', required=True, helper='Product price if no specific variety with its own price is selected. Set to 0 ONLY IF all your varieties are priced.') %}
+				<input id="prod-price" class="form-control" name="price" type="number" min="0" {% if product is defined %} value="{{ product.price }}" {% endif %} required>
+			{% endcall %}
+			{% call form_group('Description', 'prod-desc') %}
+				<textarea id="prod-desc" name="description" placeholder="Product Description.." class="form-control">{% if product is defined %} {{ product.description }} {% endif %}</textarea>
+			{% endcall %}
+			<!--Varieties-->
+			<div class="prod-varieties">
+				<h4>Varieties: <small>Different types, like sizes, materials, etc. Example: title: Size XL, price: 200.</small></h4>
+				<div class="">
+					{% call form_group('Title', 'prod-var-title') %}
+						<input id="prod-var-title" type="text" placeholder="(e.g. Size XL)" class="form-control">
+					{% endcall %}
+				</div>
+				<div class="">
+					{% call form_group('Price', 'prod-var-price') %}
+						<input id="prod-var-price" type="number" min="0" placeholder="(e.g. 200)" class="form-control">
+					{% endcall %}
+				</div>
+				<div class="">
+					{% call form_group('', 'prod-var-add') %}
+						<input type="button" class="btn btn-primary" id="prod-var-add" value="Add" disabled>
+					{% endcall %}			
+				</div>
+				<div id="prod-var-select" class=""></div>
+			</div>
+			<!--End Varieties-->
+				{% if product is defined %}
+					{% for variety in product.varieties %}
+						<input type="hidden" class="already-var-title" value="{{ variety.name }}">
+						<input type="hidden" class="already-var-price" value="{% if variety.price %}{{ variety.price }}{% else %}Default{% endif %}">
+					{% endfor %}
+				{% endif %}
+				<input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"/>
+				<input type="hidden" name="variety_title" value=""/>
+				<input type="hidden" name="variety_price" value=""/>
+				<div class="row" style="margin-bottom: 1em;">
+					<div class="col-xs-12 text-right">
+						<input type="submit" class="btn btn-primary" value="{% if product is defined %}Save{% else %}Create{% endif %}">		
+					</div>
+				</div>
+				
+	</div>

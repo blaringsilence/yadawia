@@ -80,16 +80,25 @@ $(function(){
 		$('.prod-edit-pic-li').each(function(){
 			var pos = $(this).parent().index() + 1;
 			var id = $(this).data('id');
-			$('span', this).text(pos);
-			$('span', this).show();
+			$('.prod-edit-pic-span', this).text(pos);
+			$('.prod-edit-pic-span', this).show();
 			$('.hidden-parts', '#prod-pic-edit-form')
 				.append('<input type="hidden" class="positions" name="pic_id" value="' + id + '">');
 			$('.hidden-parts', '#prod-pic-edit-form')
-				.append('<input type="hidden" class="positions" name="pic_order" value="' + pos + '">')
+				.append('<input type="hidden" class="positions rem' + id + '" name="pic_order" value="' + pos + '">')
 		});
 	};
 
 	updatePos();
+
+	$('.prod-edit-pic-remove').click(function(){
+		var parent = $(this).parent();
+		var grandparent = $(this).parent().parent();
+		var id = $(parent).data('id');
+		$('.rem' + id).val('remove');
+		$(parent).remove();
+		$(grandparent).remove();
+	});
 
 	$( "#sortable" ).sortable({
 		update: function(event, ui) {
