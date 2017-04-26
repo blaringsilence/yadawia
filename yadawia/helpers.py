@@ -110,10 +110,11 @@ def create_edit_product(create=True, productID=None):
             variety = Variety(vtitle, product.id, vprice)
             db.session.add(variety)
         for pic in pictures:
-            rand_name = uuid.uuid4().hex + '.'
-            filename = photos.save(pic, name=rand_name)
-            upload = Upload(filename, product.id)
-            db.session.add(upload)
+            if pic.filename:
+                rand_name = uuid.uuid4().hex + '.'
+                filename = photos.save(pic, name=rand_name)
+                upload = Upload(filename, product.id)
+                db.session.add(upload)
         db.session.commit()
     except DBException as dbe:
         error = dbe.args[0]['message']
