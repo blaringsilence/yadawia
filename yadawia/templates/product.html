@@ -19,7 +19,7 @@
 			{% endfor %}
 			<div id="prod-pic-circles" title="Click circle to view pictures."></div>
 			{% if 'logged_in' in session and product.seller_id == session.userId %}
-			<button class="btn btn-default edit-btn" data-toggle="modal" data-target="#prod-edit-pic"><i class="fa fa-upload"></i> Edit Pictures</button>
+			<button class="btn btn-default edit-btn" data-toggle="modal" data-target="#prod-edit-pic"><i class="fa fa-pencil"></i> Edit Pictures</button>
 			{% endif %}
 		</div>
 		<div class="col-xs-12 col-md-6 center-if-mobile">
@@ -71,7 +71,7 @@
 			<button type="submit" class="btn btn-default"><i class="fa fa-cart-plus"></i> Add to cart</button>
 			</form>
 		{% else %}
-			<button class="btn btn-default"><i class="fa fa-pencil"></i> Edit Product</button>
+			<button class="btn btn-default" data-toggle="modal" data-target="#product-edit"><i class="fa fa-pencil"></i> Edit Product</button>
 			
 				<button class="btn btn-default" id="toggle-prod" data-prod="{{ product.id }}"><i class="fa fa-eye{% if product.available %}-slash{% endif %}"></i> Mark {% if product.available %}Una{% else %}A{% endif %}vailable</button>
 			
@@ -122,6 +122,9 @@
 		<img id="zoomed-pic">
 	{% endcall %}
 	{% if 'logged_in' in session and product.seller_id == session.userId %}
+		{% call modal('product-edit', 'Edit Product') %}
+			{% include 'form_edit_product.html' with context %}
+		{% endcall %}
 		{% call modal('prod-edit-pic', 'Edit Pictures') %}
 			<div class="row">
 			<div class="col-xs-12">
@@ -129,7 +132,9 @@
 				<ul id="sortable" class="list-inline list-unstyled">
 					{% for pic in product.uploads %}
 						<div class="col-xs-6 col-md-3">
-							<li class="ui-state-default prod-edit-pic-li" data-id="{{ pic.id }}"><img class="prod-edit-pic-pic" src="{{ pic.url() }}"><br><span class="prod-edit-pic-span"></span></li>
+							<li class="ui-state-default prod-edit-pic-li" data-id="{{ pic.id }}"><img class="prod-edit-pic-pic" src="{{ pic.url() }}"><br><span class="prod-edit-pic-span"></span>
+							<span class="prod-edit-pic-remove"><i class="fa fa-minus"></i></span>
+							</li>
 						</div>
 					{% endfor %}
 				</ul>

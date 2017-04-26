@@ -1,0 +1,6 @@
+{% from 'macros.html' import form_group, change_pic_form with context %}
+<form  id="edit-product-form" method="POST" action="{{ url_for('edit_product', productID=product.id) }}">
+	{% include 'fields_create_edit_product.html' with context %}
+</form>
+
+<script src="{{ url_for('static', filename='js/create_product.js') }}"></script>

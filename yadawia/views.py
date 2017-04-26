@@ -12,7 +12,8 @@ from yadawia.classes import DBException, LoginException, User, Address,\
 from yadawia.helpers import login_user, is_safe, redirect_back, \
                             authenticate, anonymous_only, public,\
                             curr_user, get_upload_url, logout_user,\
-                            is_allowed_in_thread, disable_user
+                            is_allowed_in_thread, disable_user,\
+                            create_edit_product
 from sqlalchemy import exc, or_, and_
 from flask import request, render_template, session, redirect, url_for, abort, flash, jsonify, send_from_directory
 from flask_uploads import UploadSet, configure_uploads, IMAGES, UploadNotAllowed
@@ -239,43 +240,7 @@ def delete_address():
 @authenticate
 def create_product():
     if request.method == 'POST':
-        error = None
-        name = request.form['pname']
-        seller_id = session['userId']
-        description = request.form['description']
-        currency = request.form['currency']
-        price = int(request.form['price']) if request.form['price'] is not None else None
-        categories = request.form.getlist('categories')
-        variety_titles = request.form.getlist('variety_title')
-        variety_prices = request.form.getlist('variety_price')
-        pictures = request.files.getlist('photo')
-        try:
-            product = Product(name, seller_id, description, price, currency)
-            db.session.add(product)
-            db.session.flush() # to access product ID
-            for category_id in categories:
-                prodCat = ProductCategory(product.id, category_id)
-                db.session.add(prodCat)
-            for i in range(1, len(variety_titles)):
-                vtitle = variety_titles[i]
-                vprice = int(variety_prices[i]) if variety_prices[i] != 'Default' else None
-                variety = Variety(vtitle, product.id, vprice)
-                db.session.add(variety)
-            for pic in pictures:
-                rand_name = uuid.uuid4().hex + '.'
-                filename = photos.save(pic, name=rand_name)
-                upload = Upload(filename, product.id)
-                db.session.add(upload)
-            db.session.commit()
-        except DBException as dbe:
-            error = dbe.args[0]['message']
-        except (exc.IntegrityError, exc.SQLAlchemyError) as e:
-            error = e.message
-        if error:
-            flash(error)
-            return redirect(url_for('create_product'))
-        else:
-            return redirect(url_for('product', productID=product.id))
+        return create_edit_product(create=True)
     elif request.method == 'GET':
         categories = Category.query.order_by(Category.name).all()
         currencies = Currency.query.order_by(Currency.name).all()
@@ -288,7 +253,9 @@ def product(productID):
     if product is None or\
     (not product.available and ('logged_in' not in session or product.seller_id != session['userId'])):
         abort(404)
-    return render_template('product.html', product=product)
+    categories = Category.query.all()
+    currencies = Currency.query.all()
+    return render_template('product.html', product=product, categories=categories, currencies=currencies)
 
 @app.route('/message/create', methods=['POST'])
 @authenticate
@@ -482,8 +449,21 @@ def edit_product_pics(productID):
     for i in range(len(pic_ids)):
         temp_pic = product.uploads.filter_by(id=pic_ids[i]).first()
         if temp_pic is not None:
-            temp_pic.order = pic_orders[i]
+            order = pic_orders[i]
+            if order == 'remove':
+                db.session.delete(temp_pic)
+            else:
+                temp_pic.order = pic_orders[i]
     db.session.commit()
     if product is None:
         abort(400)
     return redirect(url_for('product', productID=productID))
+
+@app.route('/product/<int:productID>/edit', methods=['POST'])
+@authenticate
+def edit_product(productID):
+    product = Product.query.filter_by(id=productID, seller_id=session['userId']).first() 
+    if product is not None:
+        return create_edit_product(create=False, productID=productID)
+    else:
+        abort(400)
