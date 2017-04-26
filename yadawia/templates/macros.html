@@ -163,7 +163,7 @@
 
 {% macro product_card(product) %}
 <a href="{{ url_for('product', productID=product.id) }}"><div class="product-card">
-    <img src="{{ product.random_picture() }}">
+    <img src="{{ product.first_picture() }}">
     <h5>{{ product.name }}</h5>
     {% if product.avg_rating() %}
       <span title="Average rating: {{ product.avg_rating() }}">{{ rating_stars(product.avg_rating()) }}</span>

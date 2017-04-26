@@ -76,10 +76,16 @@ $(function(){
 	$(cart_form).change(update_total);
 
 	var updatePos = function(){
+		$('.positions', '.hidden-parts').remove();
 		$('.prod-edit-pic-li').each(function(){
 			var pos = $(this).parent().index() + 1;
+			var id = $(this).data('id');
 			$('span', this).text(pos);
 			$('span', this).show();
+			$('.hidden-parts', '#prod-pic-edit-form')
+				.append('<input type="hidden" class="positions" name="pic_id" value="' + id + '">');
+			$('.hidden-parts', '#prod-pic-edit-form')
+				.append('<input type="hidden" class="positions" name="pic_order" value="' + pos + '">')
 		});
 	};
 

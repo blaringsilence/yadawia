@@ -472,3 +472,18 @@ def toggle_availability(productID):
     except (exc.IntegrityError, exc.SQLAlchemyError) as e:
         error = e.message
     return jsonify(success=True) if error is None else jsonify(error=error)
+
+@app.route('/product/<int:productID>/edit-pics', methods=['POST'])
+@authenticate
+def edit_product_pics(productID):
+    product = Product.query.filter_by(id=productID, seller_id=session['userId']).first()
+    pic_ids = request.form.getlist('pic_id')
+    pic_orders = request.form.getlist('pic_order')
+    for i in range(len(pic_ids)):
+        temp_pic = product.uploads.filter_by(id=pic_ids[i]).first()
+        if temp_pic is not None:
+            temp_pic.order = pic_orders[i]
+    db.session.commit()
+    if product is None:
+        abort(400)
+    return redirect(url_for('product', productID=productID))
