@@ -1,10 +1,11 @@
+# -*- coding: utf-8 -*-
+
 """
 Classes
 -------
 Contains all the classes (database, exceptions, etc) created for this app.
 
 """
-# -*- coding: utf-8 -*-
 from yadawia import app, db
 from sqlalchemy.orm import validates
 from werkzeug.security import generate_password_hash, check_password_hash
