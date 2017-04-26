@@ -1,5 +1,5 @@
 {% from 'macros.html' import form_group, change_pic_form with context %}
-<form  id="edit-product-form" method="POST" action="{{ url_for('edit_product', productID=product.id) }}">
+<form  id="edit-product-form" method="POST" action="{{ url_for('edit_product', productID=product.id) }}" enctype="multipart/form-data">
 	{% include 'fields_create_edit_product.html' with context %}
 </form>
 
