@@ -3,6 +3,8 @@ uploads/
 
 # Mine
 todo.txt
+deploy.sh
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
