@@ -230,7 +230,7 @@ def assetsList(app, folder='js', extension='js', exclusions=[]):
     files_list = []
     for root, dirs, files in os.walk(os.path.join(app.static_folder,folder)):
         for file in files:
-            if file.endswith("."+extension) and all(file != s for s in exclusions):
+            if file.endswith("."+extension) and file not in exclusions:
                 path_parts = splitall(root)
                 static_index = path_parts.index("static")
                 path_parts = path_parts[static_index+1:]
