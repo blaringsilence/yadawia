@@ -4,7 +4,7 @@ Helpers
 Contains helper functions (decorators, others) used by other parts of the app.
 
 """
-from yadawia import db, photos, app
+from yadawia import db, app
 from yadawia.classes import User, LoginException, DBException, MessageThread, Product, Variety, ProductCategory, Upload
 from flask import session, url_for, redirect, request, flash
 from urllib.parse import urlparse, urljoin

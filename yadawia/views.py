@@ -4,7 +4,7 @@ Views
 Contains all the view logic/endpoints for this app.
 
 """
-from yadawia import app, db, photos
+from yadawia import app, db
 from yadawia.classes import DBException, LoginException, User, Address,\
                              Country, Review, Product, Category, Currency,\
                               Variety, ProductCategory, Upload, MessageThread,\
@@ -17,7 +17,6 @@ from yadawia.helpers import login_user, is_safe, redirect_back, \
                             get_presigned_post
 from sqlalchemy import exc, or_, and_
 from flask import request, render_template, session, redirect, url_for, abort, flash, jsonify, send_from_directory
-from flask_uploads import UploadSet, configure_uploads, IMAGES, UploadNotAllowed
 from sqlalchemy.sql import func
 import uuid
 import os

@@ -7,15 +7,12 @@ Initialize configuration and put all the parts together.
 from flask import Flask, request, session, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_jsglue import JSGlue
-from flask_uploads import UploadSet, configure_uploads, IMAGES
 import re
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
 db = SQLAlchemy(app)
 jsglue = JSGlue(app)
-photos = UploadSet('photos', IMAGES)
-configure_uploads(app, photos)
 
 # import other necessary modules
 import yadawia.errorhandlers
