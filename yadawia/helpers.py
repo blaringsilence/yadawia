@@ -4,7 +4,7 @@ Helpers
 Contains helper functions (decorators, others) used by other parts of the app.
 
 """
-from yadawia import db, photos
+from yadawia import db, photos, app
 from yadawia.classes import User, LoginException, DBException, MessageThread, Product, Variety, ProductCategory, Upload
 from flask import session, url_for, redirect, request, flash
 from urllib.parse import urlparse, urljoin
@@ -14,6 +14,8 @@ import string
 import random
 from sqlalchemy import exc
 import uuid
+import boto3
+import os
 
 def login_user(username, password):
     """Function to login user through their username.
@@ -125,6 +127,24 @@ def create_edit_product(create=True, productID=None):
         if create:
             return redirect(url_for('create_product'))
     return redirect(url_for('product', productID=product.id))
+
+def valid_photo(photo_type, photo_size):
+    return photo_size <= app.config['MAX_PHOTO_SIZE'] and photo_type[:6] == 'image/'
+
+def get_presigned_post(filename, filetype):
+    S3_BUCKET = os.environ.get('S3_BUCKET')
+    s3 = boto3.client('s3')
+
+    return s3.generate_presigned_post(
+        Bucket = S3_BUCKET,
+        Key = filename,
+        Fields = {"acl": "public-read", "Content-Type": filetype},
+        Conditions = [
+          {"acl": "public-read"},
+          {"Content-Type": filetype}
+        ],
+        ExpiresIn = 3600
+    )
 
 def get_random_string(length=32):
     """Generate a random string of length 32, used in ``generate_csrf_token()``"""

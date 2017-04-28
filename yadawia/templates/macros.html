@@ -122,6 +122,7 @@
     <input id="photo" class="form-control" type="file" name="photo" accept="image/*" {% if multiple %} multiple="multiple" {% endif %} {% if required %} required {% endif %}>
   {% endcall %} 
   <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"/>
+  <div class="hidden" id="photo-urls"></div>
   {% if hasUpload %}
   <div class="modal-footer">
     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
