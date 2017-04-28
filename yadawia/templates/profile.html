@@ -9,7 +9,7 @@
 <div class="profile-banner">
 	<div class="row">
 		<div class="col-xs-12 col-md-3 text-center">
-			<img id="profile-pic" src="{% if not picture_url %}{{ url_for('static', filename='img/logo.svg') }}{% else %}{{ picture_url }}{% endif %}"/>
+			<img id="profile-pic" src="{% if not user.picture %}{{ url_for('static', filename='img/logo.svg') }}{% else %}{{ user.picture }}{% endif %}"/>
 			<br>
 			{% if is_curr_user %}
 			<button data-toggle="modal" data-target="#change-pic" class="btn btn-default edit-btn" title="Upload a new profile picture."><i class="fa fa-upload"></i> Change</button>

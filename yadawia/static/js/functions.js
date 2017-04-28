@@ -22,9 +22,33 @@ var colorUntil = function(pos){
 	}
 };
 
+var getSignedRequest = function(files, callback) {
+	var data = getFileData(files);
+	console.log(data);
+	$.getJSON(Flask.url_for('sign_s3'), {
+		photo_name: data.photo_name,
+		photo_type: data.photo_type,
+		photo_size_mb: data.photo_size_mb
+	}, function (d) {
+		callback(d);
+	});
+};
+
+var getFileData = function(files) {
+	var photo_name = [];
+	var photo_type = [];
+	var photo_size_mb = [];
+	for(var i=0; i<files.length; i++){
+		photo_name.push(files[i].name);
+		photo_type.push(files[i].type);
+		photo_size_mb.push(files[i].size * 0.000001);
+	}
+	return { photo_name: photo_name, photo_type: photo_type, photo_size_mb: photo_size_mb };
+};
+
 var generateHidden = function(name, value, form, class_name) {
 	$(form).append('<input type="hidden" class="' + class_name + '" name="' + name + '" value="' + value + '">');
-}
+};
 
 // FEEDBACK ICONS
 var successful_icon = '<i class="fa fa-check success-check"></i>';
