@@ -9,6 +9,7 @@ $(function(){
 		$('#little-previews', '#preview-wrapper').html('');
 		$('#photo-urls').html('');
 		$('#complete-upload').val('false').trigger('change');
+
 		// 2. If there are files..
 		if (input.files && input.files[0]) {
 			// 2.1 Put the other images if they pass validation in a grid below the big image,
