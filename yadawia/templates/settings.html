@@ -65,10 +65,6 @@
 	</div>
 {% endblock %}
 
-{% block scripts %}
-<script src="{{ url_for('static', filename='js/form_settings.js') }}"></script>
-{% endblock %}
-
 {% block modals %}
 	{% call modal('delete-address', 'Delete Address') %}
 	<h4>Are you sure you want to delete the address "<span id="address-name-del"></span>"?</h4>

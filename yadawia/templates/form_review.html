@@ -16,5 +16,3 @@
 	<input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
 	<button type="submit" class="btn btn-primary">{% if review_edit %}Edit{% else %}Submit{% endif %} Review</button>
 </form>
-
-<script src="{{ url_for('static', filename='js/form_review.js') }}"></script>

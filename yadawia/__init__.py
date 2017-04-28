@@ -7,18 +7,23 @@ Initialize configuration and put all the parts together.
 from flask import Flask, request, session, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_jsglue import JSGlue
+from flask_assets import Environment, Bundle
 import re
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
 db = SQLAlchemy(app)
 jsglue = JSGlue(app)
+assets = Environment(app)
 
 # import other necessary modules
 import yadawia.errorhandlers
 import yadawia.views
 import yadawia.classes
 import yadawia.helpers
+
+js = Bundle(*yadawia.helpers.assetsList(app), filters='slimit', output='js/all.js')
+assets.register('js_all', js)
 
 @app.before_request
 def csrf_protect():
