@@ -208,7 +208,7 @@ class Product(db.Model):
         self.currency_id = currency_id
 
     def first_picture(self):
-        return get_upload_url(self.uploads.order_by(Upload.order).first().filename)
+        return self.uploads.order_by(Upload.order).first().filename
 
     
     def avg_rating(self):
