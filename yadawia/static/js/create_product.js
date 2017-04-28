@@ -102,5 +102,11 @@ $(function(){
 
 	$('#complete-upload').change(function(){
 		$('#submit-form').prop('disabled', $(this).val() !== 'true');
+		if($(this).val() === 'true'){
+			$('#loading').hide();
+		}
+		else{
+			$('#loading').show();
+		}
 	});
 });

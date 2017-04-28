@@ -58,6 +58,12 @@ $(function(){
 
 	$('#complete-upload', '.change-pic-form').change(function(){
 		$('#change-pic-submit', '.change-pic-form').prop('disabled', $(this).val() !== 'true');
+		if($(this).val() === 'true'){
+			$('#loading').hide();
+		}
+		else{
+			$('#loading').show();
+		}
 	});
 
 	var resetValues = function(field) {
