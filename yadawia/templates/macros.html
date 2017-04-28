@@ -118,6 +118,7 @@
         <div id="little-previews"></div>
       </div>
   </div>
+  <input type="hidden" id="complete-upload" value="false">
   {% call form_group(prompt, 'photo', required=required) %}
     <input id="photo" class="form-control" type="file" name="photo" accept="image/*" {% if multiple %} multiple="multiple" {% endif %} {% if required %} required {% endif %}>
   {% endcall %} 
@@ -126,7 +127,7 @@
   {% if hasUpload %}
   <div class="modal-footer">
     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-    <input type="submit" class="btn btn-primary" id="change-pic-submit" value="Upload">
+    <input type="submit" class="btn btn-primary" id="change-pic-submit" value="Upload" disabled>
   </div>
   {% endif %}
 

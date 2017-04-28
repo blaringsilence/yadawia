@@ -314,7 +314,7 @@ class Upload(db.Model):
         self.order = order
 
     def url(self):
-        return get_upload_url(self.filename)
+        return self.filename
 
 class Review(db.Model):
     """Database model for reviews on products. Contains:

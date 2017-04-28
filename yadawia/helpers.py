@@ -89,7 +89,7 @@ def create_edit_product(create=True, productID=None):
     categories = request.form.getlist('categories')
     variety_titles = request.form.getlist('variety_title')
     variety_prices = request.form.getlist('variety_price')
-    pictures = request.files.getlist('photo')
+    pictures = request.form.getlist('photo_url')
     try:
         if create:
             product = Product(name, seller_id, description, price, currency)
@@ -112,11 +112,8 @@ def create_edit_product(create=True, productID=None):
             variety = Variety(vtitle, product.id, vprice)
             db.session.add(variety)
         for pic in pictures:
-            if pic.filename:
-                rand_name = uuid.uuid4().hex + '.'
-                filename = photos.save(pic, name=rand_name)
-                upload = Upload(filename, product.id)
-                db.session.add(upload)
+            upload = Upload(pic, product.id)
+            db.session.add(upload)
         db.session.commit()
     except DBException as dbe:
         error = dbe.args[0]['message']

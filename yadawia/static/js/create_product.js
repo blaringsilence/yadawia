@@ -100,4 +100,7 @@ $(function(){
 		$(this).prop('disabled', true);
 	});
 
+	$('#complete-upload').change(function(){
+		$('#submit-form').prop('disabled', $(this).val() !== 'true');
+	});
 });

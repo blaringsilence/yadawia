@@ -67,7 +67,7 @@
 {% block modals %}
 	{% call modal('change-pic', 'Change Profile Picture') %}
 	<form  id="{{ id }}" class="change-pic-form"  method="POST" action="{{ url_for('upload_avatar') }}" enctype="multipart/form-data">
-		{% with curr_pic=picture_url %}
+		{% with curr_pic=user.picture %}
 			{{  change_pic_form('change-avatar', curr_pic=curr_pic) }}
 		{% endwith %}
 	</form>

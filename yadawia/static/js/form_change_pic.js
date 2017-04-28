@@ -8,6 +8,7 @@ $(function(){
 		hide_feedback_elem(input);
 		$('#little-previews', '#preview-wrapper').html('');
 		$('#photo-urls').html('');
+		$('#complete-upload').val('false').trigger('change');
 		// 2. If there are files..
 		if (input.files && input.files[0]) {
 			// 2.1 Put the other images if they pass validation in a grid below the big image,
@@ -20,7 +21,6 @@ $(function(){
 				var is_image = pic.type.substr(0,6) === 'image/';
 				var disable_submit = is_bigger_than_limit || !is_image;
 				offline_check(input, !disable_submit, pic.name +  ' is not an image or is over 16 megabytes.');
-				$('#change-pic-submit', '.change-pic-form').prop('disabled', disable_submit);
 
 				if(!disable_submit) { // if valid
 					var url = window.URL.createObjectURL(pic);
@@ -48,26 +48,15 @@ $(function(){
 					$('#preview').attr('src', url);
 				});
 				$('#photo-urls').data('number', input.files.length);
-				getSignedRequest(input.files, function(data){
-					if(!data.error) {
-						console.log(data);
-						for(var i=0; i<data.data.length; i++){
-							$.ajax({
-								url: data.data[i].url,
-								data: data.data[i].fields,
-								success: function(d) {
-									console.log(d);
-									$('#photo-urls').append('<input type="hidden" name="photo_url" value="' 
-													+ data.urls[i] + '">');
-								}
-							});
-						}
-					}
-				});
+				uploadPicsToS3(input.files, $('#photo-urls'), $('#complete-upload'));
 			}
     	} else {
     		$('#init-preview').show();
     	}
+	});
+
+	$('#complete-upload', '.change-pic-form').change(function(){
+		$('#change-pic-submit', '.change-pic-form').prop('disabled', $(this).val() !== 'true');
 	});
 
 	var resetValues = function(field) {

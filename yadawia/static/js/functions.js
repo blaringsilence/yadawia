@@ -22,9 +22,37 @@ var colorUntil = function(pos){
 	}
 };
 
+var uploadPicsToS3 = function(files, url_elem, valid_elem) {
+	getSignedRequest(files, function(data){
+		if(!data.error) {
+			for(var i=0; i<data.data.length; i++){
+				var postData = new FormData();
+				for(key in data.data[i].fields){
+				  postData.append(key, data.data[i].fields[key]);
+				}
+				postData.append('file', files[i]);
+				$.ajax({
+					url: data.data[i].url,
+					data: postData,
+					method: 'POST',
+					processData: false,
+					contentType: false,
+					indexValue: i,
+					success: function(d) {
+						$(url_elem).append('<input type="hidden" name="photo_url" value="' 
+										+ data.urls[this.indexValue] + '">');
+						if($(url_elem).children().length === Number($(url_elem).data('number'))) {
+							$(valid_elem).val('true').trigger('change');
+						}
+					}
+				});
+			}
+		}
+	});
+};
+
 var getSignedRequest = function(files, callback) {
 	var data = getFileData(files);
-	console.log(data);
 	$.getJSON(Flask.url_for('sign_s3'), {
 		photo_name: data.photo_name,
 		photo_type: data.photo_type,
