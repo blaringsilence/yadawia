@@ -7,12 +7,12 @@
 		<title>Yadawia {% block extend_title %}{% endblock %}</title>
 		<!--End Metadata-->
 		<!--CSS-->
-		<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-		<link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
 		<link href="https://fonts.googleapis.com/css?family=Comfortaa:400,700" rel="stylesheet">
-		<link rel='stylesheet' type='text/css' href="{{ url_for('static', filename='css/bootstrap.min.css')}}">
-		<link rel='stylesheet' type='text/css' href="{{ url_for('static', filename='css/layout.css') }}">
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+		<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+		{% assets "css_all" %}
+    		<link rel="stylesheet" href="{{ ASSET_URL }}">
+		{% endassets %}
+		
 		{% block css %}
 		{% endblock %}
 		<!--End CSS-->
@@ -68,6 +68,7 @@
 		{% endblock %}
 		<!--End Modals-->
 		<!--Scripts-->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 		{% assets "js_all" %}
     		<script type="text/javascript" src="{{ ASSET_URL }}"></script>

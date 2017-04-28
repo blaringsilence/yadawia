@@ -23,7 +23,9 @@ import yadawia.classes
 import yadawia.helpers
 
 js = Bundle(*yadawia.helpers.assetsList(app), filters='slimit', output='js/all.js')
+css = Bundle(*yadawia.helpers.assetsList(app, folder='css', extension='css'), filters='cssmin', output='css/all.css')
 assets.register('js_all', js)
+assets.register('css_all', css)
 
 @app.before_request
 def csrf_protect():
