@@ -32,7 +32,7 @@ You will need:
       export DATABASE_URL="postgresql+psycopg2://USER:PASSWORD@localhost/yadawia"
       export AWS_ACCESS_KEY_ID="YOUR/YOUR IAM USER'S AWS ACCESS KEY"
       export AWS_SECRET_ACCESS_KEY="YOUR/YOUR IAM USER'S SECRET ACCESS KEY"
-      export S3_BUCKET="yadawia"
+      export S3_BUCKET="YOUR BUCKET NAME HERE"
     ```
 6. Create the tables.
     ```bash
