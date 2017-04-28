@@ -7,14 +7,16 @@ $(function(){
 		$('#preview').attr('src', '');
 		hide_feedback_elem(input);
 		$('#little-previews', '#preview-wrapper').html('');
+		$('#photo-urls').html('');
 		// 2. If there are files..
 		if (input.files && input.files[0]) {
 			// 2.1 Put the other images if they pass validation in a grid below the big image,
 			// 	   and display the first one in the big preview.
-			for(var i=0; i<input.files.length; i++){
+			var i;
+			for(i=0; i<input.files.length; i++){
 				var pic = input.files[i];
 				var size_in_mb = pic.size * 0.000001;
-				var is_bigger_than_limit = size_in_mb > 16;
+				var is_bigger_than_limit = size_in_mb > 10;
 				var is_image = pic.type.substr(0,6) === 'image/';
 				var disable_submit = is_bigger_than_limit || !is_image;
 				offline_check(input, !disable_submit, pic.name +  ' is not an image or is over 16 megabytes.');
@@ -40,10 +42,29 @@ $(function(){
 					break;
 				}
 			}
-			$('.little-preview-pic').click(function(){
-				var url = $(this).attr('src');
-				$('#preview').attr('src', url);
-			});
+			if(i===input.files.length) {
+				$('.little-preview-pic').click(function(){
+					var url = $(this).attr('src');
+					$('#preview').attr('src', url);
+				});
+				$('#photo-urls').data('number', input.files.length);
+				getSignedRequest(input.files, function(data){
+					if(!data.error) {
+						console.log(data);
+						for(var i=0; i<data.data.length; i++){
+							$.ajax({
+								url: data.data[i].url,
+								data: data.data[i].fields,
+								success: function(d) {
+									console.log(d);
+									$('#photo-urls').append('<input type="hidden" name="photo_url" value="' 
+													+ data.urls[i] + '">');
+								}
+							});
+						}
+					}
+				});
+			}
     	} else {
     		$('#init-preview').show();
     	}

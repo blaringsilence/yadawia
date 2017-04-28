@@ -13,12 +13,14 @@ from yadawia.helpers import login_user, is_safe, redirect_back, \
                             authenticate, anonymous_only, public,\
                             curr_user, get_upload_url, logout_user,\
                             is_allowed_in_thread, disable_user,\
-                            create_edit_product
+                            create_edit_product, valid_photo,\
+                            get_presigned_post
 from sqlalchemy import exc, or_, and_
 from flask import request, render_template, session, redirect, url_for, abort, flash, jsonify, send_from_directory
 from flask_uploads import UploadSet, configure_uploads, IMAGES, UploadNotAllowed
 from sqlalchemy.sql import func
 import uuid
+import os
 
 @app.route('/')
 def home():
@@ -111,7 +113,6 @@ def profile(username=None):
     kwargs = {} if is_current_users_profile else { 'available': True }
 
     return render_template('profile.html', user=user,\
-                            picture_url=get_upload_url(user.picture),\
                             is_curr_user=is_current_users_profile,\
                             avg_rating=avg_rating,\
                             products=user.products.filter_by(**kwargs)\
@@ -121,17 +122,11 @@ def profile(username=None):
 @app.route('/upload/profile-pic', methods=['POST'])
 @authenticate
 def upload_avatar():
-    if 'photo' in request.files:
-        rand_name = uuid.uuid4().hex + '.'
-        try:
-            filename = photos.save(request.files['photo'], name=rand_name)
-            user = User.query.filter_by(username=session['username']).first()
-            user.picture = filename
-            db.session.commit()
-        except UploadNotAllowed as e:
-            flash('Upload not allowed. Must be an image under 16 megabytes.')
-        return redirect(url_for('profile', username=session['username']))
-    abort(400)
+    photo_url = request.form['photo_url']
+    user = User.query.filter_by(username=session['username']).first()
+    user.picture = photo_url
+    db.session.commit()
+    return redirect(url_for('profile', username=session['username']))
 
 @app.route('/edit/profile', methods=['POST'])
 @authenticate
@@ -467,3 +462,22 @@ def edit_product(productID):
         return create_edit_product(create=False, productID=productID)
     else:
         abort(400)
+
+@app.route('/sign_s3', methods=['GET'])
+@authenticate
+def sign_s3():
+    S3_BUCKET = os.environ.get('S3_BUCKET')
+    user_id = session['userId']
+    photo_name = request.args.getlist('photo_name[]')
+    photo_type = request.args.getlist('photo_type[]')
+    photo_size_mb = request.args.getlist('photo_size_mb[]')
+    posts = []
+    urls = []
+    for i in range(len(photo_type)):
+        if not valid_photo(photo_type[i], float(photo_size_mb[i])):
+            return jsonify(error= photo_name[i] + ' is not a valid photo under 10 MBs.')
+        else:
+            new_name = uuid.uuid4().hex + '_' + str(user_id) + os.path.splitext(photo_name[i])[1]
+            posts.append(get_presigned_post(new_name, photo_type[i]))
+            urls.append('https://%s.s3.amazonaws.com/%s' % (S3_BUCKET, new_name))
+    return jsonify(data=posts, urls=urls)
