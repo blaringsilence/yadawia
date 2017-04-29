@@ -517,5 +517,5 @@ def sign_s3():
 @app.route('/search', methods=['GET'])
 def search_products():
     term = request.args.get('q')
-    matches = Product.query.whoosh_search(term).all()
+    matches = Product.query.search(term).all()
     return render_template('search.html', matches=matches, term=term)

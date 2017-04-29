@@ -8,6 +8,7 @@ from flask import Flask, request, session, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_jsglue import JSGlue
 from flask_assets import Environment, Bundle
+from sqlalchemy_searchable import make_searchable
 import re
 
 app = Flask(__name__)
@@ -20,13 +21,15 @@ jsglue = JSGlue(app)
 """Initialize Flask-JSGlue which allows us to use Flask.url_for in un-rendered JavaScript."""
 assets = Environment(app)
 """Initialize assets in app."""
+make_searchable()
+"""Activates SQLAlchemy-Searchable"""
 
 # import other necessary modules
 import yadawia.errorhandlers
 import yadawia.views
 import yadawia.classes
 import yadawia.helpers
-import yadawia.whooshalchemy as whooshalchemy
+
 
 js = Bundle(*yadawia.helpers.assetsList(app), filters='slimit', output='js/all.js')
 """Bundle all JavaScript files and minify them."""
@@ -35,7 +38,7 @@ css_libs = Bundle(*yadawia.helpers.assetsList(app, folder='css', extension='css'
 """Bundle library css files and minify them."""
 assets.register('js_all', js)
 assets.register('css_libs', css_libs)
-whooshalchemy.init_app(app)
+
 
 @app.before_request
 def csrf_protect():
