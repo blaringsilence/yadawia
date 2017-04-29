@@ -34,10 +34,13 @@ You will need:
       export AWS_SECRET_ACCESS_KEY="YOUR/YOUR IAM USER'S SECRET ACCESS KEY"
       export S3_BUCKET="YOUR BUCKET NAME HERE"
     ```
-6. Create the tables.
+6. Create and populate the tables (if files don't have execution permissions `chmod a+x $FILENAME`.
     ```bash
-      $ chmod a+x create_db.py
       $ ./create_db.py
+      $ ./populate_countries.py
+      $ ./populate_currencies.py
+      $ ./populate_reasons.py
+      $ ./populate_categories.py
     ```
 7. Run the app.
     ```bash
