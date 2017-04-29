@@ -10,8 +10,15 @@ from yadawia import app, db
 from sqlalchemy.orm import validates
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.sql import func
+from flask_sqlalchemy import SQLAlchemy, BaseQuery
+from sqlalchemy_searchable import SearchQueryMixin
+from sqlalchemy_utils.types import TSVectorType
 import re
 import datetime
+
+
+class ProductQuery(BaseQuery, SearchQueryMixin):
+    pass
 
 class DBException(Exception):
     """Custom exceptions raised on the ORM level. In its 0th arg,\
@@ -185,17 +192,17 @@ class Product(db.Model):
         - price: float.
         - available: boolean, default: True.
     """
-
+    query_class = ProductQuery
     __tablename__ = 'products'
-    __searchable__ = ['name', 'description']
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
+    name = db.Column(db.Unicode, nullable=False)
     seller_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     create_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     update_date = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
-    description = db.Column(db.String)
+    description = db.Column(db.UnicodeText)
     currency_id = db.Column(db.String(3), db.ForeignKey('currencies.id'))
     price = db.Column(db.Float)
+    search_vector = db.Column(TSVectorType('name', 'description'))
     categories = db.relationship('Category', secondary='product_category',\
                                 back_populates='products', lazy='dynamic')
     varieties = db.relationship('Variety', backref='product', lazy='dynamic',\

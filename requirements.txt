@@ -8,13 +8,12 @@ boto3==1.4.4
 botocore==1.5.44
 click==6.7
 cssmin==0.2.0
+decorator==4.0.11
 docutils==0.13.1
 Flask==0.10.1
 Flask-Assets==0.12
 Flask-JSGlue==0.3.1
 Flask-SQLAlchemy==2.2
-Flask-WhooshAlchemy-Redux==0.6.3
-Flask-WhooshAlchemyPlus==0.7.5
 gunicorn==19.7.1
 imagesize==0.7.1
 itsdangerous==0.24
@@ -40,7 +39,10 @@ snowballstemmer==1.2.1
 Sphinx==1.5.5
 sphinx-autobuild==0.6.0
 SQLAlchemy==1.1.9
+SQLAlchemy-Searchable==0.10.3
+SQLAlchemy-Utils==0.32.14
 tornado==4.5.1
+validators==0.11.3
 watchdog==0.8.3
 webassets==0.12.1
 Werkzeug==0.12.1
