@@ -80,6 +80,7 @@ def enable_user(username, was_suspended=False):
         db.session.commit()
 
 def create_edit_product(create=True, productID=None):
+    """Function to create or edit a product (used in views)."""
     error = None
     name = request.form['pname']
     seller_id = session['userId']
@@ -126,9 +127,11 @@ def create_edit_product(create=True, productID=None):
     return redirect(url_for('product', productID=product.id))
 
 def valid_photo(photo_type, photo_size):
+    """Given a photo_type and a photo_size, make sure it's an image under MAX_PHOTO_SIZE in app.config"""
     return photo_size <= app.config['MAX_PHOTO_SIZE'] and photo_type[:6] == 'image/'
 
 def get_presigned_post(filename, filetype):
+    """Use boto3 the AWS Python SDK to generate a presigned post for S3."""
     S3_BUCKET = os.environ.get('S3_BUCKET')
     s3 = boto3.client('s3')
 
@@ -154,10 +157,12 @@ def generate_csrf_token(force=False):
     return session['_csrf_token']
 
 def is_allowed_in_thread(threadID):
+    """Given a threadID, is the signed in user allowed in the thread?"""
     thread = MessageThread.query.filter_by(id=threadID).first()
     return thread is not None and thread.isParticipant(session['userId'])
 
 def is_safe(url):
+    """Is the URL safe to redirect to?"""
     ref_url = urlparse(request.host_url)
     test_url = urlparse(urljoin(request.host_url, url))
     return test_url.scheme in ('http', 'https') and \
@@ -171,12 +176,14 @@ def redirect_back(endpoint, **values):
     return redirect(target)
 
 def logout_user():
+    """Log user out."""
     session.pop('logged_in', None)
     session.pop('username', None)
     session.pop('userId', None)
     generate_csrf_token(force=True)
 
 def no_special_chars(string, allowNumbers=False, optional=True, allowComma=False):
+    """Function to check if a string has no special characters."""
     nums = '0-9' if not allowNumbers else ''
     postfix = '*' if optional else '+'
     comma = '\,' if not allowComma else ''
@@ -184,6 +191,7 @@ def no_special_chars(string, allowNumbers=False, optional=True, allowComma=False
     return pattern.match(string)
 
 def validate_name_pattern(name_input, allowNumbers=False, optional=True):
+    """Validate name pattern, given that generally names do not have special chars."""
     if not no_special_chars(name_input, allowNumbers=allowNumbers, optional=optional):
         raise DBException({'message': 'Name cannot contain numbers or special characters.',\
                          'code': 'name'})
@@ -227,6 +235,7 @@ def splitall(path):
     return allparts
     
 def assetsList(app, folder='js', extension='js', exclusions=[]):
+    """Get list of files of a specific extension in a folder inside the static directory."""
     files_list = []
     for root, dirs, files in os.walk(os.path.join(app.static_folder,folder)):
         for file in files:

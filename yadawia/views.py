@@ -79,7 +79,7 @@ def register():
 
 @app.route('/_validateField', methods=['GET'])
 def validate_field():
-    """Check availability of username. For use in registeration form."""
+    """Check availability of username/email. For use in registeration form."""
     field_type = request.args.get('type', 0, type=str)
     if field_type not in ['email', 'username']:
         abort(400)
@@ -93,6 +93,15 @@ def validate_field():
 @app.route('/profile')
 @app.route('/p/<username>')
 def profile(username=None):
+    """View function for profile given a username OR if not, use username of logged in user.
+    Returns:
+
+        - user: Object instance of type User.
+        - is_curr_user: Boolean = is this the logged in user's profile?
+        - avg_rating: user's average rating throughout their products.
+        - products: user's products (all if is_curr_user, available only if not).
+        - report_reasons: reasons to report a user if not is_curr_user.
+    """
     if username is None:
         if 'username' in session:
             username = session['username']
@@ -106,10 +115,10 @@ def profile(username=None):
     rating = db.session.query(func.avg(Review.rating).label('average'))\
             .join(Product).join(User).filter(User.id == user.id).first()[0]
     avg_rating = round(rating,2) if rating is not None else None
-    report_reasons = Reason.query.order_by(Reason.text).all()
 
     is_current_users_profile = curr_user(username.lower())
     kwargs = {} if is_current_users_profile else { 'available': True }
+    report_reasons = None if is_current_users_profile else Reason.query.order_by(Reason.text).all()
 
     return render_template('profile.html', user=user,\
                             is_curr_user=is_current_users_profile,\
@@ -121,6 +130,7 @@ def profile(username=None):
 @app.route('/upload/profile-pic', methods=['POST'])
 @authenticate
 def upload_avatar():
+    """Upload profile picture for logged in user."""
     photo_url = request.form['photo_url']
     user = User.query.filter_by(username=session['username']).first()
     user.picture = photo_url
@@ -130,6 +140,7 @@ def upload_avatar():
 @app.route('/edit/profile', methods=['POST'])
 @authenticate
 def edit_profile():
+    """Edit profile (name, username, location) of logged in user."""
     user = User.query.filter_by(id=session['userId']).first()
     error = None
     try:
@@ -153,6 +164,7 @@ def edit_profile():
 @app.route('/settings')
 @authenticate
 def settings():
+    """View for settings for logged in user."""
     user = User.query.filter_by(username=session['username']).first()
     countries = Country.query.order_by(Country.value).all()
     return render_template('settings.html', user=user, addresses=user.addresses.all(), countries=countries)
@@ -160,6 +172,7 @@ def settings():
 @app.route('/settings/account', methods=['POST'])
 @authenticate
 def update_account():
+    """Edit account (email, password) of logged in user."""
     field_type = request.form['type']
     error = None
     if field_type in ['password', 'email']:
@@ -181,6 +194,9 @@ def update_account():
 @app.route('/settings/deactivate', methods=['POST'])
 @authenticate
 def deactivate_account(): # TODO prevent deactivate if ongoing orders.
+    """Deactivate a user's account. Can be undone by simply logging in again,
+    as opposed to admin suspension (yet to be implemented in a view).
+    """
     password = request.form['password']
     user = User.query.filter_by(username=session['username']).first()
     if user.isPassword(password):
@@ -194,6 +210,7 @@ def deactivate_account(): # TODO prevent deactivate if ongoing orders.
 @app.route('/settings/addresses/add', methods=['POST'])
 @authenticate
 def add_address():
+    """Add a new address to a logged in user's account."""
     error = None
     name = request.form['name']
     text = request.form['text']
@@ -217,6 +234,7 @@ def add_address():
 @app.route('/settings/addresses/delete', methods=['DELETE'])
 @authenticate
 def delete_address():
+    """Delete an address from a logged in user's account."""
     error = None
     user = User.query.filter_by(username=session['username']).first()
     address_id = int(request.form['address_id'])
@@ -233,6 +251,7 @@ def delete_address():
 @app.route('/product/create', methods=['GET', 'POST'])
 @authenticate
 def create_product():
+    """Create a new product to sell by the logged in user."""
     if request.method == 'POST':
         return create_edit_product(create=True)
     elif request.method == 'GET':
@@ -242,6 +261,7 @@ def create_product():
 
 @app.route('/product/<int:productID>')
 def product(productID):
+    """View for product page given the product ID."""
     productID = productID
     product = Product.query.filter_by(id=productID).outerjoin(Review).order_by(Review.create_date.desc()).first()
     if product is None or\
@@ -254,6 +274,7 @@ def product(productID):
 @app.route('/message/create', methods=['POST'])
 @authenticate
 def new_message():
+    """Send a new message (start a new message thread) with another user."""
     error = None
     title = request.form['subject']
     message = request.form['message']
@@ -281,6 +302,7 @@ def new_message():
 @app.route('/messages')
 @authenticate
 def messages():
+    """View for message threads."""
     user_id = session['userId']
     threads = MessageThread.query.join(Message)\
             .filter(or_(MessageThread.user1 == user_id, MessageThread.user2 == user_id))\
@@ -290,6 +312,7 @@ def messages():
 @app.route('/see-message/<int:threadID>', methods=['POST'])
 @authenticate
 def see_message(threadID):
+    """Mark a message as seen by receiver."""
     if is_allowed_in_thread(threadID):
         error = None
         user_id = session['userId']
@@ -306,6 +329,7 @@ def see_message(threadID):
 @app.route('/messages/<int:threadID>/reply', methods=['POST'])
 @authenticate
 def reply(threadID):
+    """Reply to a message thread."""
     if is_allowed_in_thread(threadID):
         error = None
         message = request.form['message']
@@ -327,6 +351,7 @@ def reply(threadID):
 @app.route('/messages/<int:threadID>')
 @authenticate
 def message_thread(threadID): # TODO: PAGE
+    """View for single message thread."""
     if is_allowed_in_thread(threadID): # checks if thread exists and user is allowed in
         thread = MessageThread.query.filter_by(id=int(threadID)).first()
         other_user_id = thread.user2 if thread.user1 == session['userId'] else thread.user1
@@ -338,6 +363,7 @@ def message_thread(threadID): # TODO: PAGE
 @app.route('/report/new', methods=['POST'])
 @authenticate
 def report_user():
+    """Report a user to platform admins."""
     error = None
     sender_id = session['userId']
     about_username = request.form['reported_user']
@@ -362,6 +388,7 @@ def report_user():
 @app.route('/product/<int:productID>/review/new', methods=['POST'])
 @authenticate
 def new_review(productID):
+    """Review a product (only available to logged in users)."""
     error = None
     text = request.form['text']
     rating = float(request.form['rating'])
@@ -380,6 +407,7 @@ def new_review(productID):
 @app.route('/product/<int:productID>/review/edit', methods=['POST'])
 @authenticate
 def edit_review(productID):
+    """Edit a previously written review."""
     error = None
     text = request.form['text']
     rating = float(request.form['rating'])
@@ -402,6 +430,7 @@ def edit_review(productID):
 @app.route('/product/<int:productID>/review/delete', methods=['POST'])
 @authenticate
 def delete_review(productID):
+    """Delete a previously written review."""
     error = None
     user_id = session['userId']
     try:
@@ -420,6 +449,7 @@ def delete_review(productID):
 @app.route('/product/<int:productID>/toggle', methods=['POST'])
 @authenticate
 def toggle_availability(productID):
+    """Toggle a product's availability."""
     error = None
     user_id = session['userId']
     try:
@@ -437,6 +467,7 @@ def toggle_availability(productID):
 @app.route('/product/<int:productID>/edit-pics', methods=['POST'])
 @authenticate
 def edit_product_pics(productID):
+    """Edit product pictures (remove or re-order)."""
     product = Product.query.filter_by(id=productID, seller_id=session['userId']).first()
     pic_ids = request.form.getlist('pic_id')
     pic_orders = request.form.getlist('pic_order')
@@ -456,6 +487,7 @@ def edit_product_pics(productID):
 @app.route('/product/<int:productID>/edit', methods=['POST'])
 @authenticate
 def edit_product(productID):
+    """Edit product (edit non-image attributes and add new images)."""
     product = Product.query.filter_by(id=productID, seller_id=session['userId']).first() 
     if product is not None:
         return create_edit_product(create=False, productID=productID)
@@ -465,6 +497,7 @@ def edit_product(productID):
 @app.route('/sign_s3', methods=['GET'])
 @authenticate
 def sign_s3():
+    """Sign a request to upload to the S3 Bucket."""
     S3_BUCKET = os.environ.get('S3_BUCKET')
     user_id = session['userId']
     photo_name = request.args.getlist('photo_name[]')

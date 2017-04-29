@@ -53,7 +53,8 @@ class User(db.Model):
                 cascade='save-update, merge, delete')
 
     def __init__(self, username, email, password, name=None, location=None):
-        """Initialize a User using the required fields: username, email, password."""
+        """Initialize a User using the required fields: username, email, password
+         and optionally: name, location."""
         self.username = username
         self.email = email
         self.password = password
@@ -61,18 +62,22 @@ class User(db.Model):
         self.location = location
 
     def isPassword(self, pw):
+        """Check if a string matches the stored password hash."""
         return check_password_hash(self.password, pw)
 
     def name_or_username(self):
+        """Return name if name is set, otherwise return username."""
         if self.name:
             return self.name
         return self.username
 
     def bought(self, productID):
+        """Check if the user bought a certain product."""
         return self.orders.join(OrderProduct).join(Product).filter(Product.id == productID).count() > 0
 
     @validates('password')
     def validate_password(self, key, pw):
+        """Validate that the password is at least 6 chars long. Raises a DBException if not."""
         if len(pw) < 6:
             raise DBException({'message': 'Password cannot be less than 6 characters long.',\
                                 'code': 'password'})
@@ -140,6 +145,8 @@ class Address(db.Model):
     orders = db.relationship('Order', backref='address', lazy='dynamic')
 
     def __init__(self, name, user_id, text, country_id, code=None, phone=None):
+        """Initialize an Address object with name of address, userID, text, country_id,
+         and optionally: zip code, phone."""
         self.name = name
         self.user_id = user_id
         self.country_id = country_id
@@ -153,6 +160,7 @@ class Address(db.Model):
 
     @phone.setter
     def phone(self, value):
+        """Strip phone of everything but digits, + and x or extensions on set."""
         pattern = re.compile('[^\d\+x]') # all but digits, +, and x (for extensions)
         stripped = re.sub(pattern, '', value)
         self._phone = stripped
@@ -201,6 +209,8 @@ class Product(db.Model):
     force_unavailable = db.Column(db.Boolean, default=False, nullable=False)
 
     def __init__(self, name, seller_id, description=None, price=None, currency_id=None):
+        """Initialize product with product name, sellerID, and optionally:
+         description, price, currency_id."""
         self.name = name
         self.seller_id = seller_id
         self.description = description
@@ -208,10 +218,12 @@ class Product(db.Model):
         self.currency_id = currency_id
 
     def first_picture(self):
+        """Get the first picture of a product (by order set in upload)."""
         return self.uploads.order_by(Upload.order).first().filename
 
     
     def avg_rating(self):
+        """Get a product's average rating."""
         return db.session.query(func.avg(Review.rating).label('average')).\
                 join(Product).filter(Product.id == self.id).first()[0]
 
@@ -237,6 +249,7 @@ class Category(db.Model):
 
 
     def __init__(self, name):
+        """Initialize category with name only."""
         self.name = name
 
     @validates('name')
@@ -258,6 +271,7 @@ class ProductCategory(db.Model):
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), primary_key=True)
 
     def __init__(self, product_id, category_id):
+        """Initialize a ProductCategory entry with productID and categoryID."""
         self.product_id = product_id
         self.category_id = category_id
 
@@ -280,6 +294,7 @@ class Variety(db.Model):
     orders = db.relationship('OrderProduct', backref='variety', lazy='dynamic')
 
     def __init__(self, name, product_id, price=None, available=True):
+        """Initialize Variety with variety name, productID and optionally: price, availability."""
         self.name = name
         self.product_id = product_id
         self.price = price
@@ -287,6 +302,7 @@ class Variety(db.Model):
 
     @validates('price')
     def validate_price(self, key, pr):
+        """Make sure price is not less than 0. Raises a DBException otherwise."""
         if pr is not None and pr < 0:
             raise DBException({'message': 'Variety price cannot be less than zero.', 'code': 'price'})
         return pr
@@ -310,6 +326,8 @@ class Upload(db.Model):
     order = db.Column(db.Integer, default=0)
 
     def __init__(self, filename, product_id, variety_id=None, order=0):
+        """Initialize upload with filename (S3 URL), productID and optionally:
+         varietyID, and order."""
         self.filename = filename
         self.product_id = product_id
         self.variety_id = variety_id
@@ -341,6 +359,7 @@ class Review(db.Model):
     update_date = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
     def __init__(self, user_id, product_id, rating, title=None, text=None):
+        """Initialize Review with userID, productID, rating, and optionally: title, text."""
         self.user_id = user_id
         self.product_id = product_id
         self.rating = rating
@@ -349,7 +368,8 @@ class Review(db.Model):
 
     @validates('rating')
     def validate_rating(self, key, r):
-        """Makes sure the rating is between 1 and 5 with 0.5 increments only."""
+        """Makes sure the rating is between 1 and 5 with 0.5 increments only.
+         Raises DBException otherwise."""
         half_or_full = r % 1 == 0 or r % 1 == 0.5
         if r < 1 or r > 5 or not half_or_full:
             raise DBException({'message': 'Rating must be between 1 and 5, with 0.5 increments only.',\
@@ -378,6 +398,7 @@ class Order(db.Model):
     message_threads = db.relationship('MessageThread', backref='order', lazy='dynamic')
 
     def __init__(self, user_id):
+        """Initialize order with userID only."""
         self.user_id = user_id
 
 class OrderProduct(db.Model):
@@ -400,7 +421,8 @@ class OrderProduct(db.Model):
     create_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     update_date = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
-    def __init__(self, order_id, product_id, variety_id, quantity=0):
+    def __init__(self, order_id, product_id, variety_id=None, quantity=1):
+        """Initialize OrderProduct row with order_id, product_id and optionally: variety_id and quantity."""
         self.order_id = order_id
         self.product_id = product_id
         self.variety_id = variety_id
@@ -431,14 +453,17 @@ class MessageThread(db.Model):
     messages = db.relationship('Message', backref='thread', lazy='dynamic')
 
     def __init__(self, user1, user2, title=None):
+        """Initialize thread with user1ID, user2ID, and optionally: title."""
         self.user1 = user1
         self.user2 = user2
         self.title = title
 
     def isParticipant(self, user):
+        """Check if a user is a participant in a thread."""
         return self.user1 == user or self.user2 == user
 
     def otherUser(self, user):
+        """Given a user in a thread, find the other one."""
         if self.isParticipant(user):
             return self.user2 if self.user1 == user else self.user1
         return None
@@ -462,11 +487,13 @@ class Message(db.Model):
     seen = db.Column(db.DateTime)
 
     def __init__(self, thread_id, sender_id, text):
+        """Initialize message with threadID, senderID, and text."""
         self.thread_id = thread_id
         self.sender_id = sender_id
         self.text = text
 
     def see(self, userId):
+        """Mark the message as seen by the receiver."""
         thread = self.thread.first()
         if userId != self.sender_id and (thread.user1 == userId or thread.user2 == userId):
             self.seen = datetime.datetime.utcnow()
@@ -485,6 +512,7 @@ class Country(db.Model):
     addresses = db.relationship('Address', backref='country', lazy='dynamic')
 
     def __init__(self, country_id, value):
+        """Initialize country with an ID and a name (easiest way ever)."""
         self.id = country_id
         self.value = value
 
@@ -502,6 +530,7 @@ class Currency(db.Model):
     products = db.relationship('Product', backref='currency', lazy='dynamic')
 
     def __init__(self, curr_id, name, symbol=None):
+        """Initialize a currency with a currency ID, name, and optionally: symbol."""
         self.name = name
         self.id = curr_id
         self.symbol = symbol
@@ -518,6 +547,7 @@ class Reason(db.Model):
     reports = db.relationship('Report', backref='reason', lazy='dynamic')
 
     def __init__(self, text):
+        """Initialize reason to report with text."""
         self.text = text
 
 class Report(db.Model):
@@ -539,15 +569,18 @@ class Report(db.Model):
     resolved = db.Column(db.Boolean, default=False)
 
     def __init__(self, sender_id, about_id, reason_id, message):
+        """Initialize Report with senderID, aboutID (user being reported), reasonID, and message."""
         self.sender_id = sender_id
         self.about_id = about_id
         self.reason_id = reason_id
         self.message = message
 
     def getSender(self):
+        """Return sender of the report."""
         return User.query.filter_by(id=self.sender_id).first()
 
     def getAbout(self):
+        """Return user this report is about."""
         return User.query.filter_by(id=self.about_id).first()
 
 
@@ -563,6 +596,7 @@ class Admins(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), unique=True)
 
     def __init__(self, user_id):
+        """Initialize admin with an existing userID."""
         self.user_id = user_id
 
 
