@@ -35,7 +35,7 @@ css_libs = Bundle(*yadawia.helpers.assetsList(app, folder='css', extension='css'
 """Bundle library css files and minify them."""
 assets.register('js_all', js)
 assets.register('css_libs', css_libs)
-whooshalchemy.whoosh_index(app, yadawia.classes.Product)
+whooshalchemy.init_app(app)
 
 @app.before_request
 def csrf_protect():

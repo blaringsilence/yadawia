@@ -116,6 +116,7 @@ def create_edit_product(create=True, productID=None):
             upload = Upload(pic, product.id)
             db.session.add(upload)
         db.session.commit()
+        db.session.flush()
     except DBException as dbe:
         error = dbe.args[0]['message']
     except (exc.IntegrityError, exc.SQLAlchemyError) as e:
