@@ -8,6 +8,7 @@ from flask import Flask, request, session, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_jsglue import JSGlue
 from flask_assets import Environment, Bundle
+import flask_whooshalchemy as whooshalchemy
 import re
 
 app = Flask(__name__)
@@ -34,6 +35,7 @@ css_libs = Bundle(*yadawia.helpers.assetsList(app, folder='css', extension='css'
 """Bundle library css files and minify them."""
 assets.register('js_all', js)
 assets.register('css_libs', css_libs)
+whooshalchemy.whoosh_index(app, yadawia.classes.Product)
 
 @app.before_request
 def csrf_protect():

@@ -2,6 +2,10 @@
 yadawia/static/js/all.js
 yadawia/static/css/all.css
 
+# Indexes
+whoosh_index/
+whoosh_indexes/
+
 # Mine
 todo.txt
 deploy.sh

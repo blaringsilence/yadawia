@@ -187,6 +187,7 @@ class Product(db.Model):
     """
 
     __tablename__ = 'products'
+    __searchable__ = ['name', 'description']
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     seller_id = db.Column(db.Integer, db.ForeignKey('users.id'))
