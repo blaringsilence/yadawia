@@ -1,4 +1,3 @@
 #!/bin/bash
 
-pip uninstall flask-whooshalchemy
-pip install git+git://github.com/miguelgrinberg/flask-whooshalchemy.git
+pip install https://github.com/dhamaniasad/Flask-WhooshAlchemy/archive/python3-compat.zip
