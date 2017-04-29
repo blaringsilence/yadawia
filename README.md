@@ -1,4 +1,6 @@
 # Yadawia
+[![Documentation Status](https://readthedocs.org/projects/yadawia/badge/?version=latest)](http://yadawia.readthedocs.io/en/latest/?badge=latest)
+
 Web platform for buying and selling handmade products. Built with Flask and PostgreSQL.
 
 ## Quick Install
