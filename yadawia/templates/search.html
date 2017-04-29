@@ -12,17 +12,19 @@
 		{{ search_bar(term=term) }}
 	</div>
 </div>
-<div class="row">	
-	<div class="col-xs-12">
-		{% if matches %}
-			{% for match in matches %}
-			<div class="col-xs-12 col-md-3">
-				{{ product_card(match) }}
-			</div>
-			{% endfor %}
-		{% else %}
-		<h3>No matches found for your query.</h3>
+	{% if matches %}
+		{% for match in matches %}
+		{% if loop.index % 3 == 0 %}<div class="row">{% endif %}
+		<div class="col-xs-12 col-md-3">
+			{{ product_card(match) }}
+		</div>
+		{% if loop.index % 3 == 0 %}</div>{% endif %}
+		{% endfor %}
+	{% else %}
+	<div class="row">
+		<div class="col-xs-12">
+			<h3>No matches found for your query.</h3>
+		</div>
 	</div>
-</div>
 {% endif %}
 {% endblock %}
