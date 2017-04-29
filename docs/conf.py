@@ -161,5 +161,10 @@ texinfo_documents = [
      'Miscellaneous'),
 ]
 
+import os
 
+os.environ['DATABASE_URL'] = 'database url'
+os.environ['AWS_ACCESS_KEY_ID'] = 'aws access key'
+os.environ['AWS_SECRET_ACCESS_KEY'] = 'aws secret access key'
+os.environ['S3_BUCKET'] = 's3 bucket'
 
