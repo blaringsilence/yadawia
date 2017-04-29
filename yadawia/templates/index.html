@@ -16,10 +16,10 @@
 			<h2>All your handmade needs in one place. What are you waiting for?</h2>	
 		</div>
 		<div class="col-xs-10 col-centered">
-			<form class="form-inline" id="main-search-form">
+			<form class="form-inline" id="main-search-form" method="GET" action="{{ url_for('search_products') }}">
 				<div class="col-xs-10 cols">
 				{% call form_group('', 'main-search', hasFeedback=True, hasLabel=False) %}
-					<input id="main-search" type="text" class="form-control" placeholder="Search for products..">
+					<input id="main-search" type="text" name="q" class="form-control" placeholder="Search for products..">
 				{% endcall %}
 				</div>
 				<div class="col-xs-2 cols">

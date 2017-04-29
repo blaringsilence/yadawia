@@ -513,3 +513,9 @@ def sign_s3():
             posts.append(get_presigned_post(new_name, photo_type[i]))
             urls.append('https://%s.s3.amazonaws.com/%s' % (S3_BUCKET, new_name))
     return jsonify(data=posts, urls=urls)
+
+@app.route('/search', methods=['GET'])
+def search_products():
+    term = request.args.get('q')
+    matches = Product.query.whoosh_search(term).all()
+    return render_template('search.html', matches=matches, term=term)

@@ -1,0 +1,28 @@
+{% extends 'layout.html' %}
+{% from 'macros.html' import product_card, search_bar with context %}
+
+{% block extend_title %}
+| Search Results
+{% endblock %}
+
+{% block middle %}
+<div class="row">
+	<div class="col-xs-12 margin-bottom">
+		<h2>Search Results <small>{{ matches | length }} found</small></h2> 
+		{{ search_bar(term=term) }}
+	</div>
+</div>
+<div class="row">	
+	<div class="col-xs-12">
+		{% if matches %}
+			{% for match in matches %}
+			<div class="col-xs-12 col-md-3">
+				{{ product_card(match) }}
+			</div>
+			{% endfor %}
+		{% else %}
+		<h3>No matches found for your query.</h3>
+	</div>
+</div>
+{% endif %}
+{% endblock %}

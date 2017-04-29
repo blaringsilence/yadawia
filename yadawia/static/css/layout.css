@@ -11,6 +11,10 @@
 	display: none;
 }
 
+.margin-bottom {
+	margin-bottom: 2em;
+}
+
 .prod-edit-pic-remove {
 	background-color: rgba(192, 57, 43,1.0);
 	color: white;
