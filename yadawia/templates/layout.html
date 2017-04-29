@@ -21,28 +21,25 @@
 	</head>
 	<body data-csrf="{{ csrf_token() }}" data-in="{% if session.logged_in %}true{% else %}false{% endif %}">
 		<div class="all-but-footer">
-		<div class="container-fluid top-nav">
-			<div class="row">
-				<div class="col-xs-12 col-md-4 title">
-					<h1 title="Home"><a href="{{ url_for('home') }}"> {% include 'logo.html' %} Yadawia</a></h1>
+			<div class="container-fluid top-nav">
+				<div class="row">
+					<div class="col-xs-12 col-md-4 title">
+						<h1 title="Home"><a href="{{ url_for('home') }}"> {% include 'logo.html' %} Yadawia</a></h1>
+					</div>
+					<div class="col-xs-12 col-md-8 menu-space hidden-xs hidden-sm">
+						{% include 'top_menu.html' with context %}
+					</div>
 				</div>
-				<div class="col-xs-12 col-md-8 menu-space hidden-xs hidden-sm">
-					{% include 'top_menu.html' with context %}
+				<div class="row hidden-md hidden-lg">
+					<div class="col-xs-12 mobile-menu">
+						{% include 'top_menu.html' with context %}
+					</div>
 				</div>
 			</div>
-			<div class="row hidden-md hidden-lg">
-				<div class="col-xs-12 mobile-menu">
-					{% include 'top_menu.html' with context %}
-				</div>
+			<div class="container-fluid middle-container">
+				{% block middle %}
+				{% endblock %}
 			</div>
-		</div>
-		<div class="container-fluid middle-container">
-		{% block flash %}
-			{% include 'flash.html' %}
-		{% endblock %}
-		{% block middle %}
-		{% endblock %}
-		</div>
 		</div>
 		<div class="container-fluid footer">
 			<div class="col-xs-12 col-md-4">
@@ -59,6 +56,9 @@
 			</div>
 		</div>
 		<!--Modals-->
+		{% block flash %}
+			{% include 'flash.html' %}
+		{% endblock %}
 		{% call modal('login', 'Login') %}
 			{% include 'form_login.html' with context %}
 		{% endcall %}
