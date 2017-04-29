@@ -8,7 +8,6 @@ from flask import Flask, request, session, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_jsglue import JSGlue
 from flask_assets import Environment, Bundle
-import flask_whooshalchemy as whooshalchemy
 import re
 
 app = Flask(__name__)
@@ -27,6 +26,7 @@ import yadawia.errorhandlers
 import yadawia.views
 import yadawia.classes
 import yadawia.helpers
+import yadawia.whooshalchemy as whooshalchemy
 
 js = Bundle(*yadawia.helpers.assetsList(app), filters='slimit', output='js/all.js')
 """Bundle all JavaScript files and minify them."""
