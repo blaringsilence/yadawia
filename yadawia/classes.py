@@ -419,6 +419,7 @@ class OrderProduct(db.Model):
         - quantity: int.
         - create_date: date.
         - update_date: date.
+        - remarks: string.
     """
     __tablename__ = 'order_product'
     id = db.Column(db.Integer, primary_key=True)
@@ -427,14 +428,17 @@ class OrderProduct(db.Model):
     variety_id = db.Column(db.Integer, db.ForeignKey('varieties.id'))
     quantity = db.Column(db.Integer, nullable=False, default=0)
     create_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    update_date = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    update_date = db.Column(db.DateTime, default=datetime.datetime.utcnow,\
+                            onupdate=datetime.datetime.utcnow)
+    remarks = db.Column(db.String)
 
-    def __init__(self, order_id, product_id, variety_id=None, quantity=1):
+    def __init__(self, order_id, product_id, variety_id=None, quantity=1, remarks=None):
         """Initialize OrderProduct row with order_id, product_id and optionally: variety_id and quantity."""
         self.order_id = order_id
         self.product_id = product_id
         self.variety_id = variety_id
         self.quantity = quantity
+        self.remarks = remarks
 
     @validates('quantity')
     def validate_quantity(self, key, q):

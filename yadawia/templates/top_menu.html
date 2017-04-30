@@ -6,6 +6,6 @@
 	<a><li class="button" title="Logout" id="logout"><i class="fa fa-sign-out"></i> Logout</li></a>
 	<a href="{{ url_for('profile', username=session.username) }}"><li class="button" title="Profile"><i class="fa fa-user"></i> {{ session.username }}</li></a>
 	<a href="{{ url_for('create_product') }}"><li class="button" title="Post a Product"><i class="fa fa-bolt"></i> Post Product</li></a>
-	<a><li class="button cart-icon"><i class="fa fa-shopping-cart"></i> Cart</li></a>
+	<a><li class="button cart-icon"><i class="fa fa-shopping-cart"></i> Cart <div id="cart-icon-wrapper"></div></li></a>
 {% endif %}
 </ul>
