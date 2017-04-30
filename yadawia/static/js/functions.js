@@ -236,6 +236,9 @@ $(function(){
 	window.addEventListener('storage', function(event){
 		if(event.key === 'logged_in'){
 	        window.location.reload();
+	        if (window.localStorage.getItem('logged_in') === 'false') {
+	        	Cart.clear();
+	        }
 		}
 	    else if(event.key === 'cart'){
 	    	Cart.update();
@@ -247,6 +250,9 @@ $(function(){
 	var logged_in = $('body').data('in');
 
 	window.localStorage.setItem('logged_in', logged_in);
+	if (window.localStorage.getItem('logged_in') === 'false') {
+		Cart.clear();
+	}
 
 	$('#logout', '.menu').parent().attr('href', Flask.url_for('logout', { next: window.location.href }));
 
