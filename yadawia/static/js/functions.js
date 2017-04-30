@@ -221,10 +221,10 @@ var validate_and_send = function(form, endpoint, extra_field_check, refresh_to, 
 
 var cart_num = function(num) { return '<span class="cart-number">' + num + '</span>'; }
 var updateCartIcon = function() {
-	if(cart_num(Cart.size()) !== $('#cart-icon-wrapper').html()) {
-		$('#cart-icon-wrapper').html('');
+	if(cart_num(Cart.size()) !== $('.cart-icon-wrapper').first().html()) {
+		$('.cart-icon-wrapper').each(function(){ $(this).html(''); });
 		if(!Cart.isEmpty()) {
-			$('#cart-icon-wrapper').html(cart_num(Cart.size()));
+			$('.cart-icon-wrapper').each(function() { $(this).html(cart_num(Cart.size())); });
 		}
 	}
 }
