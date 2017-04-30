@@ -236,9 +236,7 @@ $(function(){
 	window.addEventListener('storage', function(event){
 		if(event.key === 'logged_in'){
 	        window.location.reload();
-	        if (window.localStorage.getItem('logged_in') === 'false') {
-	        	Cart.clear();
-	        }
+	        Cart.clear();
 		}
 	    else if(event.key === 'cart'){
 	    	Cart.update();

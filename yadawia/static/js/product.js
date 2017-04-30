@@ -109,15 +109,19 @@ $(function(){
 
     $('#add-to-cart').submit(function(e){
     	e.preventDefault();
-    	var productID = $(this).data('id');
-    	var quantity = $('#quantity', this).val();
-    	var variety_id = $('#variety', this).val();
-    	var remarks = $('#remarks', this).val();
-    	var p = new Product({ id: productID, quantity: quantity, variety_id: variety_id, remarks: remarks });
-    	try {
-    		Cart.add(p);
-    	} catch(err) {
-    		generateMessage('warning', $('#add-cart-err-place'), err);
+    	if(window.localStorage.getItem('logged_in') === 'true') {
+    		var productID = $(this).data('id');
+	    	var quantity = $('#quantity', this).val();
+	    	var variety_id = $('#variety', this).val();
+	    	var remarks = $('#remarks', this).val();
+	    	var p = new Product({ id: productID, quantity: quantity, variety_id: variety_id, remarks: remarks });
+	    	try {
+	    		Cart.add(p);
+	    	} catch(err) {
+	    		generateMessage('warning', $('#add-cart-err-place'), err);
+	    	}
+    	} else {
+    		window.location.href = Flask.url_for('login', { next: window.location.pathname });
     	}
     });
 });
