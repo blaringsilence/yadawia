@@ -6,6 +6,73 @@ var generateMessage = function (type, selector, message) {
 	)
 };
 
+
+var Cart = {
+	products: [],
+	add: function(product) {
+		for(var i=0; i<this.products.length; i++){
+			if(this.products[i].isEqual(product)) {
+				throw 'This item was already added. You can edit it from your cart.';
+			}
+		}
+		this.products.push(product);
+		this.triggerChange();
+	},
+	remove: function(productID, varietyID) {
+		var temp = new Product(productID, 0, varietyID);
+		for(var i=0; i<this.products.length; i++) {
+			if(this.products[i].isEqual(temp)) {
+				this.products.splice(i, 1);
+				break;
+			}
+		}
+		this.triggerChange();
+	},
+	clear: function() {
+		this.products = [];
+		this.triggerChange();
+	},
+	size: function() {
+		return this.products.length;
+	},
+	isEmpty: function() {
+		return this.size() === 0;
+	},
+	triggerChange: function() {
+		window.localStorage.setItem('cart', JSON.stringify(this.products));
+		$(document).trigger('cartChange');
+	},
+	update: function() {
+		if(window.localStorage.getItem('cart')){
+			var arr = JSON.parse(window.localStorage.getItem('cart'));
+			var products = [];
+			for(var i=0; i<arr.length; i++){
+				var temp = new Product({
+										   id: arr[i].id,
+										   quantity: arr[i].quantity,
+										   variety_id: arr[i].variety_id, 
+										   remarks: arr[i].remarks, 
+										   date_added: moment(arr[i].date_added, 'MMMM Do YYYY h:mm:ss a')
+										});
+				products.push(temp);
+			}
+			this.products = products;
+		}
+	}
+};
+
+function Product(options) {
+	var self = this;
+	self.id = options.id;
+	self.quantity = options.quantity;
+	self.remarks = options.remarks ? options.remarks : null;
+	self.variety_id = options.variety_id;
+	self.date_added = options.date_added ? options.date_added : moment().format('MMMM Do YYYY h:mm:ss a');
+	self.isEqual = function(otherProduct) {
+		return otherProduct.id === self.id && otherProduct.variety_id == self.variety_id;
+	};
+}
+
 var momentDate = function(date) {
 	var moment_date = moment.utc(date).local();
 	return { formatted:  moment_date.format('MMMM Do YYYY, h:mm:ss a'), fromNow: moment_date.fromNow() };
@@ -152,16 +219,38 @@ var validate_and_send = function(form, endpoint, extra_field_check, refresh_to, 
 	}
 }
 
+var cart_num = function(num) { return '<span class="cart-number">' + num + '</span>'; }
+var updateCartIcon = function() {
+	if(cart_num(Cart.size()) !== $('#cart-icon-wrapper').html()) {
+		$('#cart-icon-wrapper').html('');
+		if(!Cart.isEmpty()) {
+			$('#cart-icon-wrapper').html(cart_num(Cart.size()));
+		}
+	}
+}
+
 $(function(){
+	Cart.update();
+	updateCartIcon();
 	// Log in/out of all tabs if logged in/out in one.
 	window.addEventListener('storage', function(event){
-		if(event.key === 'logged_in')
+		if(event.key === 'logged_in'){
 	        window.location.reload();
+	        Cart.clear();
+		}
+	    else if(event.key === 'cart'){
+	    	Cart.update();
+	    	updateCartIcon();
+	    }
 	}, false)
+	$(document).on('cartChange', updateCartIcon);
 
 	var logged_in = $('body').data('in');
 
 	window.localStorage.setItem('logged_in', logged_in);
+	if (window.localStorage.getItem('logged_in') === 'false') {
+		Cart.clear();
+	}
 
 	$('#logout', '.menu').parent().attr('href', Flask.url_for('logout', { next: window.location.href }));
 

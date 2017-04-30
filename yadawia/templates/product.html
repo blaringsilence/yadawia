@@ -44,7 +44,8 @@
 		</div>
 		<div class="col-xs-12 col-md-2 center-if-mobile banner-controls">
 		{% if not session.logged_in or product.seller_id != session.userId %}
-			<form id="add-to-cart" action="" method="POST">
+			<form id="add-to-cart" data-id="{{ product.id }}">
+			<div id="add-cart-err-place"></div>
 			{% call form_group('Variety', 'variety', required=True) %}
 				<select name="variety" class="form-control" id="variety" required>
 				{% if product.varieties.count() > 0 %}
@@ -59,6 +60,9 @@
 			{% endcall %}
 			{% call form_group('Quantity', 'quantity', required=True) %}
 				<input type="number" name="quantity" id="quantity" class="form-control" min="1" value="1" required>
+			{% endcall %}
+			{% call form_group('Remarks', 'remarks') %}
+				<textarea name="remarks" id="remarks" class="form-control"></textarea>
 			{% endcall %}
 			<div id="total-price">
 				{% if product.currency.symbol %}
