@@ -114,11 +114,13 @@ $(function(){
 	    	var quantity = $('#quantity', this).val();
 	    	var variety_id = $('#variety', this).val();
 	    	var remarks = $('#remarks', this).val();
+	    	var error_place = $('#add-cart-err-place', this);
 	    	var p = new Product({ id: productID, quantity: quantity, variety_id: variety_id, remarks: remarks });
 	    	try {
 	    		Cart.add(p);
+	    		generateMessage('success', error_place, 'Successfully added to cart.');
 	    	} catch(err) {
-	    		generateMessage('warning', $('#add-cart-err-place'), err);
+	    		generateMessage('warning', error_place, err);
 	    	}
     	} else {
     		window.location.href = Flask.url_for('login', { next: window.location.pathname });
