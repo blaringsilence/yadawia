@@ -420,6 +420,7 @@ class OrderProduct(db.Model):
         - create_date: date.
         - update_date: date.
         - remarks: string.
+        - price: price at time of checkout.
     """
     __tablename__ = 'order_product'
     id = db.Column(db.Integer, primary_key=True)
@@ -427,6 +428,7 @@ class OrderProduct(db.Model):
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
     variety_id = db.Column(db.Integer, db.ForeignKey('varieties.id'))
     quantity = db.Column(db.Integer, nullable=False, default=0)
+    price = db.Column(db.Float)
     create_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     update_date = db.Column(db.DateTime, default=datetime.datetime.utcnow,\
                             onupdate=datetime.datetime.utcnow)

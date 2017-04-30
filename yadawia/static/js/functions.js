@@ -19,14 +19,18 @@ var Cart = {
 		this.triggerChange();
 	},
 	remove: function(productID, varietyID) {
-		var temp = new Product(productID, 0, varietyID);
+		var index = this.find(productID, varietyID);
+		if(index !== -1){ this.products.splice(index, 1); }
+		this.triggerChange();
+	},
+	find: function(productID, varietyID) {
+		var temp = new Product({id: productID, quantity:0, variety_id: varietyID });
 		for(var i=0; i<this.products.length; i++) {
 			if(this.products[i].isEqual(temp)) {
-				this.products.splice(i, 1);
-				break;
+				return i;
 			}
 		}
-		this.triggerChange();
+		return -1;
 	},
 	clear: function() {
 		this.products = [];
@@ -52,7 +56,7 @@ var Cart = {
 										   quantity: arr[i].quantity,
 										   variety_id: arr[i].variety_id, 
 										   remarks: arr[i].remarks, 
-										   date_added: moment(arr[i].date_added, 'MMMM Do YYYY h:mm:ss a')
+										   date_added: new Date(arr[i].date_added)
 										});
 				products.push(temp);
 			}
@@ -67,9 +71,9 @@ function Product(options) {
 	self.quantity = options.quantity;
 	self.remarks = options.remarks ? options.remarks : null;
 	self.variety_id = options.variety_id;
-	self.date_added = options.date_added ? options.date_added : moment().format('MMMM Do YYYY h:mm:ss a');
+	self.date_added = options.date_added ? options.date_added : new Date();
 	self.isEqual = function(otherProduct) {
-		return otherProduct.id === self.id && otherProduct.variety_id == self.variety_id;
+		return otherProduct.id === self.id && otherProduct.variety_id === self.variety_id;
 	};
 }
 
@@ -228,6 +232,7 @@ var updateCartIcon = function() {
 		}
 	}
 }
+
 
 $(function(){
 	Cart.update();

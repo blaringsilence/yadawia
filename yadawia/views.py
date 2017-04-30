@@ -516,6 +516,50 @@ def sign_s3():
 
 @app.route('/search', methods=['GET'])
 def search_products():
+    """Search products using a single query line."""
     term = request.args.get('q')
     matches = Product.query.search(term).all()
     return render_template('search.html', matches=matches, term=term)
+
+@app.route('/cart')
+@authenticate
+def cart():
+    """View function for cart."""
+    return render_template('cart.html')
+
+@app.route('/cart-products', methods=['GET'])
+@authenticate
+def cart_products():
+    """AJAX endpoint for cart pages: get info about products in cart."""
+    ids = [int(x) for x in request.args.getlist('product_id[]')]
+    variety_ids = request.args.getlist('product_variety[]')
+    quantity = request.args.getlist('product_quantity[]')
+    cart_items = []
+    total_price = {}
+    for i in range(len(ids)):
+        product = Product.query.filter_by(id=int(ids[i])).first()
+        price = None
+        variety_name = None
+        if product is None:
+            return jsonify(error='Product with ID ' + ids[i] + ' does not exist.')
+        if variety_ids[i] == 'default':
+            price = product.price
+            variety_name = 'Default'
+        else:
+            variety = product.varieties.filter_by(id=int(variety_ids[i])).first()
+            price = variety.price if variety.price else product.price
+            variety_name = variety.name
+        if product.currency_id in total_price:
+            total_price[product.currency_id] += int(quantity[i]) * price
+        else:
+            total_price[product.currency_id] = int(quantity[i]) * price
+        temp = dict(product_id=product.id, 
+                    product_name=product.name, 
+                    variety_id=variety_ids[i], 
+                    price=price, 
+                    currency=product.currency_id,
+                    variety_name=variety_name)
+        cart_items.append(temp)
+    return jsonify(total_price=total_price, items=cart_items)
+
+
