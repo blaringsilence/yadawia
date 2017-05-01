@@ -5,11 +5,20 @@
 {% endblock %}
 
 {% block middle %}
+<div class="col-xs-12 col-md-6 col-centered">
+	<h3>
 	{% if error %}
-		{{ error }}
+		Error: {{ error }}
 	{% else %}
-		Success! Your Order ID is: {{ orderID }}
+		<div class="success text-center"><i class="fa fa-check-circle"></i></div><br>
+		Your order has been successfully created with the number #{{ orderID }}.<br><br>
+		You will be informed when the sellers of the products you've ordered have confirmed
+		your requests.<br><br>
+		You can review your order history any time from <a href="{{ url_for('profile', username=session.username) }}">your profile</a>.
 	{% endif %}
+	</h3>
+	<div class="text-center"><a href="{{ url_for('home') }}"><button class="btn btn-default"><i class="fa fa-home"></i> Home Page</button></a></button></div>
+</div>
 {% endblock %}
 
 {% block scripts %}

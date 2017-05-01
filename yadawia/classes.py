@@ -461,6 +461,7 @@ class OrderProduct(db.Model):
         - remarks: string.
         - price: price at time of checkout.
         - currency_id: currencyID at time of checkout.
+        - confirmed: boolean: is this item confirmed by the seller?
     """
     __tablename__ = 'order_product'
     id = db.Column(db.Integer, primary_key=True)
@@ -470,6 +471,7 @@ class OrderProduct(db.Model):
     quantity = db.Column(db.Integer, nullable=False, default=0)
     price = db.Column(db.Float)
     seller_price = db.Column(db.Float)
+    confirmed = db.Column(db.Boolean, default=False)
     currency_id = db.Column(db.String, db.ForeignKey('currencies.id'))
     create_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     update_date = db.Column(db.DateTime, default=datetime.datetime.utcnow,
