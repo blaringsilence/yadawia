@@ -8,7 +8,8 @@ from yadawia import app, db
 from yadawia.classes import DBException, LoginException, User, Address,\
     Country, Review, Product, Category, Currency,\
     Variety, ProductCategory, Upload, MessageThread,\
-    Message, Reason, Report
+    Message, Reason, Report, PaymentMethod, Order,\
+    OrderProduct
 from yadawia.helpers import login_user, is_safe, redirect_back, \
     authenticate, anonymous_only, public,\
     curr_user, get_upload_url, logout_user,\
@@ -608,7 +609,7 @@ def cart_products():
             else:
                 variety = product.varieties.filter_by(
                     id=int(variety_ids[i])).first()
-                if variety is None:
+                if variety is None or not variety.available:
                     prod_error = 'The variety selected for '\
                         + '<a target="_blank" href="'\
                         + url_for('product', productID=product.id)\
@@ -641,5 +642,32 @@ def cart_products():
 @app.route('/checkout', methods=['GET', 'POST'])
 @authenticate
 def checkout():
-    if request.method == 'GET':
-        return render_template('checkout.html')
+    if request.method == 'POST':
+        try:
+            address_id = int(request.form['address'])
+            payment_method_id = int(request.form['payment'])
+            order = Order(session['userId'], address_id=address_id, payment_method_id=payment_method_id)
+            db.session.add(order)
+            db.session.flush()
+
+            product_ids = [int(x) for x in request.form.getlist('product_id')]
+            variety_ids = [int(x) if x != 'default' else None for x in request.form.getlist('variety_id')]
+            prices = [float(x) for x in request.form.getlist('price')]
+            quantities = [int(x) for x in request.form.getlist('quantity')]
+            currencies = request.form.getlist('currency')
+            remarks = request.form.getlist('remark')
+
+            for i in range(len(product_ids)):
+                order_product = OrderProduct(order.id, product_ids[i], prices[i], currencies[i],\
+                 variety_id=variety_ids[i], quantity=quantities[i], remarks=remarks[i])
+                db.session.add(order_product)
+
+            db.session.commit()
+            return render_template('checkout_feedback.html', orderID=order.id)
+        except exc.IntegrityError as e:
+            db.session.rollback()
+            return render_template('checkout_feedback.html', error=e.message)
+    elif request.method == 'GET':
+        addresses = User.query.filter_by(id=session['userId']).first().addresses.all()
+        payment_methods = PaymentMethod.query.order_by(PaymentMethod.name).all()
+        return render_template('checkout.html', addresses=addresses, payment_methods=payment_methods)

@@ -1,0 +1,19 @@
+{% extends 'layout.html' %}
+
+{% block extend_title %}
+| Checkout - Feedback
+{% endblock %}
+
+{% block middle %}
+	{% if error %}
+		{{ error }}
+	{% else %}
+		Success! Your Order ID is: {{ orderID }}
+	{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if not error %}
+	<script>$(function(){ Cart.locked = false; Cart.clear(); });</script>
+{% endif %}
+{% endblock %}
