@@ -9,20 +9,33 @@ var generateMessage = function (type, selector, message) {
 
 var Cart = {
 	products: [],
+	locked: false,
 	add: function(product) {
-		for(var i=0; i<this.products.length; i++){
-			if(this.products[i].isEqual(product)) {
-				throw 'This item was already added. You can edit it from your cart.';
+		if(!this.locked){
+			for(var i=0; i<this.products.length; i++){
+				if(this.products[i].isEqual(product)) {
+					throw 'This item was already added. You can edit it from your cart.';
+				}
 			}
+			this.products.push(product);
+			this.triggerChange();
+		} else {
+			throw 'Cannot add items. Your cart is locked until you continue (or cancel) <a href="' 
+			+ Flask.url_for('checkout') 
+			+ '">checkout</a>.';
 		}
-		this.products.push(product);
-		this.triggerChange();
 	},
 	remove: function(productID, varietyID, noTrigger) {
-		var index = this.find(productID, varietyID);
-		if(index !== -1){ this.products.splice(index, 1); }
-		else { console.log('Not found'); }
-		this.triggerChange(noTrigger);
+		if(!this.locked){
+			var index = this.find(productID, varietyID);
+			if(index !== -1){ this.products.splice(index, 1); }
+			else { console.log('Not found'); }
+			this.triggerChange(noTrigger);
+		} else {
+			throw 'Cannot remove items. Your cart is locked until you continue (or cancel) <a href="' 
+			+ Flask.url_for('checkout') 
+			+ '">checkout</a>.';
+		}
 	},
 	find: function(productID, varietyID) {
 		var temp = new Product({id: productID, quantity:0, variety_id: varietyID });
@@ -34,8 +47,14 @@ var Cart = {
 		return -1;
 	},
 	clear: function() {
-		this.products = [];
-		this.triggerChange();
+		if(!this.locked){
+			this.products = [];
+			this.triggerChange();
+		} else {
+			throw 'Cannot clear cart. Your cart is locked until you continue (or cancel) <a href="' 
+			+ Flask.url_for('checkout') 
+			+ '">checkout</a>.';
+		}
 	},
 	size: function() {
 		return this.products.length;
@@ -45,12 +64,15 @@ var Cart = {
 	},
 	triggerChange: function(noTrigger) {
 		window.localStorage.setItem('cart', JSON.stringify(this.products));
+		window.localStorage.setItem('cart_lock', JSON.stringify(this.locked));
 		var trigger = noTrigger ? false : true;
 		if(trigger) $(document).trigger('cartChange');
 	},
 	update: function() {
 		if(window.localStorage.getItem('cart')){
 			var arr = JSON.parse(window.localStorage.getItem('cart'));
+			var locked = JSON.parse(window.localStorage.getItem('cart_lock'));
+			this.locked = locked;
 			var products = [];
 			for(var i=0; i<arr.length; i++){
 				var temp = new Product({
@@ -64,6 +86,14 @@ var Cart = {
 			}
 			this.products = products;
 		}
+	},
+	lock: function() {
+		this.locked = true;
+		this.triggerChange();
+	},
+	unlock: function() {
+		this.locked = false;
+		this.triggerChange();
 	}
 };
 
@@ -235,6 +265,17 @@ var updateCartIcon = function() {
 	}
 }
 
+var getCartProductInfo = function(callback) {
+	var data = formatCartData(Cart.products);
+	$.getJSON(Flask.url_for('cart_products'), {
+		product_id: data.pid,
+		product_variety: data.pvar,
+		product_quantity: data.pq
+	}, function (d) {
+		callback(d);
+	});
+}
+
 
 $(function(){
 	Cart.update();
@@ -245,7 +286,7 @@ $(function(){
 	        window.location.reload();
 	        Cart.clear();
 		}
-	    else if(event.key === 'cart'){
+	    else if(event.key === 'cart' || event.key === 'cart_lock'){
 	    	Cart.update();
 	    	updateCartIcon();
 	    }

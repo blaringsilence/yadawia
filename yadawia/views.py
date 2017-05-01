@@ -636,3 +636,10 @@ def cart_products():
                 error=prod_error)
         cart_items.append(temp)
     return jsonify(total_price=total_price, items=cart_items)
+
+
+@app.route('/checkout', methods=['GET', 'POST'])
+@authenticate
+def checkout():
+    if request.method == 'GET':
+        return render_template('checkout.html')
