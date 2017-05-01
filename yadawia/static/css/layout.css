@@ -14,8 +14,25 @@
 	margin-bottom: 1em;
 }
 
-.clear-cart-btn {
+.remove-from-cart-btn {
+	float: right;
+	margin-bottom: 1em;
+	font-size: 0.8em;
+	font-weight: bold;
+	text-transform: uppercase;
+}
+
+.btn-yellow {
+	background-color: rgb(237,216,52);
+	color: white;
+}
+
+.cart-buttons button {
 	display: none;
+}
+
+.proceed-to-checkout-btn {
+	font-weight: bold;
 }
 
 .added-when {

@@ -21,6 +21,7 @@ var Cart = {
 	remove: function(productID, varietyID, noTrigger) {
 		var index = this.find(productID, varietyID);
 		if(index !== -1){ this.products.splice(index, 1); }
+		else { console.log('Not found'); }
 		this.triggerChange(noTrigger);
 	},
 	find: function(productID, varietyID) {
@@ -74,7 +75,7 @@ function Product(options) {
 	self.variety_id = options.variety_id;
 	self.date_added = options.date_added ? options.date_added : new Date();
 	self.isEqual = function(otherProduct) {
-		return otherProduct.id === self.id && otherProduct.variety_id === self.variety_id;
+		return otherProduct.id == self.id && otherProduct.variety_id == self.variety_id;
 	};
 }
 
