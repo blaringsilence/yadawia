@@ -10,6 +10,7 @@ whoosh_indexes/
 todo.txt
 deploy.sh
 
+.fuse_hidden*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
