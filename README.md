@@ -43,6 +43,7 @@ You will need:
       $ ./populate_currencies.py
       $ ./populate_reasons.py
       $ ./populate_categories.py
+      $ ./populate_methods.py
     ```
 7. Run the app.
     ```bash
