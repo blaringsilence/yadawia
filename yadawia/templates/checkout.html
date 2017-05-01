@@ -1,4 +1,5 @@
 {% extends 'layout.html' %}
+{% from 'macros.html' import form_group %}
 
 {% block extend_title %}
 {% endblock %}
@@ -6,8 +7,34 @@
 {% block middle %}
 	<div class="col-xs-12 col-md-6 col-centered">
 		<h2><i class="fa fa-angle-double-right"></i> Checkout</h2>
-		<div class="checkout-buttons">
-			<button class="btn btn-default" id="cancel-checkout"><i class="fa fa-times"></i> Cancel Checkout</button>
+		<div class="checkout-error-place"></div>
+		<div class="checkout-invoice">
+			<ul></ul>
+			<div class="total-before-method"></div>
+		</div>
+		<hr>
+		<div class="checkout-nonempty">
+			<form id="checkout-form" method="POST" action="{{ url_for('checkout') }}">
+				{% call form_group('Address', 'address', required=True, helper='To add a new address or edit those, go to your profile > settings > shipping & addresses.') %}
+					<select class="form-control" id="address" name="address" required>
+						<option selected="selected" disabled="disabled" value="">Choose an address to deliver to</option>
+						{% for address in addresses %}
+							<option value="{{ address.id }}">{{ address.name }}</option>
+						{% endfor %}
+					</select>
+				{% endcall %}
+				{% for method in payment_methods %}
+  					<input type="radio" name="payment" id="payment-{{ method.id }}" value="{{ method.id }}" selected="selected" required><label for="payment-{{ method.id }}">{{ method.name }} <small class="form-group-helper">{{ method.helperText() }}</small></label>
+  				{% endfor %}
+  				<input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+				<div class="checkout-buttons">
+					<button class="btn btn-default" id="cancel-checkout"><i class="fa fa-times"></i> Cancel Checkout</button>
+					<button type="submit" class="btn btn-primary" id="finalize-order"><i class="fa fa-check"></i> Confirm Order</button>
+				</div>
+			</form>
+		</div>
+		<div class="go-to-cart">
+			<a href="{{ url_for('cart') }}"><button class="btn btn-default"><i class="fa fa-shopping-cart"></i> Go to cart</button></a>
 		</div>
 	</div>
 {% endblock %}

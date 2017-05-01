@@ -423,6 +423,7 @@ class Order(db.Model):
         - update_date: date.
         - status: string.
         - address_id: int, foreign key.
+        - payment_method_id: int, foreign key.
     """
     __tablename__ = 'orders'
     id = db.Column(db.Integer, primary_key=True)
@@ -434,14 +435,17 @@ class Order(db.Model):
         onupdate=datetime.datetime.utcnow)
     status = db.Column(db.String, default='New')
     address_id = db.Column(db.Integer, db.ForeignKey('addresses.id'))
+    payment_method_id = db.Column(db.Integer, db.ForeignKey('payment_methods.id'))
     products = db.relationship('Product', secondary='order_product',
                                back_populates='orders', lazy='dynamic')
     message_threads = db.relationship(
         'MessageThread', backref='order', lazy='dynamic')
 
-    def __init__(self, user_id):
-        """Initialize order with userID only."""
+    def __init__(self, user_id, address_id=None, payment_method_id=None):
+        """Initialize order with userID at least."""
         self.user_id = user_id
+        self.address_id = address_id
+        self.payment_method_id = payment_method_id
 
 
 class OrderProduct(db.Model):
@@ -456,6 +460,7 @@ class OrderProduct(db.Model):
         - update_date: date.
         - remarks: string.
         - price: price at time of checkout.
+        - currency_id: currencyID at time of checkout.
     """
     __tablename__ = 'order_product'
     id = db.Column(db.Integer, primary_key=True)
@@ -464,19 +469,24 @@ class OrderProduct(db.Model):
     variety_id = db.Column(db.Integer, db.ForeignKey('varieties.id'))
     quantity = db.Column(db.Integer, nullable=False, default=0)
     price = db.Column(db.Float)
+    seller_price = db.Column(db.Float)
+    currency_id = db.Column(db.String, db.ForeignKey('currencies.id'))
     create_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     update_date = db.Column(db.DateTime, default=datetime.datetime.utcnow,
                             onupdate=datetime.datetime.utcnow)
     remarks = db.Column(db.String)
 
-    def __init__(self, order_id, product_id,
+    def __init__(self, order_id, product_id, price, currency_id,
                  variety_id=None, quantity=1, remarks=None):
         """Initialize OrderProduct row with order_id, product_id and optionally: variety_id and quantity."""
         self.order_id = order_id
         self.product_id = product_id
         self.variety_id = variety_id
+        self.currency_id = currency_id
         self.quantity = quantity
         self.remarks = remarks
+        self.price = price
+        self.seller_price = price * 0.95 # give sellers 95% of the price -> take 3.5%
 
     @validates('quantity')
     def validate_quantity(self, key, q):
@@ -581,6 +591,8 @@ class Currency(db.Model):
     name = db.Column(db.String, unique=True)
     symbol = db.Column(db.String, nullable=True)
     products = db.relationship('Product', backref='currency', lazy='dynamic')
+    order_products = db.relationship('OrderProduct', backref='currency', lazy='dynamic')
+    payment_methods = db.relationship('PaymentMethod', backref='currency', lazy='dynamic')
 
     def __init__(self, curr_id, name, symbol=None):
         """Initialize a currency with a currency ID, name, and optionally: symbol."""
@@ -653,6 +665,42 @@ class Admins(db.Model):
     def __init__(self, user_id):
         """Initialize admin with an existing userID."""
         self.user_id = user_id
+
+
+class PaymentMethod(db.Model):
+    """Database model for payment methods. Contains:
+
+        - id: int, auto-incremented.
+        - name: string (Cash on delivery, etc).
+        - fee: float (extra fee taken to use this method).
+        - isPercentFee: Boolean (is the fee a percentage? true = yes, false = fee is flat)
+        - currency_id: currency for fee if it's flat
+    """
+    __tablename__ = 'payment_methods'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, unique=True)
+    fee = db.Column(db.Float, default=0)
+    isPercentFee = db.Column(db.Boolean, default=False)
+    currency_id = db.Column(db.String, db.ForeignKey('currencies.id'), nullable=True)
+    orders = db.relationship('Order', backref='payment_method', lazy='dynamic')
+
+    def __init__(self, name, fee=0, isPercentFee=False, currency_id=None):
+        """Initialize payment method with an existing name at least."""
+        self.name = name
+        self.fee = fee
+        self.isPercentFee = isPercentFee
+        self.currency_id = currency_id
+
+    def helperText(self):
+        text = 'This method '
+        if self.fee == 0:
+            text += ' is free.'
+        elif self.isPercentFee:
+            text += ' will add ' + self.fee + '% to your order total.'
+        else:
+            text += ' will add ' + self.currency.id + ' ' + self.fee + ' to your order total.'
+        return text
+
 
 
 from yadawia.helpers import validate_name_pattern, no_special_chars, get_upload_url

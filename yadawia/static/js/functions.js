@@ -1,9 +1,10 @@
-var generateMessage = function (type, selector, message) {
-	$(selector).html("<div class='alert alert-" + type + " alert-dismissable fade in' role='alert'>" 
+var generateMessage = function (type, selector, message, append) {
+	var error = "<div class='alert alert-" + type + " alert-dismissable fade in' role='alert'>" 
 		+ "<a class='close' data-dismiss='alert' aria-label='close'>&times;</a>"
 		+ message
-		+ "</div>"
-	)
+		+ "</div>";
+	if(append) $(selector).append(error);
+	else $(selector).html(error);
 };
 
 
@@ -284,6 +285,7 @@ $(function(){
 	window.addEventListener('storage', function(event){
 		if(event.key === 'logged_in'){
 	        window.location.reload();
+	        Cart.locked = false;
 	        Cart.clear();
 		}
 	    else if(event.key === 'cart' || event.key === 'cart_lock'){
@@ -297,6 +299,7 @@ $(function(){
 
 	window.localStorage.setItem('logged_in', logged_in);
 	if (window.localStorage.getItem('logged_in') === 'false') {
+		Cart.locked = false;
 		Cart.clear();
 	}
 

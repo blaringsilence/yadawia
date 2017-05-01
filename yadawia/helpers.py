@@ -124,7 +124,7 @@ def create_edit_product(create=True, productID=None):
                     if pv.price != var_price:
                         pv.price = var_price
                     continue
-                db.session.delete(pv)
+                pv.available = False
         for category_id in categories:
             prodCat = ProductCategory(product.id, category_id)
             db.session.add(prodCat)

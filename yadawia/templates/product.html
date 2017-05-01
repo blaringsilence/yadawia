@@ -50,7 +50,7 @@
 				<select name="variety" class="form-control" id="variety" required>
 				{% if product.varieties.count() > 0 %}
 					<option value="" disabled="disabled" selected>Choose A Variety</option>
-					{% for variety in product.varieties %}
+					{% for variety in product.varieties.filter_by(available=True) %}
 						<option value="{{ variety.id }}" data-price="{% if variety.price %}{{ variety.price }}{% else %}{{ product.price }}{% endif %}">{{ variety.name }}</option>
 					{% endfor %}
 				{% else %}
