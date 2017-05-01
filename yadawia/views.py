@@ -6,25 +6,27 @@ Contains all the view logic/endpoints for this app.
 """
 from yadawia import app, db
 from yadawia.classes import DBException, LoginException, User, Address,\
-                             Country, Review, Product, Category, Currency,\
-                              Variety, ProductCategory, Upload, MessageThread,\
-                              Message, Reason, Report
+    Country, Review, Product, Category, Currency,\
+    Variety, ProductCategory, Upload, MessageThread,\
+    Message, Reason, Report
 from yadawia.helpers import login_user, is_safe, redirect_back, \
-                            authenticate, anonymous_only, public,\
-                            curr_user, get_upload_url, logout_user,\
-                            is_allowed_in_thread, disable_user,\
-                            create_edit_product, valid_photo,\
-                            get_presigned_post
+    authenticate, anonymous_only, public,\
+    curr_user, get_upload_url, logout_user,\
+    is_allowed_in_thread, disable_user,\
+    create_edit_product, valid_photo,\
+    get_presigned_post
 from sqlalchemy import exc, or_, and_
 from flask import request, render_template, session, redirect, url_for, abort, flash, jsonify, send_from_directory
 from sqlalchemy.sql import func
 import uuid
 import os
 
+
 @app.route('/')
 def home():
     """View function for home."""
     return render_template('index.html')
+
 
 @app.route('/login', methods=['GET', 'POST'])
 @anonymous_only
@@ -42,12 +44,14 @@ def login():
         return redirect_back('home')
     return render_template('login.html')
 
+
 @app.route('/logout')
 @authenticate
 def logout():
     """Log user out."""
     logout_user()
     return redirect_back('home')
+
 
 @app.route('/register', methods=['GET', 'POST'])
 @anonymous_only
@@ -68,7 +72,7 @@ def register():
         except exc.IntegrityError as ex:
             reason = ex.message
             if reason.endswith('is not unique'):
-                error = "%s is already in use." % ex.params[0] 
+                error = "%s is already in use." % ex.params[0]
             else:
                 error = reason
             db.session.rollback()
@@ -77,6 +81,7 @@ def register():
         return jsonify(success=True) if error is None else jsonify(error=error)
     return render_template('register.html')
 
+
 @app.route('/_validateField', methods=['GET'])
 def validate_field():
     """Check availability of username/email. For use in registeration form."""
@@ -84,11 +89,12 @@ def validate_field():
     if field_type not in ['email', 'username']:
         abort(400)
     field = request.args.get('field', 0, type=str)
-    kwargs = { field_type: field.lower() }
+    kwargs = {field_type: field.lower()}
     existing = User.query.filter_by(**kwargs).first()
     is_taken = existing if not (existing and curr_user(existing.username)) else False
     available = 'false' if is_taken else 'true'
     return jsonify(available=available)
+
 
 @app.route('/profile')
 @app.route('/p/<username>')
@@ -113,19 +119,20 @@ def profile(username=None):
     if user is None:
         abort(404)
     rating = db.session.query(func.avg(Review.rating).label('average'))\
-            .join(Product).join(User).filter(User.id == user.id).first()[0]
-    avg_rating = round(rating,2) if rating is not None else None
+        .join(Product).join(User).filter(User.id == user.id).first()[0]
+    avg_rating = round(rating, 2) if rating is not None else None
 
     is_current_users_profile = curr_user(username.lower())
-    kwargs = {} if is_current_users_profile else { 'available': True }
+    kwargs = {} if is_current_users_profile else {'available': True}
     report_reasons = None if is_current_users_profile else Reason.query.order_by(Reason.text).all()
 
-    return render_template('profile.html', user=user,\
-                            is_curr_user=is_current_users_profile,\
-                            avg_rating=avg_rating,\
-                            products=user.products.filter_by(**kwargs)\
-                                    .order_by(Product.update_date.desc()).all(),\
-                            report_reasons=report_reasons)
+    return render_template('profile.html', user=user,
+                           is_curr_user=is_current_users_profile,
+                           avg_rating=avg_rating,
+                           products=user.products.filter_by(**kwargs)
+                           .order_by(Product.update_date.desc()).all(),
+                           report_reasons=report_reasons)
+
 
 @app.route('/upload/profile-pic', methods=['POST'])
 @authenticate
@@ -136,6 +143,7 @@ def upload_avatar():
     user.picture = photo_url
     db.session.commit()
     return redirect(url_for('profile', username=session['username']))
+
 
 @app.route('/edit/profile', methods=['POST'])
 @authenticate
@@ -155,11 +163,12 @@ def edit_profile():
     except exc.IntegrityError as ex:
         reason = ex.message
         if reason.endswith('is not unique'):
-            error = "%s is already in use." % ex.params[0] 
+            error = "%s is already in use." % ex.params[0]
         else:
             error = reason
         db.session.rollback()
     return jsonify(success=True) if error is None else jsonify(error=error)
+
 
 @app.route('/settings')
 @authenticate
@@ -167,7 +176,9 @@ def settings():
     """View for settings for logged in user."""
     user = User.query.filter_by(username=session['username']).first()
     countries = Country.query.order_by(Country.value).all()
-    return render_template('settings.html', user=user, addresses=user.addresses.all(), countries=countries)
+    return render_template('settings.html', user=user,
+                           addresses=user.addresses.all(), countries=countries)
+
 
 @app.route('/settings/account', methods=['POST'])
 @authenticate
@@ -184,16 +195,17 @@ def update_account():
                 setattr(user, field_type, new_value)
                 db.session.commit()
             except DBException as dbe:
-                error = dbe.args[0]['message'] 
+                error = dbe.args[0]['message']
         else:
             error = 'Current password is incorrect.'
         return jsonify(success=True, message='Successfully changed ' + field_type + '.')\
-                 if error is None else jsonify(error=error)
+            if error is None else jsonify(error=error)
     abort(400)
+
 
 @app.route('/settings/deactivate', methods=['POST'])
 @authenticate
-def deactivate_account(): # TODO prevent deactivate if ongoing orders.
+def deactivate_account():  # TODO prevent deactivate if ongoing orders.
     """Deactivate a user's account. Can be undone by simply logging in again,
     as opposed to admin suspension (yet to be implemented in a view).
     """
@@ -206,6 +218,7 @@ def deactivate_account(): # TODO prevent deactivate if ongoing orders.
         return redirect(url_for('home'))
     flash('The password you entered was incorrect.')
     return redirect(url_for('settings'))
+
 
 @app.route('/settings/addresses/add', methods=['POST'])
 @authenticate
@@ -243,10 +256,11 @@ def delete_address():
         try:
             db.session.delete(address)
             db.session.commit()
-        except exc.IntegrityError as e: # TODO check if ongoing orders or just history
+        except exc.IntegrityError as e:  # TODO check if ongoing orders or just history
             error = 'Cannot delete an address currently used in ongoing orders.'
-        return jsonify(success=True) if not error else jsonify(error=error) 
+        return jsonify(success=True) if not error else jsonify(error=error)
     abort(400)
+
 
 @app.route('/product/create', methods=['GET', 'POST'])
 @authenticate
@@ -259,17 +273,22 @@ def create_product():
         currencies = Currency.query.order_by(Currency.name).all()
         return render_template('create_product.html', categories=categories, currencies=currencies)
 
+
 @app.route('/product/<int:productID>')
 def product(productID):
     """View for product page given the product ID."""
     productID = productID
-    product = Product.query.filter_by(id=productID).outerjoin(Review).order_by(Review.create_date.desc()).first()
+    product = Product.query.filter_by(
+        id=productID).outerjoin(Review).order_by(
+        Review.create_date.desc()).first()
     if product is None or\
-    (not product.available and ('logged_in' not in session or product.seller_id != session['userId'])):
+            (not product.available and ('logged_in' not in session or product.seller_id != session['userId'])):
         abort(404)
     categories = Category.query.all()
     currencies = Currency.query.all()
-    return render_template('product.html', product=product, categories=categories, currencies=currencies)
+    return render_template('product.html', product=product,
+                           categories=categories, currencies=currencies)
+
 
 @app.route('/message/create', methods=['POST'])
 @authenticate
@@ -299,15 +318,17 @@ def new_message():
     else:
         return redirect(url_for('message_thread', threadID=thread.id))
 
+
 @app.route('/messages')
 @authenticate
 def messages():
     """View for message threads."""
     user_id = session['userId']
     threads = MessageThread.query.join(Message)\
-            .filter(or_(MessageThread.user1 == user_id, MessageThread.user2 == user_id))\
-            .order_by(Message.date.desc()).all()
+        .filter(or_(MessageThread.user1 == user_id, MessageThread.user2 == user_id))\
+        .order_by(Message.date.desc()).all()
     return render_template('messages.html', threads=threads)
+
 
 @app.route('/see-message/<int:threadID>', methods=['POST'])
 @authenticate
@@ -325,6 +346,7 @@ def see_message(threadID):
             error = e.message
         return jsonify(success=True) if not error else jsonify(error=error)
     abort(400)
+
 
 @app.route('/messages/<int:threadID>/reply', methods=['POST'])
 @authenticate
@@ -350,15 +372,16 @@ def reply(threadID):
 
 @app.route('/messages/<int:threadID>')
 @authenticate
-def message_thread(threadID): # TODO: PAGE
+def message_thread(threadID):  # TODO: PAGE
     """View for single message thread."""
-    if is_allowed_in_thread(threadID): # checks if thread exists and user is allowed in
+    if is_allowed_in_thread(threadID):  # checks if thread exists and user is allowed in
         thread = MessageThread.query.filter_by(id=int(threadID)).first()
         other_user_id = thread.user2 if thread.user1 == session['userId'] else thread.user1
         other_user = User.query.filter_by(id=other_user_id).first()
-        return render_template('message_thread.html',\
-                             thread=thread, other_user=other_user)
+        return render_template('message_thread.html',
+                               thread=thread, other_user=other_user)
     abort(400)
+
 
 @app.route('/report/new', methods=['POST'])
 @authenticate
@@ -385,6 +408,7 @@ def report_user():
     flash(flash_msg)
     return redirect(url_for('profile', username=about_username))
 
+
 @app.route('/product/<int:productID>/review/new', methods=['POST'])
 @authenticate
 def new_review(productID):
@@ -403,6 +427,7 @@ def new_review(productID):
     except (exc.IntegrityError, exc.SQLAlchemyError) as e:
         error = e.message
     return jsonify(success=True) if error is None else jsonify(error=error)
+
 
 @app.route('/product/<int:productID>/review/edit', methods=['POST'])
 @authenticate
@@ -427,6 +452,7 @@ def edit_review(productID):
         error = e.message
     return jsonify(success=True) if error is None else jsonify(error=error)
 
+
 @app.route('/product/<int:productID>/review/delete', methods=['POST'])
 @authenticate
 def delete_review(productID):
@@ -446,6 +472,7 @@ def delete_review(productID):
     flash_msg = error if error is not None else 'Successfully deleted your review.'
     return redirect(url_for('product', productID=productID))
 
+
 @app.route('/product/<int:productID>/toggle', methods=['POST'])
 @authenticate
 def toggle_availability(productID):
@@ -463,6 +490,7 @@ def toggle_availability(productID):
     except (exc.IntegrityError, exc.SQLAlchemyError) as e:
         error = e.message
     return jsonify(success=True) if error is None else jsonify(error=error)
+
 
 @app.route('/product/<int:productID>/edit-pics', methods=['POST'])
 @authenticate
@@ -484,15 +512,17 @@ def edit_product_pics(productID):
         abort(400)
     return redirect(url_for('product', productID=productID))
 
+
 @app.route('/product/<int:productID>/edit', methods=['POST'])
 @authenticate
 def edit_product(productID):
     """Edit product (edit non-image attributes and add new images)."""
-    product = Product.query.filter_by(id=productID, seller_id=session['userId']).first() 
+    product = Product.query.filter_by(id=productID, seller_id=session['userId']).first()
     if product is not None:
         return create_edit_product(create=False, productID=productID)
     else:
         abort(400)
+
 
 @app.route('/sign_s3', methods=['GET'])
 @authenticate
@@ -507,12 +537,13 @@ def sign_s3():
     urls = []
     for i in range(len(photo_type)):
         if not valid_photo(photo_type[i], float(photo_size_mb[i])):
-            return jsonify(error= photo_name[i] + ' is not a valid photo under 10 MBs.')
+            return jsonify(error=photo_name[i] + ' is not a valid photo under 10 MBs.')
         else:
             new_name = uuid.uuid4().hex + '_' + str(user_id) + os.path.splitext(photo_name[i])[1]
             posts.append(get_presigned_post(new_name, photo_type[i]))
             urls.append('https://%s.s3.amazonaws.com/%s' % (S3_BUCKET, new_name))
     return jsonify(data=posts, urls=urls)
+
 
 @app.route('/search', methods=['GET'])
 def search_products():
@@ -521,11 +552,13 @@ def search_products():
     matches = Product.query.search(term).all()
     return render_template('search.html', matches=matches, term=term)
 
+
 @app.route('/cart')
 @authenticate
 def cart():
     """View function for cart."""
     return render_template('cart.html')
+
 
 @app.route('/cart-products', methods=['GET'])
 @authenticate
@@ -552,17 +585,17 @@ def cart_products():
                     variety_name = 'Default'
                 else:
                     prod_error = '<a target="_blank" href="' + url_for('product', productID=product.id)\
-                                + '">' + product.name + '</a>'\
-                                + ' no longer has a "Default" variety.'
+                        + '">' + product.name + '</a>'\
+                        + ' no longer has a "Default" variety.'
                     price = 0
             else:
                 variety = product.varieties.filter_by(id=int(variety_ids[i])).first()
                 if variety is None:
                     prod_error = 'The variety selected for '\
-                                + '<a target="_blank" href="'\
-                                + url_for('product', productID=product.id)\
-                                + '">' + product.name + '</a>'\
-                                + ' does not exist.'
+                        + '<a target="_blank" href="'\
+                        + url_for('product', productID=product.id)\
+                        + '">' + product.name + '</a>'\
+                        + ' does not exist.'
                     price = 0
                 else:
                     price = variety.price if variety.price else product.price
@@ -572,15 +605,13 @@ def cart_products():
             else:
                 total_price[product.currency_id] = int(quantity[i]) * price
         if prod_error is None:
-            temp = dict(product_id=product.id, 
-                        product_name=product.name, 
-                        variety_id=variety_ids[i], 
-                        price=price, 
+            temp = dict(product_id=product.id,
+                        product_name=product.name,
+                        variety_id=variety_ids[i],
+                        price=price,
                         currency=product.currency_id,
                         variety_name=variety_name)
         else:
             temp = dict(product_id=ids[i], variety_id=variety_ids[i], error=prod_error)
         cart_items.append(temp)
     return jsonify(total_price=total_price, items=cart_items)
-
-
