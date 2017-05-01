@@ -19,17 +19,15 @@ var update_list = function() {
 	var cart_btns = $('.cart-buttons button');
 	$(list_place).html('');
 	$(total_price_place).html('');
+	$('#cart-lock-warning').html('');
 	$(cart_btns).hide();
+	$('.cart-div button:not(.proceed-to-checkout-btn')
+							.prop('disabled', false);
 	Cart.update(); // so we don't have to rely on order of functions executed.
 	if(Cart.isEmpty()) {
 		$(list_place).append('<li><h4>Your cart is empty.</h4></li>');
 	} else {
-		var data = formatCartData(Cart.products);
-		$.getJSON(Flask.url_for('cart_products'), {
-			product_id: data.pid,
-			product_variety: data.pvar,
-			product_quantity: data.pq
-		}, function (d) {
+		getCartProductInfo(function(d){
 			if(!d.error){
 				errors = 0
 				for(var i in d.items) {
@@ -63,7 +61,7 @@ var update_list = function() {
 											+ '</li>');	
 					} else {
 						$(list_place).append('<li id="' + prod.id + '-' + prod.variety_id + '"></li>');
-						generateMessage('error', $('#' + prod.id + '-' + prod.variety_id), item.error);
+						generateMessage('danger', $('#' + prod.id + '-' + prod.variety_id), item.error);
 						var id_in_cart = Cart.find(item.product_id, item.variety_id);
 						Cart.remove(item.product_id, item.variety_id, true);
 						errors++;
@@ -84,6 +82,15 @@ var update_list = function() {
 						var variety_id = $(product_elem).data('varietyid');
 						Cart.remove(product_id, variety_id);
 					});
+					if(Cart.locked){
+						generateMessage('danger', $('#cart-lock-warning'), '<i class="fa fa-lock"></i>'
+																		+' Your cart is locked.<br>&nbsp;&nbsp;&nbsp;'
+																		+'Complete or cancel <a href="'
+																		+ Flask.url_for('checkout')
+																		+'">checkout</a> to unlock it.');
+						$('.cart-div button:not(.proceed-to-checkout-btn')
+							.prop('disabled', true);
+					}
 				}
 			}
 		});
@@ -92,7 +99,7 @@ var update_list = function() {
 $(function(){
 	update_list();
 	window.addEventListener('storage', function(event){
-		if(event.key === 'cart') {
+		if(event.key === 'cart' || event.key === 'cart_lock') {
 			update_list();
 		}
 	}, false);
