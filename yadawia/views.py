@@ -540,25 +540,46 @@ def cart_products():
         product = Product.query.filter_by(id=int(ids[i])).first()
         price = None
         variety_name = None
+        prod_error = None
         if product is None:
-            return jsonify(error='Product with ID ' + ids[i] + ' does not exist.')
-        if variety_ids[i] == 'default':
-            price = product.price
-            variety_name = 'Default'
+            prod_error = 'Product with ID ' + ids[i] + ' does not exist.'
+        elif not product.available:
+            prod_error = product.name + ' is no longer available.'
         else:
-            variety = product.varieties.filter_by(id=int(variety_ids[i])).first()
-            price = variety.price if variety.price else product.price
-            variety_name = variety.name
-        if product.currency_id in total_price:
-            total_price[product.currency_id] += int(quantity[i]) * price
+            if variety_ids[i] == 'default':
+                if product.varieties.count() == 0:
+                    price = product.price
+                    variety_name = 'Default'
+                else:
+                    prod_error = '<a target="_blank" href="' + url_for('product', productID=product.id)\
+                                + '">' + product.name + '</a>'\
+                                + ' no longer has a "Default" variety.'
+                    price = 0
+            else:
+                variety = product.varieties.filter_by(id=int(variety_ids[i])).first()
+                if variety is None:
+                    prod_error = 'The variety selected for '\
+                                + '<a target="_blank" href="'\
+                                + url_for('product', productID=product.id)\
+                                + '">' + product.name + '</a>'\
+                                + ' does not exist.'
+                    price = 0
+                else:
+                    price = variety.price if variety.price else product.price
+                    variety_name = variety.name
+            if product.currency_id in total_price:
+                total_price[product.currency_id] += int(quantity[i]) * price
+            else:
+                total_price[product.currency_id] = int(quantity[i]) * price
+        if prod_error is None:
+            temp = dict(product_id=product.id, 
+                        product_name=product.name, 
+                        variety_id=variety_ids[i], 
+                        price=price, 
+                        currency=product.currency_id,
+                        variety_name=variety_name)
         else:
-            total_price[product.currency_id] = int(quantity[i]) * price
-        temp = dict(product_id=product.id, 
-                    product_name=product.name, 
-                    variety_id=variety_ids[i], 
-                    price=price, 
-                    currency=product.currency_id,
-                    variety_name=variety_name)
+            temp = dict(product_id=ids[i], variety_id=variety_ids[i], error=prod_error)
         cart_items.append(temp)
     return jsonify(total_price=total_price, items=cart_items)
 

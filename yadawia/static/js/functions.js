@@ -18,10 +18,10 @@ var Cart = {
 		this.products.push(product);
 		this.triggerChange();
 	},
-	remove: function(productID, varietyID) {
+	remove: function(productID, varietyID, noTrigger) {
 		var index = this.find(productID, varietyID);
 		if(index !== -1){ this.products.splice(index, 1); }
-		this.triggerChange();
+		this.triggerChange(noTrigger);
 	},
 	find: function(productID, varietyID) {
 		var temp = new Product({id: productID, quantity:0, variety_id: varietyID });
@@ -42,9 +42,10 @@ var Cart = {
 	isEmpty: function() {
 		return this.size() === 0;
 	},
-	triggerChange: function() {
+	triggerChange: function(noTrigger) {
 		window.localStorage.setItem('cart', JSON.stringify(this.products));
-		$(document).trigger('cartChange');
+		var trigger = noTrigger ? false : true;
+		if(trigger) $(document).trigger('cartChange');
 	},
 	update: function() {
 		if(window.localStorage.getItem('cart')){

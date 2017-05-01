@@ -89,8 +89,9 @@ def create_edit_product(create=True, productID=None):
     price = float(request.form['price']) if request.form['price'] is not None else None
     categories = request.form.getlist('categories')
     variety_titles = request.form.getlist('variety_title')
-    variety_prices = request.form.getlist('variety_price')
+    variety_prices = [float(x) if x != 'Default' and x != '' else None for x in request.form.getlist('variety_price')]
     pictures = request.form.getlist('photo_url')
+    var_indexes = list(range(1, len(variety_titles)))
     try:
         if create:
             product = Product(name, seller_id, description, price, currency)
@@ -102,14 +103,23 @@ def create_edit_product(create=True, productID=None):
             product.name = name
             product.price = price
             product.currency_id = currency
-            product.varieties.delete()
             ProductCategory.query.filter_by(product_id=productID).delete()
+            prod_vars = product.varieties.all()
+            for pv in prod_vars:
+                if pv.name in variety_titles:
+                    var_index = variety_titles.index(pv.name)
+                    var_indexes.remove(var_index)
+                    var_price = variety_prices[var_index]
+                    if pv.price != var_price:
+                        pv.price = var_price
+                    continue
+                db.session.delete(pv) 
         for category_id in categories:
             prodCat = ProductCategory(product.id, category_id)
             db.session.add(prodCat)
-        for i in range(1, len(variety_titles)):
+        for i in var_indexes:
             vtitle = variety_titles[i]
-            vprice = float(variety_prices[i]) if variety_prices[i] != 'Default' else None
+            vprice = variety_prices[i]
             variety = Variety(vtitle, product.id, vprice)
             db.session.add(variety)
         for pic in pictures:
