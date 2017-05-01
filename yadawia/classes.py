@@ -45,7 +45,9 @@ class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.Unicode, unique=True, nullable=False)
-    password = db.Column(db.String(157), nullable=False)  # 128 + salt + algo info
+    password = db.Column(
+        db.String(157),
+        nullable=False)  # 128 + salt + algo info
     email = db.Column(db.String, unique=True, nullable=False)
     name = db.Column(db.Unicode)
     picture = db.Column(db.String)
@@ -120,7 +122,8 @@ class User(db.Model):
         w3c_pattern = re.compile(
             '^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$')
         if not w3c_pattern.match(em):
-            raise DBException({'message': 'Email must be valid.', 'code': 'email'})
+            raise DBException(
+                {'message': 'Email must be valid.', 'code': 'email'})
         return em.lower()
 
     @validates('username')
@@ -175,7 +178,8 @@ class Address(db.Model):
     @phone.setter
     def phone(self, value):
         """Strip phone of everything but digits, + and x or extensions on set."""
-        pattern = re.compile('[^\d\+x]')  # all but digits, +, and x (for extensions)
+        pattern = re.compile(
+            '[^\d\+x]')  # all but digits, +, and x (for extensions)
         stripped = re.sub(pattern, '', value)
         self._phone = stripped
 
@@ -227,7 +231,8 @@ class Product(db.Model):
     available = db.Column(db.Boolean, default=True, nullable=False)
     force_unavailable = db.Column(db.Boolean, default=False, nullable=False)
 
-    def __init__(self, name, seller_id, description=None, price=None, currency_id=None):
+    def __init__(self, name, seller_id, description=None,
+                 price=None, currency_id=None):
         """Initialize product with product name, sellerID, and optionally:
          description, price, currency_id."""
         self.name = name
@@ -286,8 +291,14 @@ class ProductCategory(db.Model):
         - category_id: int, foreign key.
     """
     __tablename__ = 'product_category'
-    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), primary_key=True)
-    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), primary_key=True)
+    product_id = db.Column(
+        db.Integer,
+        db.ForeignKey('products.id'),
+        primary_key=True)
+    category_id = db.Column(
+        db.Integer,
+        db.ForeignKey('categories.id'),
+        primary_key=True)
 
     def __init__(self, product_id, category_id):
         """Initialize a ProductCategory entry with productID and categoryID."""
@@ -425,7 +436,8 @@ class Order(db.Model):
     address_id = db.Column(db.Integer, db.ForeignKey('addresses.id'))
     products = db.relationship('Product', secondary='order_product',
                                back_populates='orders', lazy='dynamic')
-    message_threads = db.relationship('MessageThread', backref='order', lazy='dynamic')
+    message_threads = db.relationship(
+        'MessageThread', backref='order', lazy='dynamic')
 
     def __init__(self, user_id):
         """Initialize order with userID only."""
@@ -457,7 +469,8 @@ class OrderProduct(db.Model):
                             onupdate=datetime.datetime.utcnow)
     remarks = db.Column(db.String)
 
-    def __init__(self, order_id, product_id, variety_id=None, quantity=1, remarks=None):
+    def __init__(self, order_id, product_id,
+                 variety_id=None, quantity=1, remarks=None):
         """Initialize OrderProduct row with order_id, product_id and optionally: variety_id and quantity."""
         self.order_id = order_id
         self.product_id = product_id
@@ -469,7 +482,8 @@ class OrderProduct(db.Model):
     def validate_quantity(self, key, q):
         """Validate that quantity is more than 0."""
         if q < 0:
-            raise DBException({'message': 'Quantity cannot be less than zero.', 'code': 'quantity'})
+            raise DBException(
+                {'message': 'Quantity cannot be less than zero.', 'code': 'quantity'})
         return q
 
 
@@ -534,7 +548,8 @@ class Message(db.Model):
     def see(self, userId):
         """Mark the message as seen by the receiver."""
         thread = self.thread.first()
-        if userId != self.sender_id and (thread.user1 == userId or thread.user2 == userId):
+        if userId != self.sender_id and (
+                thread.user1 == userId or thread.user2 == userId):
             self.seen = datetime.datetime.utcnow()
 
 
