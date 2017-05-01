@@ -43,7 +43,8 @@ def forbidden(e):
 @app.errorhandler(404)
 def not_found(e):
     """Render error template with the message: Page Not Found and details."""
-    return render_error(404, 'Page Not Found', det="These aren't the droids you're looking for.")
+    return render_error(404, 'Page Not Found',
+                        det="These aren't the droids you're looking for.")
 
 
 @app.errorhandler(410)

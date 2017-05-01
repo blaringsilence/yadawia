@@ -34,9 +34,11 @@ def login_user(username, password):
     user = User.query.filter_by(username=username.lower()).first()
     if user is not None:
         if not user.isPassword(password):
-            raise LoginException({'message': 'Password is incorrect.', 'code': 'password'})
+            raise LoginException(
+                {'message': 'Password is incorrect.', 'code': 'password'})
         if user.suspended:
-            raise LoginException({'message': 'Your account has been suspended.', 'code': 'suspend'})
+            raise LoginException(
+                {'message': 'Your account has been suspended.', 'code': 'suspend'})
         elif user.disabled:
             enable_user(username)
             flash('Welcome back!')
@@ -45,7 +47,8 @@ def login_user(username, password):
         session['userId'] = user.id
         generate_csrf_token(force=True)
     else:
-        raise LoginException({'message': 'Username does not exist.', 'code': 'username'})
+        raise LoginException(
+            {'message': 'Username does not exist.', 'code': 'username'})
 
 
 def suspend_user(username):
@@ -92,7 +95,8 @@ def create_edit_product(create=True, productID=None):
     seller_id = session['userId']
     description = request.form['description']
     currency = request.form['currency']
-    price = float(request.form['price']) if request.form['price'] is not None else None
+    price = float(request.form['price']
+                  ) if request.form['price'] is not None else None
     categories = request.form.getlist('categories')
     variety_titles = request.form.getlist('variety_title')
     variety_prices = [float(x) if x != 'Default' and x !=
@@ -169,7 +173,8 @@ def get_presigned_post(filename, filetype):
 
 def get_random_string(length=32):
     """Generate a random string of length 32, used in ``generate_csrf_token()``"""
-    return ''.join(random.choice(string.ascii_letters + string.digits) for i in range(length))
+    return ''.join(random.choice(string.ascii_letters + string.digits)
+                   for i in range(length))
 
 
 def generate_csrf_token(force=False):
@@ -210,7 +215,8 @@ def logout_user():
     generate_csrf_token(force=True)
 
 
-def no_special_chars(string, allowNumbers=False, optional=True, allowComma=False):
+def no_special_chars(string, allowNumbers=False,
+                     optional=True, allowComma=False):
     """Function to check if a string has no special characters."""
     nums = '0-9' if not allowNumbers else ''
     postfix = '*' if optional else '+'
@@ -228,7 +234,8 @@ def no_special_chars(string, allowNumbers=False, optional=True, allowComma=False
 
 def validate_name_pattern(name_input, allowNumbers=False, optional=True):
     """Validate name pattern, given that generally names do not have special chars."""
-    if not no_special_chars(name_input, allowNumbers=allowNumbers, optional=optional):
+    if not no_special_chars(
+            name_input, allowNumbers=allowNumbers, optional=optional):
         raise DBException({'message': 'Name cannot contain numbers or special characters.',
                            'code': 'name'})
 
@@ -248,7 +255,8 @@ def curr_user(username):
 
 def get_upload_url(filename):
     """Return url to uploaded file."""
-    return url_for('static', filename='uploads/' + filename) if filename else None
+    return url_for('static', filename='uploads/' +
+                   filename) if filename else None
 
 
 def is_logged_in():

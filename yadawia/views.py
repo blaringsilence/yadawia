@@ -16,7 +16,8 @@ from yadawia.helpers import login_user, is_safe, redirect_back, \
     create_edit_product, valid_photo,\
     get_presigned_post
 from sqlalchemy import exc, or_, and_
-from flask import request, render_template, session, redirect, url_for, abort, flash, jsonify, send_from_directory
+from flask import request, render_template, session, redirect,\
+    url_for, abort, flash, jsonify, send_from_directory
 from sqlalchemy.sql import func
 import uuid
 import os
@@ -91,7 +92,9 @@ def validate_field():
     field = request.args.get('field', 0, type=str)
     kwargs = {field_type: field.lower()}
     existing = User.query.filter_by(**kwargs).first()
-    is_taken = existing if not (existing and curr_user(existing.username)) else False
+    is_taken = existing if not (
+        existing and curr_user(
+            existing.username)) else False
     available = 'false' if is_taken else 'true'
     return jsonify(available=available)
 
@@ -114,7 +117,9 @@ def profile(username=None):
         else:
             abort(404)
 
-    user = User.query.filter_by(username=username.lower(), disabled=False).first()
+    user = User.query.filter_by(
+        username=username.lower(),
+        disabled=False).first()
 
     if user is None:
         abort(404)
@@ -124,7 +129,8 @@ def profile(username=None):
 
     is_current_users_profile = curr_user(username.lower())
     kwargs = {} if is_current_users_profile else {'available': True}
-    report_reasons = None if is_current_users_profile else Reason.query.order_by(Reason.text).all()
+    report_reasons = None if is_current_users_profile else Reason.query.order_by(
+        Reason.text).all()
 
     return render_template('profile.html', user=user,
                            is_curr_user=is_current_users_profile,
@@ -271,7 +277,8 @@ def create_product():
     elif request.method == 'GET':
         categories = Category.query.order_by(Category.name).all()
         currencies = Currency.query.order_by(Currency.name).all()
-        return render_template('create_product.html', categories=categories, currencies=currencies)
+        return render_template('create_product.html',
+                               categories=categories, currencies=currencies)
 
 
 @app.route('/product/<int:productID>')
@@ -374,7 +381,8 @@ def reply(threadID):
 @authenticate
 def message_thread(threadID):  # TODO: PAGE
     """View for single message thread."""
-    if is_allowed_in_thread(threadID):  # checks if thread exists and user is allowed in
+    if is_allowed_in_thread(
+            threadID):  # checks if thread exists and user is allowed in
         thread = MessageThread.query.filter_by(id=int(threadID)).first()
         other_user_id = thread.user2 if thread.user1 == session['userId'] else thread.user1
         other_user = User.query.filter_by(id=other_user_id).first()
@@ -439,7 +447,8 @@ def edit_review(productID):
     user_id = session['userId']
     title = request.form['title']
     try:
-        review = Review.query.filter_by(product_id=productID, user_id=user_id).first()
+        review = Review.query.filter_by(
+            product_id=productID, user_id=user_id).first()
         if review is None:
             abort(400)
         review.text = text
@@ -460,7 +469,8 @@ def delete_review(productID):
     error = None
     user_id = session['userId']
     try:
-        review = Review.query.filter_by(product_id=productID, user_id=user_id).first()
+        review = Review.query.filter_by(
+            product_id=productID, user_id=user_id).first()
         if review is None:
             abort(400)
         db.session.delete(review)
@@ -480,7 +490,8 @@ def toggle_availability(productID):
     error = None
     user_id = session['userId']
     try:
-        product = Product.query.filter_by(id=productID, seller_id=user_id).first()
+        product = Product.query.filter_by(
+            id=productID, seller_id=user_id).first()
         if product is None:
             abort(400)
         product.available = not product.available
@@ -496,7 +507,8 @@ def toggle_availability(productID):
 @authenticate
 def edit_product_pics(productID):
     """Edit product pictures (remove or re-order)."""
-    product = Product.query.filter_by(id=productID, seller_id=session['userId']).first()
+    product = Product.query.filter_by(
+        id=productID, seller_id=session['userId']).first()
     pic_ids = request.form.getlist('pic_id')
     pic_orders = request.form.getlist('pic_order')
     for i in range(len(pic_ids)):
@@ -517,7 +529,8 @@ def edit_product_pics(productID):
 @authenticate
 def edit_product(productID):
     """Edit product (edit non-image attributes and add new images)."""
-    product = Product.query.filter_by(id=productID, seller_id=session['userId']).first()
+    product = Product.query.filter_by(
+        id=productID, seller_id=session['userId']).first()
     if product is not None:
         return create_edit_product(create=False, productID=productID)
     else:
@@ -537,11 +550,15 @@ def sign_s3():
     urls = []
     for i in range(len(photo_type)):
         if not valid_photo(photo_type[i], float(photo_size_mb[i])):
-            return jsonify(error=photo_name[i] + ' is not a valid photo under 10 MBs.')
+            return jsonify(error=photo_name[i] +
+                           ' is not a valid photo under 10 MBs.')
         else:
-            new_name = uuid.uuid4().hex + '_' + str(user_id) + os.path.splitext(photo_name[i])[1]
+            new_name = uuid.uuid4().hex + '_' + str(user_id) + \
+                os.path.splitext(photo_name[i])[1]
             posts.append(get_presigned_post(new_name, photo_type[i]))
-            urls.append('https://%s.s3.amazonaws.com/%s' % (S3_BUCKET, new_name))
+            urls.append(
+                'https://%s.s3.amazonaws.com/%s' %
+                (S3_BUCKET, new_name))
     return jsonify(data=posts, urls=urls)
 
 
@@ -589,7 +606,8 @@ def cart_products():
                         + ' no longer has a "Default" variety.'
                     price = 0
             else:
-                variety = product.varieties.filter_by(id=int(variety_ids[i])).first()
+                variety = product.varieties.filter_by(
+                    id=int(variety_ids[i])).first()
                 if variety is None:
                     prod_error = 'The variety selected for '\
                         + '<a target="_blank" href="'\
@@ -612,6 +630,9 @@ def cart_products():
                         currency=product.currency_id,
                         variety_name=variety_name)
         else:
-            temp = dict(product_id=ids[i], variety_id=variety_ids[i], error=prod_error)
+            temp = dict(
+                product_id=ids[i],
+                variety_id=variety_ids[i],
+                error=prod_error)
         cart_items.append(temp)
     return jsonify(total_price=total_price, items=cart_items)
