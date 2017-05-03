@@ -13,6 +13,7 @@ from sqlalchemy.sql import func
 from flask_sqlalchemy import SQLAlchemy, BaseQuery
 from sqlalchemy_searchable import SearchQueryMixin
 from sqlalchemy_utils.types import TSVectorType
+from sqlalchemy.ext.hybrid import hybrid_method
 import re
 import datetime
 
@@ -446,6 +447,7 @@ class Order(db.Model):
         self.user_id = user_id
         self.address_id = address_id
         self.payment_method_id = payment_method_id
+
 
 
 class OrderProduct(db.Model):
