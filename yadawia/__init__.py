@@ -81,6 +81,19 @@ def paragraph(text):
     """TEMPLATE FILTER: Replace newlines with <br /> in html."""
     return text.replace('\n', '<br />')
 
+@app.template_filter('order_total')
+def order_total(order):
+    """TEMPLATE FILTER: Get order total given the order object."""
+    total = {}
+    strings = []
+    for product in order.products.all():
+        if product.currency_id in total:
+            total[product.currency_id] += product.price * product.quantity
+        else:
+            total[product.currency_id] = product.price * product.quantity
+    for key, val in total.items():
+        strings.append(str(val) + ' ' + key)
+    return ' + '.join(strings)
 
 app.jinja_env.globals['csrf_token'] = yadawia.helpers.generate_csrf_token
 """Whenever `{{ csrf_token() }}` is used in a Jinja2 template, it returns the result of the function `generate_csrf_token()` """

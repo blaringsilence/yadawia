@@ -227,8 +227,7 @@ class Product(db.Model):
                               cascade='save-update, merge, delete')
     reviews = db.relationship('Review', backref='product', lazy='dynamic',
                               cascade='save-update, merge, delete')
-    orders = db.relationship('Order', secondary='order_product',
-                             back_populates='products', lazy='dynamic')
+    order_products = db.relationship('OrderProduct', backref='details', lazy='dynamic')
     available = db.Column(db.Boolean, default=True, nullable=False)
     force_unavailable = db.Column(db.Boolean, default=False, nullable=False)
 
@@ -437,8 +436,7 @@ class Order(db.Model):
     status = db.Column(db.String, default='New')
     address_id = db.Column(db.Integer, db.ForeignKey('addresses.id'))
     payment_method_id = db.Column(db.Integer, db.ForeignKey('payment_methods.id'))
-    products = db.relationship('Product', secondary='order_product',
-                               back_populates='orders', lazy='dynamic')
+    products = db.relationship('OrderProduct', backref='order', lazy='dynamic')
     message_threads = db.relationship(
         'MessageThread', backref='order', lazy='dynamic')
 

@@ -191,3 +191,17 @@
   </div>
 </form>
 {% endmacro %}
+
+{% macro order_card(order) %}
+  <li class="order-card">
+    <h4>Order #{{ order.id }} <small>Last updated: <span class="date-to-now">{{ order.update_date }}</span><span class="order-status-disp">{{ order.status }}</span></small></h4>
+    <ul>
+      {% for product in order.products.all() %}
+        <li><b>{{ product.details.name }} ({{ product.variety.name }})</b> X {{ product.quantity }} = {{ product.quantity * product.price }} {{ product.currency_id }}</li>
+      {% endfor %}
+    </ul>
+    <p>Total: {{ order | order_total }}</p>
+    <p>Address: {{ order.address.name }}</p>
+    <p>Order created: <span class="date-to-now">{{ order.create_date }}</span></p>
+  </li>
+{% endmacro %}

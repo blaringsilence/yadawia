@@ -676,6 +676,7 @@ def checkout():
 @authenticate
 def order_history():
     """Get someone's order history. Orders by them, and orders for them."""
-    for_you = Order.query.join(OrderProduct).join(Product).filter_by(seller_id=session['userId']).all()
-    by_you = Order.query.filter_by(user_id=session['userId']).all()
+    for_you = Order.query.join(OrderProduct).join(Product).\
+            filter_by(seller_id=session['userId']).order_by(Order.create_date.desc()).all()
+    by_you = Order.query.filter_by(user_id=session['userId']).order_by(Order.update_date.desc()).all()
     return render_template('order_history.html', for_you=for_you, by_you=by_you)
