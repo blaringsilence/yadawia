@@ -14,7 +14,7 @@
 <head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# product: http://ogp.me/ns/product#">
   <meta property="fb:app_id"                content="1480536868665105" /> 
   <meta property="og:type"                  content="product.item" /> 
-  <meta property="og:url"                   content="{{ url_for('product', productID=product.id) }}" /> 
+  <meta property="og:url"                   content="{{ url_for('product', productID=product.id, _external=True) }}" /> 
   <meta property="og:title"                 content="{{ product.name }}" /> 
   <meta property="og:image"                 content="{{ product.first_picture() }}" /> 
   <meta property="product:retailer_item_id" content="{{ product.id }}" /> 
