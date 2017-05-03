@@ -21,6 +21,7 @@
   <meta property="product:price:amount"     content="{{ product.price }}" /> 
   <meta property="product:price:currency"   content="{{ product.currency_id }}" /> 
   <meta property="product:availability"     content="{% if product.available %}available for order{% else %}out of stock{% endif %}" /> 
+  <meta property="product:condition"        content="new" /> 
 {% endblock %}
 
 {% block middle %}
