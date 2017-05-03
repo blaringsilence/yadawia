@@ -1,7 +1,9 @@
 {% from 'macros.html' import modal with context %}
 <!doctype html>
 <html lang="en-US">
+{% block overwrite_head %}
 	<head>
+{% endblock %}
 		<!--Metadata-->
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>Yadawia {% block extend_title %}{% endblock %}</title>
