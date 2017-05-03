@@ -6,6 +6,8 @@
 {% endblock %}
 
 {% block middle %}
+	{% set by_you_length = by_you | length | string %}
+	{% set for_you_length = for_you | length | string %}
 	<div class="row">
 		<div class="col-xs-12 col-md-4">
 			<h2><i class="fa fa-history"></i> Order History</h2>
@@ -13,12 +15,12 @@
 	</div>
 	<div class="settings-nav col-xs-12 col-md-4">
 		<ul class="list-unstyled">
-			{{ settings_nav('By You', 'archive', 'orders-by-you', selected=True) }}
-			{{ settings_nav('For You', 'list-ol', 'orders-for-you') }}
+			{{ settings_nav('By You (' + by_you_length + ')', 'archive', 'orders-by-you', selected=True) }}
+			{{ settings_nav('For You (' + for_you_length + ')', 'list-ol', 'orders-for-you') }}
 		</ul>
 	</div>
 	<div id="orders-by-you" class="col-xs-12 col-md-8 settings-section-wrapper">
-		<h2>By You <small>{{ by_you | length }}</small></h2>
+		<h2>By You <small>{{ by_you_length }}</small></h2>
 		{% if by_you | length > 0 %}
 		<ul class="list-unstyled">
 			{% for order in by_you %}
@@ -31,11 +33,11 @@
 	</div>
 
 	<div id="orders-for-you" class="col-xs-12 col-md-8 settings-section-wrapper" style="display:none;">
-		<h2>For You <small>{{ for_you | length }}</small></h2>
+		<h2>For You <small>{{ for_you_length }}</small></h2>
 		{% if for_you | length > 0 %}
 		<ul class="list-unstyled">
 			{% for order in for_you %}
-				{{ order_card(order) }}
+				{{ order_card(order, sellerView=True) }}
 			{% endfor %}
 		</ul>
 		{% else %}
