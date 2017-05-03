@@ -17,7 +17,10 @@
 		You can review your order history any time from <a href="{{ url_for('profile', username=session.username) }}">your profile</a>.
 	{% endif %}
 	</h3>
-	<div class="text-center"><a href="{{ url_for('home') }}"><button class="btn btn-default"><i class="fa fa-home"></i> Home Page</button></a></button></div>
+	<div class="text-center">
+		<a href="{{ url_for('home') }}"><button class="btn btn-default"><i class="fa fa-home"></i> Home Page</button></a></button>
+		<a href="{{ url_for('order_history') }}"><button class="btn btn-default"><i class="fa fa-history"></i> Order History</button></a></button>
+	</div>
 </div>
 {% endblock %}
 

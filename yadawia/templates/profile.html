@@ -40,7 +40,7 @@
 			{% if is_curr_user %}
 				<button class="btn btn-default" title="Edit profile" data-toggle="modal" data-target="#edit-profile"><i class="fa fa-pencil"></i> Edit Profile</button>
 				<a href="{{ url_for('settings') }}"><button class="btn btn-default" title="Settings"><i class="fa fa-gear"></i> Settings</button></a>
-				<button class="btn btn-default" title="Order History"><i class="fa fa-history"></i> Order History</button>
+				<a href="{{ url_for('order_history') }}"><button class="btn btn-default" title="Order History"><i class="fa fa-history"></i> Order History</button></a>
 				<a href="{{ url_for('messages') }}"><button class="btn btn-default" title="Messages"><i class="fa fa-envelope"></i> Messages</button></a>
 			{% elif session.logged_in %}
 				<button class="btn btn-default" title="Send a message" data-toggle="modal" data-target="#send-message"><i class="fa fa-envelope"></i> Send A Message</button>

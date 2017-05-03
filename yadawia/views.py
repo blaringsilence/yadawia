@@ -671,3 +671,11 @@ def checkout():
         addresses = User.query.filter_by(id=session['userId']).first().addresses.all()
         payment_methods = PaymentMethod.query.order_by(PaymentMethod.name).all()
         return render_template('checkout.html', addresses=addresses, payment_methods=payment_methods)
+
+@app.route('/orders')
+@authenticate
+def order_history():
+    """Get someone's order history. Orders by them, and orders for them."""
+    for_you = Order.query.join(OrderProduct).join(Product).filter_by(seller_id=session['userId']).all()
+    by_you = Order.query.filter_by(user_id=session['userId']).all()
+    return render_template('order_history.html', for_you=for_you, by_you=by_you)
