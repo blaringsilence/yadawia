@@ -305,6 +305,12 @@ $(function(){
 
 	$('#logout', '.menu').parent().attr('href', Flask.url_for('logout', { next: window.location.href }));
 
+	$('.date-to-now').each(function(){
+		var md = momentDate($(this).text());
+		$(this).attr('title', md.formatted);
+		$(this).text(md.fromNow);
+	});
+
 	// CHECK AVAILABILITY (FOR EMAIL AND USERNAME FIELDS)
 	$('.feedback-elem').bind('blur', function(){
 		var field = this;

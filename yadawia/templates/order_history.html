@@ -1,5 +1,5 @@
 {% extends 'layout.html' %}
-{% from 'macros.html' import settings_nav with context %}
+{% from 'macros.html' import settings_nav, order_card with context %}
 
 {% block extend_title %}
 | Orders
@@ -19,9 +19,27 @@
 	</div>
 	<div id="orders-by-you" class="col-xs-12 col-md-8 settings-section-wrapper">
 		<h2>By You <small>{{ by_you | length }}</small></h2>
+		{% if by_you | length > 0 %}
+		<ul class="list-unstyled">
+			{% for order in by_you %}
+				{{ order_card(order) }}
+			{% endfor %}
+		</ul>
+		{% else %}
+		<h3><small>You haven't placed any orders yet.</small></h3>
+		{% endif %}
 	</div>
 
 	<div id="orders-for-you" class="col-xs-12 col-md-8 settings-section-wrapper" style="display:none;">
 		<h2>For You <small>{{ for_you | length }}</small></h2>
+		{% if for_you | length > 0 %}
+		<ul class="list-unstyled">
+			{% for order in for_you %}
+				{{ order_card(order) }}
+			{% endfor %}
+		</ul>
+		{% else %}
+		<h3><small>You haven't received any orders yet.</small></h3>
+		{% endif %}
 	</div>
 {% endblock %}
