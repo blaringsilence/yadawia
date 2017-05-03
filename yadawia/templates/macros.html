@@ -192,16 +192,50 @@
 </form>
 {% endmacro %}
 
-{% macro order_card(order) %}
+{% macro order_card(order, sellerView=False) %}
   <li class="order-card">
-    <h4>Order #{{ order.id }} <small>Last updated: <span class="date-to-now">{{ order.update_date }}</span><span class="order-status-disp">{{ order.status }}</span></small></h4>
+    <h4>Order #{{ order.id }} <small>Last updated: <span class="date-to-now">{{ order.update_date }}</span>{% if not sellerView %}<span class="order-status-disp">{{ order.status }}</span>{% endif %}</small></h4>
     <ul>
       {% for product in order.products.all() %}
-        <li><b>{{ product.details.name }} ({{ product.variety.name }})</b> X {{ product.quantity }} = {{ product.quantity * product.price }} {{ product.currency_id }}</li>
+        {% if (sellerView and product.details.seller_id == session.userId) or not sellerView %}
+          {% if product.confirmed %}{% set status='Confirmed' %}{% else %}{% set status='Pending Confirmation' %}{% endif %}
+          <li>
+              <b>
+                <a href="{{ url_for('product', productID=product.details.id) }}">{{ product.details.name }}</a> {% if product.variety %}({{ product.variety.name }}){% endif %}
+              </b>
+              X {{ product.quantity }} = <span title="What you {% if sellerView %}get (95%){% else %}pay{% endif %}.">{% if not sellerView %}{{ product.quantity * product.price }}{% else %}{{ product.quantity * product.seller_price }}{% endif %} {{ product.currency_id }}</span>
+              {% if not sellerView %}
+                <span class="item-status-icon" title="Item status: {{ status }}">
+                  {% if not product.confirmed %}
+                    <i class="fa fa-circle-o"></i>
+                  {% else %}
+                    <i class="fa fa-check-circle-o"></i>
+                  {% endif %}
+                </span>
+              {% else %}
+              <span class="item-confirm-wrapper">
+                {% if product.confirmed %}
+                  <button class="item-confirm-button btn btn-default" disabled><i class="fa fa-check-circle"></i> Item confirmed</button>
+                {% else %}
+                  <button data-item="{{ product.id }}" class="item-confirm-button not-confirmed-button btn btn-default"><i class="fa fa-check"></i> Confirm item</button>
+                {% endif %}
+              </span>
+              {% endif %}
+          </li>
+        {% endif %}
       {% endfor %}
     </ul>
+    {% if not sellerView %}
     <p>Total: {{ order | order_total }}</p>
-    <p>Address: {{ order.address.name }}</p>
+    {% endif %}
+
+    {% if not sellerView %}
+      <p>Address: {{ order.address.name }}</p>
+
+        <p>{{ order.address.text }} - {{ order.address.code }} {% if order.address.city %}{{ order.address.city }},{% endif %} {{ order.address.country.value }}</p>
+
+        {% if order.address.phone %}<p>{{ order.address.phone }}</p>{% endif %}
+    {% endif %}
     <p>Order created: <span class="date-to-now">{{ order.create_date }}</span></p>
   </li>
 {% endmacro %}

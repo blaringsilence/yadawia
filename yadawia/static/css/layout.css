@@ -7,6 +7,23 @@
 	- Text Grey: rgb(51,51,51);
 */
 
+.item-confirm-button {
+	font-weight: bold;
+	margin-bottom: 1em;
+}
+
+.item-status-icon {
+	cursor: help;
+}
+
+.item-status-icon .fa-circle-o {
+	color: rgb(237,216,52);
+}
+
+.item-status-icon .fa-check-circle-o {
+	color: rgba(39,174,96,1.0);
+}
+
 .order-card {
 	background-color: #eee;
     padding: 1em;

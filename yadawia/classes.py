@@ -421,7 +421,7 @@ class Order(db.Model):
         - user_id: int, foreign key.
         - create_date: date.
         - update_date: date.
-        - status: string.
+        - status: string. (New, Ongoing, All confirmed, On its way, Done)
         - address_id: int, foreign key.
         - payment_method_id: int, foreign key.
     """
@@ -445,6 +445,20 @@ class Order(db.Model):
         self.user_id = user_id
         self.address_id = address_id
         self.payment_method_id = payment_method_id
+
+    def touch(self):
+        """Trigger the update."""
+        self.update_date = datetime.datetime.utcnow()
+
+    def updateStatus(self):
+        """Update status based on confirmation of orders/shipping (shipping not implemented yet)."""
+        confirmed = self.products.filter_by(confirmed=True).count()
+        all_prods = self.products.count()
+        if confirmed < all_prods:
+            self.status = 'Ongoing'
+        else:
+            self.status = 'All Confirmed'
+
 
 
 

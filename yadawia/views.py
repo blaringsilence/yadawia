@@ -680,3 +680,19 @@ def order_history():
             filter_by(seller_id=session['userId']).order_by(Order.create_date.desc()).all()
     by_you = Order.query.filter_by(user_id=session['userId']).order_by(Order.update_date.desc()).all()
     return render_template('order_history.html', for_you=for_you, by_you=by_you)
+
+@app.route('/confirm-item', methods=['POST'])
+@authenticate
+def confirm_item():
+    item_id = int(request.form['item_id'])
+    item = OrderProduct.query.filter_by(id=item_id).first()
+    if item is None or item.details.seller_id != session['userId']:
+        abort(400)
+    try:
+        item.confirmed = True
+        item.order.touch()
+        item.order.updateStatus()
+        db.session.commit()
+    except exc.SQLAlchemyError as e:
+        return jsonify(error='Database error.')
+    return jsonify(success=True)
