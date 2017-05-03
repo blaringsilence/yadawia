@@ -1,0 +1,27 @@
+{% extends 'layout.html' %}
+{% from 'macros.html' import settings_nav with context %}
+
+{% block extend_title %}
+| Orders
+{% endblock %}
+
+{% block middle %}
+	<div class="row">
+		<div class="col-xs-12 col-md-4">
+			<h2><i class="fa fa-history"></i> Order History</h2>
+		</div>
+	</div>
+	<div class="settings-nav col-xs-12 col-md-4">
+		<ul class="list-unstyled">
+			{{ settings_nav('By You', 'archive', 'orders-by-you', selected=True) }}
+			{{ settings_nav('For You', 'list-ol', 'orders-for-you') }}
+		</ul>
+	</div>
+	<div id="orders-by-you" class="col-xs-12 col-md-8 settings-section-wrapper">
+		<h2>By You <small>{{ by_you | length }}</small></h2>
+	</div>
+
+	<div id="orders-for-you" class="col-xs-12 col-md-8 settings-section-wrapper" style="display:none;">
+		<h2>For You <small>{{ for_you | length }}</small></h2>
+	</div>
+{% endblock %}
