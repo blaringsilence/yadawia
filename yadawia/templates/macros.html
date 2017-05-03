@@ -221,6 +221,7 @@
                 {% endif %}
               </span>
               {% endif %}
+              {% if sellerView and product.remarks != 'null' %}<p><i class="fa fa-comments-o"></i> Customer remarks: "{{ product.remarks }}"</p>{% endif %}
           </li>
         {% endif %}
       {% endfor %}
