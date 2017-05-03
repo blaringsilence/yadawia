@@ -5,3 +5,4 @@
 
   ga('create', 'UA-98458621-1', 'auto');
   ga('send', 'pageview');
+  ga('require', 'linkid');
