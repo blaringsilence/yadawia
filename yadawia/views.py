@@ -345,7 +345,7 @@ def see_message(threadID):
     if is_allowed_in_thread(threadID):
         error = None
         user_id = session['userId']
-        messages = Message.query.filter(and_(Message.sender_id != user_id, Message.seen is None)).all()
+        messages = Message.query.filter(and_(Message.sender_id != user_id, Message.seen.is_(None))).all()
         try:
             for message in messages:
                 message.see(user_id)
@@ -374,7 +374,7 @@ def reply(threadID):
             error = e.message
         if error:
             flash(error)
-        redirect(url_for('message_thread', threadID=threadID))
+        return redirect(url_for('message_thread', threadID=threadID))
     abort(400)
 
 
@@ -384,7 +384,7 @@ def message_thread(threadID):  # TODO: PAGE
     """View for single message thread."""
     if is_allowed_in_thread(
             threadID):  # checks if thread exists and user is allowed in
-        thread = MessageThread.query.filter_by(id=int(threadID)).first()
+        thread = MessageThread.query.filter_by(id=int(threadID)).join(Message).order_by(Message.date).first()
         other_user_id = thread.user2 if thread.user1 == session['userId'] else thread.user1
         other_user = User.query.filter_by(id=other_user_id).first()
         return render_template('message_thread.html',
