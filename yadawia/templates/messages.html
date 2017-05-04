@@ -1,4 +1,5 @@
 {% extends 'layout.html' %}
+{% from 'macros.html' import thread_card with context %}
 
 {% block extend_title %}
 | Messages
@@ -10,24 +11,7 @@
 	{% if threads %}
 	<ul class="list-unstyled">
 	{% for thread in threads %}
-			<li class="thread-card {% if thread.unseen(session.userId) > 0 %}not-seen{% endif %}">
-				<h4>
-					<a href="{{ url_for('message_thread', threadID=thread.id) }}">
-						{% if thread.unseen(session.userId) > 0 %}
-							<span title="New messages"><i class="unseen-circle fa fa-circle"></i></span>&nbsp;
-						{% endif %}
-						{% if thread.title %}{{ thread.title }}{% else %}Untitled Thread{% endif %}&nbsp;
-						{% if thread.unseen(session.userId) > 0 %}
-							({{ thread.unseen(session.userId) }})
-						{% endif %}
-					</a>&nbsp;
-					<a href="{{ url_for('profile', username=thread.otherUser(session.userId).username) }}">
-						<small>@{{ thread.otherUser(session.userId).name_or_username() }}</small>
-					</a>
-				</h4>
-				<p>{{ thread.messages.first().text | excerpt }}</p>
-				<span class="date-to-now">{{ thread.messages.first().date }}</span>
-			</li>
+			{{ thread_card(thread) }}
 	{% endfor %}
 	</ul>
 	{% else %}

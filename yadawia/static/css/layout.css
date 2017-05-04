@@ -11,6 +11,10 @@
 	font-size: 0.5em;
 }
 
+.unseen-message {
+	font-weight: bold;
+}
+
 .thread-card.not-seen {
 	background-color: rgba(237,216,52,0.5);
 }
@@ -27,6 +31,24 @@
 	opacity: 1;
 }
 
+.back-to-messages {
+	cursor: pointer;
+}
+
+#message-reply-form button {
+	margin-top: 1em;
+}
+
+.thread-header {
+	background-color: #eee;
+	box-shadow: 1px 3px 4px 1px rgba(51,51,3,0.3);
+}
+
+.all-messages {
+	box-shadow: 1px 3px 4px 1px rgba(51,51,3,0.3);
+	padding-top: 1em;
+	padding-bottom: 1em;
+}
 .thread-card {
 	background-color: #eee;
     padding: 1em;
@@ -105,6 +127,18 @@
 
 .checkout-nonempty {
 	display: none;
+}
+
+.seen-by-span {
+	font-size: 0.8em;
+    text-transform: lowercase;
+    font-weight: bold;
+    opacity: 0.5;
+    transition-duration: 0.5s;
+}
+
+.seen-by-span:hover {
+	opacity: 1;
 }
 
 .cart-product-item {

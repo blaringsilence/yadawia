@@ -65,6 +65,8 @@ class User(db.Model):
                               cascade='save-update, merge, delete')
     orders = db.relationship('Order', backref='user', lazy='dynamic',
                              cascade='save-update, merge, delete')
+    sent_messages = db.relationship('Message', backref='sender', lazy='dynamic',
+                                    cascade='save-update, merge, delete')
 
     def __init__(self, username, email, password, name=None, location=None):
         """Initialize a User using the required fields: username, email, password
@@ -554,6 +556,10 @@ class MessageThread(db.Model):
         return self.messages.filter(and_(Message.sender_id == other_id,
                                     Message.seen is None)).count()
 
+    def getTitle(self):
+        """Get thread title or 'Untitled Thread' if no title."""
+        return self.title if self.title is not None else 'Untitled Thread'
+
 
 class Message(db.Model):
     """Database model for messages in a thread. Contains:
@@ -581,9 +587,8 @@ class Message(db.Model):
 
     def see(self, userId):
         """Mark the message as seen by the receiver."""
-        thread = self.thread.first()
-        if userId != self.sender_id and (
-                thread.user1 == userId or thread.user2 == userId):
+        thread = self.thread
+        if userId != self.sender_id and thread.isParticipant(userId):
             self.seen = datetime.datetime.utcnow()
 
 

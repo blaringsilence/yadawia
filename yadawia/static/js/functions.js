@@ -7,6 +7,18 @@ var generateMessage = function (type, selector, message, append) {
 	else $(selector).html(error);
 };
 
+var seeMessages = function(threadID){
+	console.log('Seeing');
+	$.ajax({
+		url: Flask.url_for('see_message', { threadID: threadID }),
+		data: { _csrf_token: $('body').data('csrf') },
+		method: 'POST',
+		success: function(data){
+			console.log(data);
+		}
+	});
+};
+
 
 var Cart = {
 	products: [],

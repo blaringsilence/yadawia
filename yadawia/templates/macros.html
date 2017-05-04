@@ -240,3 +240,41 @@
     <p>Order created: <span class="date-to-now">{{ order.create_date }}</span></p>
   </li>
 {% endmacro %}
+
+{% macro thread_card(thread) %}
+<li class="thread-card {% if thread.unseen(session.userId) > 0 %}not-seen{% endif %}">
+  <h4>
+    <a href="{{ url_for('message_thread', threadID=thread.id) }}">
+      {% if thread.unseen(session.userId) > 0 %}
+        <span title="New messages"><i class="unseen-circle fa fa-circle"></i></span>&nbsp;
+      {% endif %}
+      {{ thread.getTitle() }}&nbsp;
+      {% if thread.unseen(session.userId) > 0 %}
+        ({{ thread.unseen(session.userId) }})
+      {% endif %}
+    </a>&nbsp;
+    <a href="{{ url_for('profile', username=thread.otherUser(session.userId).username) }}">
+      <small>@{{ thread.otherUser(session.userId).name_or_username() }}</small>
+    </a>
+  </h4>
+  <p>{{ thread.messages.first().text | excerpt }}</p>
+  <span class="date-to-now">{{ thread.messages.first().date }}</span>
+</li>
+{% endmacro %}
+
+{% macro message_card(message, other_user) %}
+{% set seenByOther = message.seen and message.sender_id == session.userId %}
+{% set unseenByMe = not message.seen and message.sender_id != session.userId %}
+<li class="{% if unseenByMe %}unseen-message{% endif %} message-card">
+  <h4>
+    <a href="{{ url_for('profile', username=message.sender.username) }}">@{{ message.sender.name_or_username() }}</a>: <small><span class="date-to-now">{{ message.date }}</span></small>
+  </h4>
+  <p>{{ message.text | paragraph | safe }}</p>
+  {% if seenByOther %}
+    <span class="seen-by-span" title="Seen by {{ other_user.name_or_username() }}">
+      <i class="fa fa-eye"></i> <span class="date-to-now">{{ message.seen }}</span>
+    </span>
+  {% endif %}
+  <hr>
+</li>
+{% endmacro %}
