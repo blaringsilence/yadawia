@@ -66,7 +66,7 @@ def sender(thread_id):
     """TEMPLATE FILTER: Get sender in a 2-person message from threadID and logged in session."""
     userId = session['userId']
     return yadawia.classes.MessageThread.query.filter_by(
-        id=thread_id).first().otherUser(userId)
+        id=thread_id).first().otherUser(userId).id
 
 
 @app.template_filter('name_or_username')
@@ -94,6 +94,12 @@ def order_total(order):
     for key, val in total.items():
         strings.append(str(val) + ' ' + key)
     return ' + '.join(strings)
+
+@app.template_filter('excerpt')
+def excerpt(text):
+    """TEMPLATE FILTER: Cut text and append dots if its lenght is more than 100 chars."""
+    return text[:100] + '...' if len(text) > 100 else text
+
 
 app.jinja_env.globals['csrf_token'] = yadawia.helpers.generate_csrf_token
 """Whenever `{{ csrf_token() }}` is used in a Jinja2 template, it returns the result of the function `generate_csrf_token()` """

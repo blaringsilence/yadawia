@@ -7,6 +7,48 @@
 	- Text Grey: rgb(51,51,51);
 */
 
+.unseen-circle {
+	font-size: 0.5em;
+}
+
+.thread-card.not-seen {
+	background-color: rgba(237,216,52,0.5);
+}
+
+.thread-card:hover {
+	box-shadow:  1px 3px 4px 1px rgba(51,51,3,0.2);
+}
+
+.thread-card p {
+	transition-duration: 0.3s;
+}
+
+.thread-card:hover p {
+	opacity: 1;
+}
+
+.thread-card {
+	background-color: #eee;
+    padding: 1em;
+    box-shadow: 1px 3px 4px 1px rgba(51,51,3,0.3);
+    margin-bottom: 2em;
+    transition-duration: 0.3s;
+}
+
+.thread-card h4 small {
+	font-weight: bold;
+}
+
+.thread-card p {
+	opacity: 0.7;
+}
+
+.thread-card .date-to-now {
+	text-transform: uppercase;
+    font-size: 0.7em;
+    font-weight: bold;
+}
+
 .item-confirm-button {
 	font-weight: bold;
 	margin-bottom: 1em;

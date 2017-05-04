@@ -14,6 +14,7 @@ from flask_sqlalchemy import SQLAlchemy, BaseQuery
 from sqlalchemy_searchable import SearchQueryMixin
 from sqlalchemy_utils.types import TSVectorType
 from sqlalchemy.ext.hybrid import hybrid_method
+from sqlalchemy import and_
 import re
 import datetime
 
@@ -543,8 +544,15 @@ class MessageThread(db.Model):
     def otherUser(self, user):
         """Given a user in a thread, find the other one."""
         if self.isParticipant(user):
-            return self.user2 if self.user1 == user else self.user1
+            user_id = self.user2 if self.user1 == user else self.user1
+            return User.query.filter_by(id=user_id).first()
         return None
+
+    def unseen(self, user):
+        """Get number of unseen messages relative to a user."""
+        other_id = self.otherUser(user).id
+        return self.messages.filter(and_(Message.sender_id == other_id,
+                                    Message.seen is None)).count()
 
 
 class Message(db.Model):
