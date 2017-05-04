@@ -345,7 +345,7 @@ def see_message(threadID):
     if is_allowed_in_thread(threadID):
         error = None
         user_id = session['userId']
-        messages = Message.query.filter(Message.sender_id != user_id).all()
+        messages = Message.query.filter(and_(Message.sender_id != user_id, Message.seen is None)).all()
         try:
             for message in messages:
                 message.see(user_id)

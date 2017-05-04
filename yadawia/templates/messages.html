@@ -5,9 +5,33 @@
 {% endblock %}
 
 {% block middle %}
-	<h3>Messages</h3>
+	<div class="col-xs-12 col-md-8">
+	<h3><i class="fa fa-envelope"></i> Messages</h3>
+	{% if threads %}
+	<ul class="list-unstyled">
 	{% for thread in threads %}
-		{% if thread.title %}{{ thread.title }}{% else %}Untitled Thread{% endif %} by {{ thread.id | sender | name_or_username }}
-		{{ thread.messages.first().text }}
+			<li class="thread-card {% if thread.unseen(session.userId) > 0 %}not-seen{% endif %}">
+				<h4>
+					<a href="{{ url_for('message_thread', threadID=thread.id) }}">
+						{% if thread.unseen(session.userId) > 0 %}
+							<span title="New messages"><i class="unseen-circle fa fa-circle"></i></span>&nbsp;
+						{% endif %}
+						{% if thread.title %}{{ thread.title }}{% else %}Untitled Thread{% endif %}&nbsp;
+						{% if thread.unseen(session.userId) > 0 %}
+							({{ thread.unseen(session.userId) }})
+						{% endif %}
+					</a>&nbsp;
+					<a href="{{ url_for('profile', username=thread.otherUser(session.userId).username) }}">
+						<small>@{{ thread.otherUser(session.userId).name_or_username() }}</small>
+					</a>
+				</h4>
+				<p>{{ thread.messages.first().text | excerpt }}</p>
+				<span class="date-to-now">{{ thread.messages.first().date }}</span>
+			</li>
 	{% endfor %}
+	</ul>
+	{% else %}
+		<h3><small>You don't have any messages yet.</small></h3>
+	{% endif %}
+	</div>
 {% endblock %}
