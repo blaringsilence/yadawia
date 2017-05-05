@@ -563,12 +563,22 @@ def sign_s3():
     return jsonify(data=posts, urls=urls)
 
 
-@app.route('/search', methods=['GET'])
+@app.route('/search')
 def search_products():
-    """Search products using a single query line."""
+    """Search products using a single query line, and a sort order/parameter."""
     term = request.args.get('q')
-    matches = Product.query.search(term).all()
+    matches = Product.query.filter_by(available=True).search(term, sort=True).all()
     return render_template('search.html', matches=matches, term=term)
+
+@app.route('/category/<int:categoryID>')
+def search_category(categoryID):
+    """Search in a category"""
+    term = request.args.get('q')
+    category = Category.query.filter_by(id=categoryID).first()
+    if category is None:
+        abort(404)
+    matches = category.products.filter_by(available=True).all()
+    return render_template('search.html', matches=matches, term=term, category=category)
 
 
 @app.route('/cart')

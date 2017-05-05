@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 
-{% from 'macros.html' import form_group with context %}
+{% from 'macros.html' import form_group, product_card with context %}
 
 {% block extend_title %}
 | Home
@@ -34,5 +34,64 @@
 			<a href="{{ url_for('create_product') }}"><button class="btn btn-primary start-selling"><i class="fa fa-bolt"></i>&nbsp; &nbsp;Start Selling Now</button></a>
 		</div>
 	</div>
+	<div class="row business-banner">
+		<div class="col-xs-12 text-center"><h2>Why sell with us?</h2></div>
+		<div class="col-xs-12 col-md-3 text-center">
+			<div class="icon">{% include 'icon_box.html' %}</div>
+			<h3>Free Delivery</h3>
+			<h4><small>Just drop your orders at the nearest Yadawia center and let us handle the shipping.</small></h4>
+		</div>
+
+		<div class="col-xs-12 col-md-3 text-center">
+			<div class="icon">{% include 'icon_price_tag.html' %}</div>
+			<h3>Simply Affordable</h3>
+			<h4><small>No subscription, no flat rate, no hidden fees, just 5% of each complete transaction.</small></h4>
+		</div>
+
+		<div class="col-xs-12 col-md-3 text-center">
+			<div class="icon">{% include 'icon_calendar.html' %}</div>
+			<h3>Flexible</h3>
+			<h4><small>Orders are confirmed by you first before they're deemed official. Hobbyists and professionals welcome.</small></h4>
+		</div>
+
+		<div class="col-xs-12 col-md-3 text-center">
+			<div class="icon">{% include 'icon_notepad.html' %}</div>
+			<h3>Organized</h3>
+			<h4><small>Your orders are separate from your messages with other users, and arranged by date.</small></h4>
+		</div>
+		<div class="col-xs-12 text-center"><h2>Questions?</h2></div>
+		<div class="col-xs-12 text-center">
+			<div class="fb-messengermessageus" 
+		        messenger_app_id="1480536868665105" 
+		        page_id="714591755418002" 
+		        color="blue"
+		        size="xlarge">
+		    </div>
+		    <h4>..or call an agent at 19234.</h4>
+
+		</div>
+
+	</div>
 	{% include 'flash.html' %}
+{% endblock %}
+
+{% block scripts %}
+<script>      
+    window.fbAsyncInit = function() {
+      FB.init({
+        appId      : '1480536868665105',
+        xfbml      : true,
+        version    : 'v2.6'
+      });
+      FB.AppEvents.logPageView();
+    };
+
+   	(function(d, s, id){
+    	var js, fjs = d.getElementsByTagName(s)[0];
+    	if (d.getElementById(id)) {return;}
+    	js = d.createElement(s); js.id = id;
+    	js.src = "//connect.facebook.net/en_US/sdk.js";
+    	fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));     
+</script>
 {% endblock %}
