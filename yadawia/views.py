@@ -29,6 +29,15 @@ def home():
     """View function for home."""
     return render_template('index.html')
 
+@app.route('/legal')
+def terms():
+    """View function for terms and conditions."""
+    return render_template('terms_conditions.html')
+
+@app.route('/privacy')
+def privacy():
+    """View function for privacy policy."""
+    return render_template('privacy.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 @anonymous_only
@@ -577,7 +586,7 @@ def search_category(categoryID):
     category = Category.query.filter_by(id=categoryID).first()
     if category is None:
         abort(404)
-    matches = category.products.filter_by(available=True).all()
+    matches = category.products.filter_by(available=True).order_by(Product.update_date.desc()).all()
     return render_template('search.html', matches=matches, term=term, category=category)
 
 
