@@ -14,7 +14,7 @@ Yadawia
 
 Introduction
 ------------
-Built for CCIT's E-Business Fundementals course (IS371), because building an e-commerce system is apparently a rite of passage for every CS student out there. Its idea is simple: customer-to-customer buying and selling of goods and services, if and only if those goods and services in question are handmade.
+Built for CCIT's E-Business Fundementals course (IS371). Its idea is simple: customer-to-customer buying and selling of goods and services, if and only if those goods and services in question are handmade.
 
 This documentation focuses on the technical side of things rather than the business side.
 
