@@ -13,6 +13,7 @@ from sqlalchemy.sql import func
 from flask_sqlalchemy import SQLAlchemy, BaseQuery
 from sqlalchemy_searchable import SearchQueryMixin
 from sqlalchemy_utils.types import TSVectorType
+from sqlalchemy_utils import aggregated
 from sqlalchemy.ext.hybrid import hybrid_method
 from sqlalchemy import and_
 import re
@@ -233,6 +234,7 @@ class Product(db.Model):
     order_products = db.relationship('OrderProduct', backref='details', lazy='dynamic')
     available = db.Column(db.Boolean, default=True, nullable=False)
     force_unavailable = db.Column(db.Boolean, default=False, nullable=False)
+    featured = db.relationship('Featured', backref='product', lazy='dynamic')
 
     def __init__(self, name, seller_id, description=None,
                  price=None, currency_id=None):
@@ -248,10 +250,9 @@ class Product(db.Model):
         """Get the first picture of a product (by order set in upload)."""
         return self.uploads.order_by(Upload.order).first().filename
 
+    @aggregated('reviews', db.Column(db.Float))
     def avg_rating(self):
-        """Get a product's average rating."""
-        return db.session.query(func.avg(Review.rating).label('average')).\
-            join(Product).filter(Product.id == self.id).first()[0]
+        return func.avg(Review.rating)
 
     @validates('price')
     def validate_price(self, key, p):
@@ -721,6 +722,7 @@ class PaymentMethod(db.Model):
         self.currency_id = currency_id
 
     def helperText(self):
+        """Text to explain the payment method according to its fees."""
         text = 'This method '
         if self.fee == 0:
             text += ' is free.'
@@ -730,6 +732,23 @@ class PaymentMethod(db.Model):
             text += ' will add ' + self.currency.id + ' ' + self.fee + ' to your order total.'
         return text
 
+class Featured(db.Model):
+    """Database model for featured products. Contains:
+
+    - id: int, auto-incremented, primary key.
+    - product_id: id for the featured product.
+    - date: date it was featured.
+    - notes: editor/admin's notes on why they featured it.
+    """
+    __tablename__ = 'featured'
+    id = db.Column(db.Integer, primary_key=True)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
+    date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    notes = db.Column(db.String)
+
+    def __init__(self, product_id, notes=None):
+        self.product_id = product_id
+        self.notes = notes
 
 
 from yadawia.helpers import validate_name_pattern, no_special_chars, get_upload_url

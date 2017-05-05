@@ -163,22 +163,23 @@
 </div>
 {% endmacro %}
 
-{% macro product_card(product) %}
+{% macro product_card(product, big=True, showDate=True, customMessage=None) %}
 <a href="{{ url_for('product', productID=product.id) }}"><div class="product-card text-center">
-    <img src="{{ product.first_picture() }}">
+    <img class="{% if big %}big{% else %}small{% endif %}" src="{{ product.first_picture() }}">
     <h5>{{ product.name }}</h5>
-    {% if product.avg_rating() %}
-      <span title="Average rating: {{ product.avg_rating() }}">{{ rating_stars(product.avg_rating()) }}</span>
+    {% if product.avg_rating %}
+      <span title="Average rating: {{ product.avg_rating }}">{{ rating_stars(product.avg_rating) }}</span>
     {% else %}
       <span title="No ratings yet">{% for i in range(5) %}<i class="fa fa-star-o grey"></i> {% endfor %}</span>
     {% endif %}
     <br>
-    <span class="prod-card-date" data-date="{{ product.update_date }}"></span>
+    {% if showDate%}<span class="prod-card-date" data-date="{{ product.update_date }}"></span>{% endif %}
+    {% if customMessage %}<span>"{{ customMessage }}"</span>{% endif %}
 </div></a>
 {% endmacro %}
 
-{% macro search_bar(term=None) %}
-<form class="form-inline" id="main-search-form" method="GET" action="{{ url_for('search_products') }}">
+{% macro search_bar(term=None, cat=None) %}
+<form class="form-inline" id="main-search-form" method="GET" action="{% if not cat %}{{ url_for('search_products') }}{% else %}{{ url_for('search_category', categoryID=cat.id) }}{% endif %}">
   <div class="col-xs-10 cols">
   {% call form_group('', 'main-search', hasFeedback=True, hasLabel=False) %}
     <input id="main-search" type="text" name="q" class="form-control" 

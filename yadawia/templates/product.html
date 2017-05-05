@@ -40,14 +40,14 @@
 			<h2>{{ product.name }} <small>by <a href="{{ url_for('profile', username=product.seller.username) }}">{{ product.seller.name_or_username() }}</a></small></h2>
 			<ul class="list-unstyled list-inline prod-categories">
 			{% for category in product.categories %}
-					<li><span class="prod-cat-disp">{{ category.name }}</span></li>
+					<a href="{{ url_for('search_category', categoryID=category.id) }}"><li><span class="prod-cat-disp">{{ category.name }}</span></li></a>
 			{% endfor %}
 			</ul>
-			{% if product.avg_rating() %}
+			{% if product.avg_rating %}
 				<p>
-					<span title="{{ product.reviews.count() }} review(s)" class="avg-rating" title="Average rating ({{ product.avg_rating() }})">
-						{{ product.avg_rating() }}
-						{{ rating_stars(product.avg_rating()) }}
+					<span title="{{ product.reviews.count() }} review(s)" class="avg-rating" title="Average rating ({{ product.avg_rating }})">
+						{{ product.avg_rating }}
+						{{ rating_stars(product.avg_rating) }}
 					</span>
 				</p>
 			{% endif %}

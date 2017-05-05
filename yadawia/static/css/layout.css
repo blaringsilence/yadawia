@@ -227,12 +227,28 @@ a:hover {
 	color: rgba(51,51,51,0.5);
 }
 
+.footer a {
+	color: white;
+}
+
 .product-card {
 	border: 1px solid #e8e8e8;
 	margin-bottom: 2em;
 	padding: 1em;
 	cursor: pointer;
 	transition-duration: 0.5s;
+	background-color: rgba(255,255,255,0.5);
+}
+
+.business-banner .icon {
+	width: 10em;
+	margin-right: auto;
+	margin-left: auto;
+}
+
+.business-banner h3 {
+	text-transform: lowercase;
+	font-weight: bold;
 }
 
 .product-card:hover {
@@ -241,12 +257,26 @@ a:hover {
 	box-shadow: 1px 3px 4px 1px rgba(51,51,3,0.3);
 }
 
+.prod-card-wrapper-index {
+	width: 10em;
+	margin-left: auto;
+	margin-right: auto;
+}
+
 .product-card img {
-	width: 15em;
-	height: 15em;
 	border-radius: 0.3em 1em;
 	object-fit: cover;
 	border: 2px solid rgba(51,51,51,0.3);
+}
+
+.product-card img.big {
+	width: 15em;
+	height: 15em;
+}
+
+.product-card img.small {
+	width: 8em;
+	height: 8em;
 }
 
 .product-card h5 {
@@ -587,12 +617,6 @@ a {
 }
 
 
-.banner img {
-	width: 100%;
-	opacity: .9;
-	filter: blur(1px);
-	overflow: hidden;
-}
 
 .banner {
 	font-weight: bold;
