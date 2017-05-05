@@ -19,6 +19,7 @@
 	{% call form_group('Location', 'location', hasFeedback=True) %}
 		<input id="location" title="No special characters allowed." class="form-control" type="text" placeholder="Location (Optional)" name="location">
 	{% endcall %}
+	<p>By clicking 'Register' you agree to our <a target="_blank" href="{{ url_for('terms') }}">Terms & Conditions</a>.</p>
 		<input type="hidden" name="next" id="nextVal"/>
 		<input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"/>
 	<div class="modal-footer">

@@ -55,6 +55,14 @@
 				<i class="fa fa-clock-o"></i> 
 				<span class="prod-page-date" data-date="{{ product.update_date }}"></span>
 			</p>
+			<p>
+				<ul class="list-unstyled reasons-why">
+					<li><i class="fa fa-check"></i> FREE shipping.</li>
+					<li><i class="fa fa-check"></i> NO HIDDEN FEES: pay what you see.</li>
+					<li><i class="fa fa-check"></i> FREE RETURNS WITHIN 3 DAYS*</li>
+				</ul>
+				<small>* item has to be in purchase condition.</small>
+			</p>
 		</div>
 		<div class="col-xs-12 col-md-2 center-if-mobile banner-controls">
 		{% if not session.logged_in or product.seller_id != session.userId %}
