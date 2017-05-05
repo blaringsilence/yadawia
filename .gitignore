@@ -9,6 +9,7 @@ whoosh_indexes/
 # Mine
 todo.txt
 deploy.sh
+deliverables/
 
 .fuse_hidden*
 
