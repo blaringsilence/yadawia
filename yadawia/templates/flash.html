@@ -5,6 +5,9 @@
 					<h5>{{ message }}</h5>
 				{% endfor %}
 			{% endcall %}
-		<script>$(function(){ $('#flash-message').modal('show'); });</script>
 	{% endif %}
 {% endwith %}
+
+{% if get_flashed_messages() %}
+	<script>$(function(){ $('#flash-message').modal('show'); });</script>
+{% endif %}
