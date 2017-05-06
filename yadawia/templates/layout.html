@@ -67,9 +67,7 @@
 			</div>
 		</div>
 		<!--Modals-->
-		{% block flash %}
-			{% include 'flash.html' %}
-		{% endblock %}
+		
 		{% call modal('login', 'Login') %}
 			{% include 'form_login.html' with context %}
 		{% endcall %}
@@ -85,6 +83,9 @@
 		{% assets "js_all" %}
     		<script type="text/javascript" src="{{ ASSET_URL }}"></script>
 		{% endassets %}
+		{% block flash %}
+			{% include 'flash.html' %}
+		{% endblock %}
 		{% block scripts %}
 		{% endblock %}
 		<!--End Scripts-->
